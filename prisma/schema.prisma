@@ -22,17 +22,58 @@ model Stream {
 }
 
 model StreamEvent {
-  id        String   @id @default(uuid())
-  streamId  String
+  id         String   @id @default(uuid())
+  streamId   String
 
-  type      String
-  payload   Json
+  externalId String?
+  type       String
+  payload    Json
 
   createdAt DateTime @default(now())
 
   stream Stream @relation(fields: [streamId], references: [id], onDelete: Cascade)
 
+  @@unique([externalId])
   @@index([streamId])
   @@index([type])
   @@index([createdAt])
+}
+
+model AutomationRule {
+  id        String   @id @default(uuid())
+  name      String
+  enabled   Boolean  @default(true)
+
+  eventType String
+
+  conditions Json?
+  actions    Json
+
+  priority  Int      @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  executions AutomationExecution[]
+
+  @@index([eventType])
+  @@index([enabled])
+}
+
+model AutomationExecution {
+  id        String   @id @default(uuid())
+  ruleId    String
+  eventId   String
+
+  status    String
+  result    Json?
+
+  createdAt DateTime @default(now())
+  completedAt DateTime?
+
+  rule AutomationRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+
+  @@unique([ruleId, eventId])
+  @@index([eventId])
+  @@index([status])
 }

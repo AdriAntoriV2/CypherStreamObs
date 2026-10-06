@@ -52,7 +52,9 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   Stream: 'Stream',
-  StreamEvent: 'StreamEvent'
+  StreamEvent: 'StreamEvent',
+  AutomationRule: 'AutomationRule',
+  AutomationExecution: 'AutomationExecution'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -86,12 +88,41 @@ export type StreamScalarFieldEnum = (typeof StreamScalarFieldEnum)[keyof typeof 
 export const StreamEventScalarFieldEnum = {
   id: 'id',
   streamId: 'streamId',
+  externalId: 'externalId',
   type: 'type',
   payload: 'payload',
   createdAt: 'createdAt'
 } as const
 
 export type StreamEventScalarFieldEnum = (typeof StreamEventScalarFieldEnum)[keyof typeof StreamEventScalarFieldEnum]
+
+
+export const AutomationRuleScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  enabled: 'enabled',
+  eventType: 'eventType',
+  conditions: 'conditions',
+  actions: 'actions',
+  priority: 'priority',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AutomationRuleScalarFieldEnum = (typeof AutomationRuleScalarFieldEnum)[keyof typeof AutomationRuleScalarFieldEnum]
+
+
+export const AutomationExecutionScalarFieldEnum = {
+  id: 'id',
+  ruleId: 'ruleId',
+  eventId: 'eventId',
+  status: 'status',
+  result: 'result',
+  createdAt: 'createdAt',
+  completedAt: 'completedAt'
+} as const
+
+export type AutomationExecutionScalarFieldEnum = (typeof AutomationExecutionScalarFieldEnum)[keyof typeof AutomationExecutionScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -107,6 +138,14 @@ export const JsonNullValueInput = {
 } as const
 
 export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const QueryMode = {

@@ -5,10 +5,12 @@ import { QUEUE_NAMES } from './queue.constants.js';
 import { EventsProcessor } from './processors/events.processor.js';
 import { QueueService } from './queue.service.js';
 import { QueueController } from './queue.controller.js';
+import { AutomationModule } from '../automation/automation.module.js';
 
 @Global()
 @Module({
   imports: [
+    AutomationModule,
     BullModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

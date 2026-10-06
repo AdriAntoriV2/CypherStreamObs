@@ -1,4 +1,9 @@
-import { IsObject, IsString, IsUUID } from 'class-validator';
+import {
+  IsObject,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 
 export class CreateEventDto {
   @IsUUID()
@@ -9,4 +14,8 @@ export class CreateEventDto {
 
   @IsObject()
   payload: Record<string, unknown>;
+
+  @IsOptional()
+  @IsString()
+  externalId?: string;
 }

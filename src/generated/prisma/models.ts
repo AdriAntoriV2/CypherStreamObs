@@ -10,4 +10,6 @@
  */
 export type * from './models/Stream.js'
 export type * from './models/StreamEvent.js'
+export type * from './models/AutomationRule.js'
+export type * from './models/AutomationExecution.js'
 export type * from './commonInputTypes.js'

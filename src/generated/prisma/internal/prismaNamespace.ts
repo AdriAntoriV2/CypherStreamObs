@@ -398,7 +398,9 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   Stream: 'Stream',
-  StreamEvent: 'StreamEvent'
+  StreamEvent: 'StreamEvent',
+  AutomationRule: 'AutomationRule',
+  AutomationExecution: 'AutomationExecution'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -414,7 +416,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "stream" | "streamEvent"
+    modelProps: "stream" | "streamEvent" | "automationRule" | "automationExecution"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -566,6 +568,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    AutomationRule: {
+      payload: Prisma.$AutomationRulePayload<ExtArgs>
+      fields: Prisma.AutomationRuleFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AutomationRuleFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AutomationRulePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AutomationRuleFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AutomationRulePayload>
+        }
+        findFirst: {
+          args: Prisma.AutomationRuleFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AutomationRulePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AutomationRuleFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AutomationRulePayload>
+        }
+        findMany: {
+          args: Prisma.AutomationRuleFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AutomationRulePayload>[]
+        }
+        create: {
+          args: Prisma.AutomationRuleCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AutomationRulePayload>
+        }
+        createMany: {
+          args: Prisma.AutomationRuleCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AutomationRuleCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AutomationRulePayload>[]
+        }
+        delete: {
+          args: Prisma.AutomationRuleDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AutomationRulePayload>
+        }
+        update: {
+          args: Prisma.AutomationRuleUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AutomationRulePayload>
+        }
+        deleteMany: {
+          args: Prisma.AutomationRuleDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AutomationRuleUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AutomationRuleUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AutomationRulePayload>[]
+        }
+        upsert: {
+          args: Prisma.AutomationRuleUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AutomationRulePayload>
+        }
+        aggregate: {
+          args: Prisma.AutomationRuleAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAutomationRule>
+        }
+        groupBy: {
+          args: Prisma.AutomationRuleGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AutomationRuleGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AutomationRuleCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AutomationRuleCountAggregateOutputType> | number
+        }
+      }
+    }
+    AutomationExecution: {
+      payload: Prisma.$AutomationExecutionPayload<ExtArgs>
+      fields: Prisma.AutomationExecutionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AutomationExecutionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AutomationExecutionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AutomationExecutionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AutomationExecutionPayload>
+        }
+        findFirst: {
+          args: Prisma.AutomationExecutionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AutomationExecutionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AutomationExecutionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AutomationExecutionPayload>
+        }
+        findMany: {
+          args: Prisma.AutomationExecutionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AutomationExecutionPayload>[]
+        }
+        create: {
+          args: Prisma.AutomationExecutionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AutomationExecutionPayload>
+        }
+        createMany: {
+          args: Prisma.AutomationExecutionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AutomationExecutionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AutomationExecutionPayload>[]
+        }
+        delete: {
+          args: Prisma.AutomationExecutionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AutomationExecutionPayload>
+        }
+        update: {
+          args: Prisma.AutomationExecutionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AutomationExecutionPayload>
+        }
+        deleteMany: {
+          args: Prisma.AutomationExecutionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AutomationExecutionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AutomationExecutionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AutomationExecutionPayload>[]
+        }
+        upsert: {
+          args: Prisma.AutomationExecutionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AutomationExecutionPayload>
+        }
+        aggregate: {
+          args: Prisma.AutomationExecutionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAutomationExecution>
+        }
+        groupBy: {
+          args: Prisma.AutomationExecutionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AutomationExecutionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AutomationExecutionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AutomationExecutionCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -620,12 +770,41 @@ export type StreamScalarFieldEnum = (typeof StreamScalarFieldEnum)[keyof typeof 
 export const StreamEventScalarFieldEnum = {
   id: 'id',
   streamId: 'streamId',
+  externalId: 'externalId',
   type: 'type',
   payload: 'payload',
   createdAt: 'createdAt'
 } as const
 
 export type StreamEventScalarFieldEnum = (typeof StreamEventScalarFieldEnum)[keyof typeof StreamEventScalarFieldEnum]
+
+
+export const AutomationRuleScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  enabled: 'enabled',
+  eventType: 'eventType',
+  conditions: 'conditions',
+  actions: 'actions',
+  priority: 'priority',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AutomationRuleScalarFieldEnum = (typeof AutomationRuleScalarFieldEnum)[keyof typeof AutomationRuleScalarFieldEnum]
+
+
+export const AutomationExecutionScalarFieldEnum = {
+  id: 'id',
+  ruleId: 'ruleId',
+  eventId: 'eventId',
+  status: 'status',
+  result: 'result',
+  createdAt: 'createdAt',
+  completedAt: 'completedAt'
+} as const
+
+export type AutomationExecutionScalarFieldEnum = (typeof AutomationExecutionScalarFieldEnum)[keyof typeof AutomationExecutionScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -641,6 +820,14 @@ export const JsonNullValueInput = {
 } as const
 
 export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const QueryMode = {
@@ -717,6 +904,13 @@ export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$Prisma
 
 
 /**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
  * Reference to a field of type 'Int'
  */
 export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
@@ -727,6 +921,20 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
  * Reference to a field of type 'Int[]'
  */
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Float'
+ */
+export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+    
+
+
+/**
+ * Reference to a field of type 'Float[]'
+ */
+export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
 
 /**
@@ -882,6 +1090,8 @@ export type PrismaClientOptions = PrismaClientOptionsWithAccelerateUrl | PrismaC
 export type GlobalOmitConfig = {
   stream?: Prisma.StreamOmit
   streamEvent?: Prisma.StreamEventOmit
+  automationRule?: Prisma.AutomationRuleOmit
+  automationExecution?: Prisma.AutomationExecutionOmit
 }
 
 /* Types for Logging */

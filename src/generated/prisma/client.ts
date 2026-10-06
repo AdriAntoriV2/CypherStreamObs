@@ -51,3 +51,13 @@ export type Stream = Prisma.StreamModel
  * 
  */
 export type StreamEvent = Prisma.StreamEventModel
+/**
+ * Model AutomationRule
+ * 
+ */
+export type AutomationRule = Prisma.AutomationRuleModel
+/**
+ * Model AutomationExecution
+ * 
+ */
+export type AutomationExecution = Prisma.AutomationExecutionModel

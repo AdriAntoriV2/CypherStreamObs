@@ -2,11 +2,14 @@ import 'reflect-metadata';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module.js';
+import { PrismaExceptionFilter } from './common/filters/prisma-exception.filter.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.setGlobalPrefix('api');
+
+  app.useGlobalFilters(new PrismaExceptionFilter());
 
   app.useGlobalPipes(
     new ValidationPipe({
