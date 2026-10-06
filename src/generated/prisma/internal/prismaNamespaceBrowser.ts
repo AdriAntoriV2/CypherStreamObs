@@ -54,7 +54,8 @@ export const ModelName = {
   Stream: 'Stream',
   StreamEvent: 'StreamEvent',
   AutomationRule: 'AutomationRule',
-  AutomationExecution: 'AutomationExecution'
+  AutomationExecution: 'AutomationExecution',
+  AutomationActionExecution: 'AutomationActionExecution'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -123,6 +124,21 @@ export const AutomationExecutionScalarFieldEnum = {
 } as const
 
 export type AutomationExecutionScalarFieldEnum = (typeof AutomationExecutionScalarFieldEnum)[keyof typeof AutomationExecutionScalarFieldEnum]
+
+
+export const AutomationActionExecutionScalarFieldEnum = {
+  id: 'id',
+  executionId: 'executionId',
+  actionIndex: 'actionIndex',
+  actionType: 'actionType',
+  status: 'status',
+  result: 'result',
+  error: 'error',
+  createdAt: 'createdAt',
+  completedAt: 'completedAt'
+} as const
+
+export type AutomationActionExecutionScalarFieldEnum = (typeof AutomationActionExecutionScalarFieldEnum)[keyof typeof AutomationActionExecutionScalarFieldEnum]
 
 
 export const SortOrder = {

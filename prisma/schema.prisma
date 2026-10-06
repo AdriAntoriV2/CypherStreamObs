@@ -73,7 +73,30 @@ model AutomationExecution {
 
   rule AutomationRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
 
+  actions AutomationActionExecution[]
+
   @@unique([ruleId, eventId])
   @@index([eventId])
+  @@index([status])
+}
+
+model AutomationActionExecution {
+  id          String   @id @default(uuid())
+  executionId String
+
+  actionIndex Int
+  actionType String
+
+  status      String
+  result      Json?
+  error       String?
+
+  createdAt   DateTime @default(now())
+  completedAt DateTime?
+
+  execution AutomationExecution @relation( fields: [executionId], references: [id], onDelete: Cascade)
+
+  @@unique([executionId, actionIndex])
+  @@index([executionId])
   @@index([status])
 }

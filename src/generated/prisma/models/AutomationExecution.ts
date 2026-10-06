@@ -195,6 +195,7 @@ export type AutomationExecutionWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"AutomationExecution"> | Date | string
   completedAt?: Prisma.DateTimeNullableFilter<"AutomationExecution"> | Date | string | null
   rule?: Prisma.XOR<Prisma.AutomationRuleScalarRelationFilter, Prisma.AutomationRuleWhereInput>
+  actions?: Prisma.AutomationActionExecutionListRelationFilter
 }
 
 export type AutomationExecutionOrderByWithRelationInput = {
@@ -206,6 +207,7 @@ export type AutomationExecutionOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   rule?: Prisma.AutomationRuleOrderByWithRelationInput
+  actions?: Prisma.AutomationActionExecutionOrderByRelationAggregateInput
 }
 
 export type AutomationExecutionWhereUniqueInput = Prisma.AtLeast<{
@@ -221,6 +223,7 @@ export type AutomationExecutionWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"AutomationExecution"> | Date | string
   completedAt?: Prisma.DateTimeNullableFilter<"AutomationExecution"> | Date | string | null
   rule?: Prisma.XOR<Prisma.AutomationRuleScalarRelationFilter, Prisma.AutomationRuleWhereInput>
+  actions?: Prisma.AutomationActionExecutionListRelationFilter
 }, "id" | "ruleId_eventId">
 
 export type AutomationExecutionOrderByWithAggregationInput = {
@@ -257,6 +260,7 @@ export type AutomationExecutionCreateInput = {
   createdAt?: Date | string
   completedAt?: Date | string | null
   rule: Prisma.AutomationRuleCreateNestedOneWithoutExecutionsInput
+  actions?: Prisma.AutomationActionExecutionCreateNestedManyWithoutExecutionInput
 }
 
 export type AutomationExecutionUncheckedCreateInput = {
@@ -267,6 +271,7 @@ export type AutomationExecutionUncheckedCreateInput = {
   result?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   completedAt?: Date | string | null
+  actions?: Prisma.AutomationActionExecutionUncheckedCreateNestedManyWithoutExecutionInput
 }
 
 export type AutomationExecutionUpdateInput = {
@@ -277,6 +282,7 @@ export type AutomationExecutionUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rule?: Prisma.AutomationRuleUpdateOneRequiredWithoutExecutionsNestedInput
+  actions?: Prisma.AutomationActionExecutionUpdateManyWithoutExecutionNestedInput
 }
 
 export type AutomationExecutionUncheckedUpdateInput = {
@@ -287,6 +293,7 @@ export type AutomationExecutionUncheckedUpdateInput = {
   result?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  actions?: Prisma.AutomationActionExecutionUncheckedUpdateManyWithoutExecutionNestedInput
 }
 
 export type AutomationExecutionCreateManyInput = {
@@ -361,6 +368,11 @@ export type AutomationExecutionMinOrderByAggregateInput = {
   completedAt?: Prisma.SortOrder
 }
 
+export type AutomationExecutionScalarRelationFilter = {
+  is?: Prisma.AutomationExecutionWhereInput
+  isNot?: Prisma.AutomationExecutionWhereInput
+}
+
 export type AutomationExecutionCreateNestedManyWithoutRuleInput = {
   create?: Prisma.XOR<Prisma.AutomationExecutionCreateWithoutRuleInput, Prisma.AutomationExecutionUncheckedCreateWithoutRuleInput> | Prisma.AutomationExecutionCreateWithoutRuleInput[] | Prisma.AutomationExecutionUncheckedCreateWithoutRuleInput[]
   connectOrCreate?: Prisma.AutomationExecutionCreateOrConnectWithoutRuleInput | Prisma.AutomationExecutionCreateOrConnectWithoutRuleInput[]
@@ -403,6 +415,20 @@ export type AutomationExecutionUncheckedUpdateManyWithoutRuleNestedInput = {
   deleteMany?: Prisma.AutomationExecutionScalarWhereInput | Prisma.AutomationExecutionScalarWhereInput[]
 }
 
+export type AutomationExecutionCreateNestedOneWithoutActionsInput = {
+  create?: Prisma.XOR<Prisma.AutomationExecutionCreateWithoutActionsInput, Prisma.AutomationExecutionUncheckedCreateWithoutActionsInput>
+  connectOrCreate?: Prisma.AutomationExecutionCreateOrConnectWithoutActionsInput
+  connect?: Prisma.AutomationExecutionWhereUniqueInput
+}
+
+export type AutomationExecutionUpdateOneRequiredWithoutActionsNestedInput = {
+  create?: Prisma.XOR<Prisma.AutomationExecutionCreateWithoutActionsInput, Prisma.AutomationExecutionUncheckedCreateWithoutActionsInput>
+  connectOrCreate?: Prisma.AutomationExecutionCreateOrConnectWithoutActionsInput
+  upsert?: Prisma.AutomationExecutionUpsertWithoutActionsInput
+  connect?: Prisma.AutomationExecutionWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AutomationExecutionUpdateToOneWithWhereWithoutActionsInput, Prisma.AutomationExecutionUpdateWithoutActionsInput>, Prisma.AutomationExecutionUncheckedUpdateWithoutActionsInput>
+}
+
 export type AutomationExecutionCreateWithoutRuleInput = {
   id?: string
   eventId: string
@@ -410,6 +436,7 @@ export type AutomationExecutionCreateWithoutRuleInput = {
   result?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   completedAt?: Date | string | null
+  actions?: Prisma.AutomationActionExecutionCreateNestedManyWithoutExecutionInput
 }
 
 export type AutomationExecutionUncheckedCreateWithoutRuleInput = {
@@ -419,6 +446,7 @@ export type AutomationExecutionUncheckedCreateWithoutRuleInput = {
   result?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   completedAt?: Date | string | null
+  actions?: Prisma.AutomationActionExecutionUncheckedCreateNestedManyWithoutExecutionInput
 }
 
 export type AutomationExecutionCreateOrConnectWithoutRuleInput = {
@@ -460,6 +488,62 @@ export type AutomationExecutionScalarWhereInput = {
   completedAt?: Prisma.DateTimeNullableFilter<"AutomationExecution"> | Date | string | null
 }
 
+export type AutomationExecutionCreateWithoutActionsInput = {
+  id?: string
+  eventId: string
+  status: string
+  result?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  completedAt?: Date | string | null
+  rule: Prisma.AutomationRuleCreateNestedOneWithoutExecutionsInput
+}
+
+export type AutomationExecutionUncheckedCreateWithoutActionsInput = {
+  id?: string
+  ruleId: string
+  eventId: string
+  status: string
+  result?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  completedAt?: Date | string | null
+}
+
+export type AutomationExecutionCreateOrConnectWithoutActionsInput = {
+  where: Prisma.AutomationExecutionWhereUniqueInput
+  create: Prisma.XOR<Prisma.AutomationExecutionCreateWithoutActionsInput, Prisma.AutomationExecutionUncheckedCreateWithoutActionsInput>
+}
+
+export type AutomationExecutionUpsertWithoutActionsInput = {
+  update: Prisma.XOR<Prisma.AutomationExecutionUpdateWithoutActionsInput, Prisma.AutomationExecutionUncheckedUpdateWithoutActionsInput>
+  create: Prisma.XOR<Prisma.AutomationExecutionCreateWithoutActionsInput, Prisma.AutomationExecutionUncheckedCreateWithoutActionsInput>
+  where?: Prisma.AutomationExecutionWhereInput
+}
+
+export type AutomationExecutionUpdateToOneWithWhereWithoutActionsInput = {
+  where?: Prisma.AutomationExecutionWhereInput
+  data: Prisma.XOR<Prisma.AutomationExecutionUpdateWithoutActionsInput, Prisma.AutomationExecutionUncheckedUpdateWithoutActionsInput>
+}
+
+export type AutomationExecutionUpdateWithoutActionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  eventId?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  result?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  rule?: Prisma.AutomationRuleUpdateOneRequiredWithoutExecutionsNestedInput
+}
+
+export type AutomationExecutionUncheckedUpdateWithoutActionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ruleId?: Prisma.StringFieldUpdateOperationsInput | string
+  eventId?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  result?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
 export type AutomationExecutionCreateManyRuleInput = {
   id?: string
   eventId: string
@@ -476,6 +560,7 @@ export type AutomationExecutionUpdateWithoutRuleInput = {
   result?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  actions?: Prisma.AutomationActionExecutionUpdateManyWithoutExecutionNestedInput
 }
 
 export type AutomationExecutionUncheckedUpdateWithoutRuleInput = {
@@ -485,6 +570,7 @@ export type AutomationExecutionUncheckedUpdateWithoutRuleInput = {
   result?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  actions?: Prisma.AutomationActionExecutionUncheckedUpdateManyWithoutExecutionNestedInput
 }
 
 export type AutomationExecutionUncheckedUpdateManyWithoutRuleInput = {
@@ -497,6 +583,35 @@ export type AutomationExecutionUncheckedUpdateManyWithoutRuleInput = {
 }
 
 
+/**
+ * Count Type AutomationExecutionCountOutputType
+ */
+
+export type AutomationExecutionCountOutputType = {
+  actions: number
+}
+
+export type AutomationExecutionCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  actions?: boolean | AutomationExecutionCountOutputTypeCountActionsArgs
+}
+
+/**
+ * AutomationExecutionCountOutputType without action
+ */
+export type AutomationExecutionCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AutomationExecutionCountOutputType
+   */
+  select?: Prisma.AutomationExecutionCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * AutomationExecutionCountOutputType without action
+ */
+export type AutomationExecutionCountOutputTypeCountActionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AutomationActionExecutionWhereInput
+}
+
 
 export type AutomationExecutionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -507,6 +622,8 @@ export type AutomationExecutionSelect<ExtArgs extends runtime.Types.Extensions.I
   createdAt?: boolean
   completedAt?: boolean
   rule?: boolean | Prisma.AutomationRuleDefaultArgs<ExtArgs>
+  actions?: boolean | Prisma.AutomationExecution$actionsArgs<ExtArgs>
+  _count?: boolean | Prisma.AutomationExecutionCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["automationExecution"]>
 
 export type AutomationExecutionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -544,6 +661,8 @@ export type AutomationExecutionSelectScalar = {
 export type AutomationExecutionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ruleId" | "eventId" | "status" | "result" | "createdAt" | "completedAt", ExtArgs["result"]["automationExecution"]>
 export type AutomationExecutionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   rule?: boolean | Prisma.AutomationRuleDefaultArgs<ExtArgs>
+  actions?: boolean | Prisma.AutomationExecution$actionsArgs<ExtArgs>
+  _count?: boolean | Prisma.AutomationExecutionCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type AutomationExecutionIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   rule?: boolean | Prisma.AutomationRuleDefaultArgs<ExtArgs>
@@ -556,6 +675,7 @@ export type $AutomationExecutionPayload<ExtArgs extends runtime.Types.Extensions
   name: "AutomationExecution"
   objects: {
     rule: Prisma.$AutomationRulePayload<ExtArgs>
+    actions: Prisma.$AutomationActionExecutionPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -960,6 +1080,7 @@ readonly fields: AutomationExecutionFieldRefs;
 export interface Prisma__AutomationExecutionClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   rule<T extends Prisma.AutomationRuleDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AutomationRuleDefaultArgs<ExtArgs>>): Prisma.Prisma__AutomationRuleClient<runtime.Types.Result.GetResult<Prisma.$AutomationRulePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  actions<T extends Prisma.AutomationExecution$actionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AutomationExecution$actionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AutomationActionExecutionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1394,6 +1515,30 @@ export type AutomationExecutionDeleteManyArgs<ExtArgs extends runtime.Types.Exte
    * Limit how many AutomationExecutions to delete.
    */
   limit?: number
+}
+
+/**
+ * AutomationExecution.actions
+ */
+export type AutomationExecution$actionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AutomationActionExecution
+   */
+  select?: Prisma.AutomationActionExecutionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AutomationActionExecution
+   */
+  omit?: Prisma.AutomationActionExecutionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AutomationActionExecutionInclude<ExtArgs> | null
+  where?: Prisma.AutomationActionExecutionWhereInput
+  orderBy?: Prisma.AutomationActionExecutionOrderByWithRelationInput | Prisma.AutomationActionExecutionOrderByWithRelationInput[]
+  cursor?: Prisma.AutomationActionExecutionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AutomationActionExecutionScalarFieldEnum | Prisma.AutomationActionExecutionScalarFieldEnum[]
 }
 
 /**

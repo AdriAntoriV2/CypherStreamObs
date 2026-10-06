@@ -61,3 +61,8 @@ export type AutomationRule = Prisma.AutomationRuleModel
  * 
  */
 export type AutomationExecution = Prisma.AutomationExecutionModel
+/**
+ * Model AutomationActionExecution
+ * 
+ */
+export type AutomationActionExecution = Prisma.AutomationActionExecutionModel

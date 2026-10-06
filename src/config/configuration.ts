@@ -13,4 +13,14 @@ export default () => ({
     host: process.env.REDIS_HOST ?? 'localhost',
     port: Number(process.env.REDIS_PORT ?? 6379),
   },
+
+  // mixitup: {
+  //   host: process.env.MIXITUP_HOST ?? '127.0.0.1',
+  //   port: Number(process.env.MIXITUP_PORT ?? 8911),
+  // },
+  mixitup: {
+    url:
+      process.env.MIXITUP_URL ??
+      'http://127.0.0.1:8911',
+  },
 });

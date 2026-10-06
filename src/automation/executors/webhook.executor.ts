@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
+import { ActionExecutorHandler } from './action-executor.interface.js';
 
 @Injectable()
-export class WebhookExecutor {
+export class WebhookExecutor implements ActionExecutorHandler {
+  readonly type = 'webhook' as const;
   async execute(action: Record<string, unknown>) {
     const url = action.url;
 
@@ -16,7 +18,8 @@ export class WebhookExecutor {
         : 'POST';
 
     const body =
-      typeof action.body === 'object' && action.body !== null
+      typeof action.body === 'object' &&
+      action.body !== null
         ? action.body
         : {};
 

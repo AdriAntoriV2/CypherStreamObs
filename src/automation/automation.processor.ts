@@ -3,16 +3,16 @@ import { Prisma } from '../generated/prisma/client.js';
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
 import { PrismaService } from '../database/prisma.service.js';
-import { WebhookExecutor } from './executors/webhook.executor.js';
 import { QUEUE_NAMES } from '../queue/queue.constants.js';
 import { ConditionEvaluator } from './condition-evaluator.service.js';
+import { ActionExecutor } from './action-executor.service.js';
 
 @Injectable()
 @Processor(QUEUE_NAMES.automation)
 export class AutomationProcessor extends WorkerHost {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly webhookExecutor: WebhookExecutor,
+    private readonly actionExecutor: ActionExecutor,
     private readonly conditionEvaluator: ConditionEvaluator,
   ) {
     super();
@@ -113,26 +113,32 @@ export class AutomationProcessor extends WorkerHost {
         });
     }
 
+
     try {
       const actions = Array.isArray(rule.actions)
         ? rule.actions
         : [];
 
-      const results: Prisma.InputJsonValue[] = [];
+      const results: unknown[] = [];
+      
+
       for (const action of actions) {
         if (
-          typeof action === 'object' &&
-          action !== null &&
-          'type' in action &&
-          action.type === 'webhook'
+          typeof action !== 'object' ||
+          action === null ||
+          Array.isArray(action)
         ) {
-          const result =
-            await this.webhookExecutor.execute(
-              action as Record<string, unknown>,
-            );
-
-          results.push(result);
+          throw new Error(
+            'Automation action must be an object',
+          );
         }
+
+        const result =
+          await this.actionExecutor.execute(
+            action as Record<string, unknown>,
+          );
+
+        results.push(result);
       }
 
       await this.prisma.automationExecution.update({
@@ -141,7 +147,7 @@ export class AutomationProcessor extends WorkerHost {
         },
         data: {
           status: 'COMPLETED',
-          result: results,
+          result: results as Prisma.InputJsonValue,
           completedAt: new Date(),
         },
       });
