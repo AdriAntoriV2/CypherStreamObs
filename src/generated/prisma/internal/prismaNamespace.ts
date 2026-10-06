@@ -876,6 +876,7 @@ export const AutomationExecutionScalarFieldEnum = {
   status: 'status',
   result: 'result',
   createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
   completedAt: 'completedAt'
 } as const
 

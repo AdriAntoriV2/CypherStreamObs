@@ -68,7 +68,8 @@ model AutomationExecution {
   status    String
   result    Json?
 
-  createdAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   completedAt DateTime?
 
   rule AutomationRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)

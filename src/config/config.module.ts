@@ -22,7 +22,7 @@ import configuration from './configuration.js';
 
         REDIS_PORT: Joi.number().port().default(6379),
 
-        MIXITUP_HOST: Joi.string().required(),
+        //MIXITUP_HOST: Joi.string().required(),
 
         //MIXITUP_PORT: Joi.number().port().default(8911),
         MIXITUP_URL: Joi.string().uri().required(),

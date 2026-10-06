@@ -7,6 +7,7 @@ import {
   IsString,
   Min,
 } from 'class-validator';
+import { AutomationAction } from '../types/action.types.js';
 
 export class CreateRuleDto {
   @IsString()
@@ -24,8 +25,8 @@ export class CreateRuleDto {
   conditions?: Record<string, unknown>;
 
   @IsArray()
-  actions: Record<string, unknown>[];
-
+  actions: AutomationAction[];
+  
   @IsInt()
   @Min(0)
   @IsOptional()
