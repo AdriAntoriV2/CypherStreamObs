@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
@@ -6,8 +7,10 @@ import {
   IsOptional,
   IsString,
   Min,
+  ValidateNested,
 } from 'class-validator';
-import { AutomationAction } from '../types/action.types.js';
+import { MixItUpActionDto } from './actions/mixitup-action.dto.js';
+import { WebhookActionDto } from './actions/webhook-action.dto.js';
 
 export class CreateRuleDto {
   @IsString()
@@ -25,8 +28,25 @@ export class CreateRuleDto {
   conditions?: Record<string, unknown>;
 
   @IsArray()
-  actions: AutomationAction[];
-  
+  @ValidateNested({ each: true })
+  @Type(() => Object, {
+    discriminator: {
+      property: 'type',
+      subTypes: [
+        {
+          name: 'webhook',
+          value: WebhookActionDto,
+        },
+        {
+          name: 'mixitup',
+          value: MixItUpActionDto,
+        },
+      ],
+    },
+    keepDiscriminatorProperty: true,
+  })
+  actions: (WebhookActionDto | MixItUpActionDto)[];
+
   @IsInt()
   @Min(0)
   @IsOptional()

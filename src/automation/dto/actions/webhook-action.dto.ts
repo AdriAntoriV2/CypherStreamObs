@@ -7,7 +7,6 @@ import {
 } from 'class-validator';
 
 export class WebhookActionDto {
-  @IsString()
   @IsIn(['webhook'])
   type: 'webhook';
 

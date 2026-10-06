@@ -1,35 +1,55 @@
 import { Injectable } from '@nestjs/common';
+import {
+  AutomationConditions,
+  ConditionExpression,
+  ConditionValue,
+} from './types/condition.types.js';
 
 @Injectable()
 export class ConditionEvaluator {
+  private getNestedValue(
+    payload: Record<string, unknown>,
+    path: string,
+  ): unknown {
+    const parts = path.split('.');
+
+    let current: unknown = payload;
+
+    for (const part of parts) {
+      if (
+        typeof current !== 'object' ||
+        current === null ||
+        Array.isArray(current)
+      ) {
+        return undefined;
+      }
+
+      current = (
+        current as Record<string, unknown>
+      )[part];
+    }
+
+    return current;
+  }
+
   matches(
-    conditions: unknown,
+    conditions: AutomationConditions | null,
     payload: Record<string, unknown>,
   ): boolean {
-    if (
-      conditions === null ||
-      typeof conditions !== 'object' ||
-      Array.isArray(conditions)
-    ) {
+
+    if (!conditions) {
       return true;
     }
 
     for (const [field, expected] of Object.entries(
       conditions,
     )) {
-      const actual = payload[field];
-
-      if (
-        typeof expected === 'object' &&
-        expected !== null &&
-        !Array.isArray(expected)
-      ) {
-        if (
-          !this.matchesOperator(
-            actual,
-            expected as Record<string, unknown>,
-          )
-        ) {
+      const actual = this.getNestedValue(
+        payload,
+        field,
+      );
+      if (this.isConditionExpression(expected)) {
+        if (!this.matchesOperator(actual, expected)) {
           return false;
         }
 
@@ -46,7 +66,7 @@ export class ConditionEvaluator {
 
   private matchesOperator(
     actual: unknown,
-    condition: Record<string, unknown>,
+    condition: ConditionExpression,
   ): boolean {
     for (const [operator, expected] of Object.entries(
       condition,
@@ -66,8 +86,8 @@ export class ConditionEvaluator {
 
         case 'gt':
           if (
-            typeof actual !== 'number' ||
-            typeof expected !== 'number' ||
+            !this.isNumber(actual) ||
+            !this.isNumber(expected) ||
             actual <= expected
           ) {
             return false;
@@ -76,8 +96,8 @@ export class ConditionEvaluator {
 
         case 'gte':
           if (
-            typeof actual !== 'number' ||
-            typeof expected !== 'number' ||
+            !this.isNumber(actual) ||
+            !this.isNumber(expected) ||
             actual < expected
           ) {
             return false;
@@ -86,8 +106,8 @@ export class ConditionEvaluator {
 
         case 'lt':
           if (
-            typeof actual !== 'number' ||
-            typeof expected !== 'number' ||
+            !this.isNumber(actual) ||
+            !this.isNumber(expected) ||
             actual >= expected
           ) {
             return false;
@@ -96,8 +116,8 @@ export class ConditionEvaluator {
 
         case 'lte':
           if (
-            typeof actual !== 'number' ||
-            typeof expected !== 'number' ||
+            !this.isNumber(actual) ||
+            !this.isNumber(expected) ||
             actual > expected
           ) {
             return false;
@@ -107,7 +127,7 @@ export class ConditionEvaluator {
         case 'in':
           if (
             !Array.isArray(expected) ||
-            !expected.includes(actual)
+            !expected.includes(actual as ConditionValue)
           ) {
             return false;
           }
@@ -121,5 +141,21 @@ export class ConditionEvaluator {
     }
 
     return true;
+  }
+
+  private isConditionExpression(
+    value: ConditionValue | ConditionExpression,
+  ): value is ConditionExpression {
+    return (
+      typeof value === 'object' &&
+      value !== null &&
+      !Array.isArray(value)
+    );
+  }
+
+  private isNumber(
+    value: unknown,
+  ): value is number {
+    return typeof value === 'number';
   }
 }

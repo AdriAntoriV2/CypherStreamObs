@@ -6,6 +6,7 @@ import { PrismaService } from '../database/prisma.service.js';
 import { QUEUE_NAMES } from '../queue/queue.constants.js';
 import { ConditionEvaluator } from './condition-evaluator.service.js';
 import { ActionExecutor } from './action-executor.service.js';
+import { AutomationConditions } from './types/condition.types.js';
 
 const EXECUTION_LEASE_MS = 5 * 60 * 1_000;
 
@@ -54,7 +55,7 @@ export class AutomationProcessor extends WorkerHost {
     }
 
     const matches = this.conditionEvaluator.matches(
-      rule.conditions,
+      rule.conditions as AutomationConditions | null,
       event.payload as Record<string, unknown>,
     );
 
