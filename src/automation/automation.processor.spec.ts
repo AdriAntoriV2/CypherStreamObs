@@ -1,10 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AutomationProcessor } from './automation.processor.js';
-import { ActionParser } from './action-parser.service.js';
 import { PrismaService } from '../database/prisma.service.js';
-import { ActionExecutor } from './action-executor.service.js';
 import { ConditionEvaluator } from './condition-evaluator.service.js';
 import { AutomationExecutionService } from './automation-execution.service.js';
+import { AutomationActionExecutionService } from './automation-action-execution.service.js';
 
 describe('AutomationProcessor', () => {
   let processor: AutomationProcessor;
@@ -16,15 +15,6 @@ describe('AutomationProcessor', () => {
     automationRule: {
       findUnique: vi.fn(),
     },
-    automationActionExecution: {
-      findUnique: vi.fn(),
-      create: vi.fn(),
-      update: vi.fn(),
-    },
-  };
-
-  const actionExecutor = {
-    execute: vi.fn(),
   };
 
   const conditionEvaluator = {
@@ -41,17 +31,18 @@ describe('AutomationProcessor', () => {
     fail: vi.fn(),
   };
 
+  const actionExecutionService = {
+    execute: vi.fn(),
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
 
-    const actionParser = new ActionParser();
-
     processor = new AutomationProcessor(
       prisma as unknown as PrismaService,
-      actionExecutor as unknown as ActionExecutor,
       conditionEvaluator as unknown as ConditionEvaluator,
-      actionParser,
       executionService as unknown as AutomationExecutionService,
+      actionExecutionService as unknown as AutomationActionExecutionService,
     );
   });
 
@@ -86,7 +77,7 @@ describe('AutomationProcessor', () => {
 
     conditionEvaluator.matches.mockReturnValue(true);
 
-    actionExecutor.execute.mockResolvedValue({
+    actionExecutionService.execute.mockResolvedValue({
       status: 200,
     });
   };
@@ -111,7 +102,7 @@ describe('AutomationProcessor', () => {
     );
 
     expect(
-      actionExecutor.execute,
+      actionExecutionService.execute,
     ).not.toHaveBeenCalled();
 
     expect(
@@ -141,7 +132,7 @@ describe('AutomationProcessor', () => {
     );
 
     expect(
-      actionExecutor.execute,
+      actionExecutionService.execute,
     ).not.toHaveBeenCalled();
 
     expect(
@@ -169,24 +160,16 @@ describe('AutomationProcessor', () => {
     executionService.isCompleted.mockReturnValue(false);
     executionService.isRunning.mockReturnValue(true);
     executionService.isLeaseActive.mockReturnValue(false);
+
     executionService.start.mockResolvedValue(
       startedExecution,
     );
 
-    prisma.automationActionExecution.findUnique.mockResolvedValue(
-      null,
-    );
-
-    prisma.automationActionExecution.create.mockResolvedValue({
-      id: 'action-execution-1',
+    actionExecutionService.execute.mockResolvedValue({
+      status: 200,
     });
 
-    prisma.automationActionExecution.update.mockResolvedValue(
-      {},
-    );
-
     executionService.complete.mockResolvedValue({});
-    executionService.fail.mockResolvedValue({});
 
     await processor.process(
       createJob({
@@ -204,12 +187,30 @@ describe('AutomationProcessor', () => {
     );
 
     expect(
-      actionExecutor.execute,
+      actionExecutionService.execute,
     ).toHaveBeenCalledTimes(1);
 
     expect(
+      actionExecutionService.execute,
+    ).toHaveBeenCalledWith(
+      'execution-1',
+      0,
+      {
+        type: 'webhook',
+        url: 'https://example.com/webhook',
+      },
+    );
+
+    expect(
       executionService.complete,
-    ).toHaveBeenCalled();
+    ).toHaveBeenCalledWith(
+      'execution-1',
+      [
+        {
+          status: 200,
+        },
+      ],
+    );
   });
 
   it('should skip execution when conditions do not match', async () => {
@@ -229,11 +230,11 @@ describe('AutomationProcessor', () => {
     ).not.toHaveBeenCalled();
 
     expect(
-      actionExecutor.execute,
+      actionExecutionService.execute,
     ).not.toHaveBeenCalled();
   });
 
-  it('should retry failed actions without repeating completed actions', async () => {
+  it('should execute all actions through the action execution service', async () => {
     setupMatchingRule();
 
     prisma.automationRule.findUnique.mockResolvedValue({
@@ -251,107 +252,73 @@ describe('AutomationProcessor', () => {
       ],
     });
 
-    const firstExecution = {
-      id: 'execution-1',
-      status: 'RUNNING',
-      updatedAt: new Date(),
-    };
+    executionService.find.mockResolvedValue(null);
 
-    executionService.find
-      .mockResolvedValueOnce(null)
-      .mockResolvedValueOnce(firstExecution);
-
-    executionService.isCompleted
-      .mockReturnValue(false);
-
-    executionService.isRunning
-      .mockReturnValueOnce(false)
-      .mockReturnValueOnce(true);
-
-    executionService.isLeaseActive
-      .mockReturnValue(false);
+    executionService.isCompleted.mockReturnValue(false);
+    executionService.isRunning.mockReturnValue(false);
 
     executionService.start.mockResolvedValue({
       id: 'execution-1',
       status: 'RUNNING',
     });
 
-    prisma.automationActionExecution.findUnique
-      .mockResolvedValueOnce(null)
-      .mockResolvedValueOnce(null)
-      .mockResolvedValueOnce({
-        id: 'action-execution-0',
-        status: 'COMPLETED',
-        result: {
-          status: 200,
-        },
-      })
-      .mockResolvedValueOnce(null);
-
-    prisma.automationActionExecution.create.mockResolvedValue({
-      id: 'action-execution-1',
-    });
-
-    prisma.automationActionExecution.update.mockResolvedValue(
-      {},
-    );
-
-    executionService.fail.mockResolvedValue({});
-
-    actionExecutor.execute
+    actionExecutionService.execute
       .mockResolvedValueOnce({
         status: 200,
       })
-      .mockRejectedValueOnce(
-        new Error('Webhook failed'),
-      )
-      .mockRejectedValueOnce(
-        new Error('Webhook failed'),
-      );
+      .mockResolvedValueOnce({
+        status: 201,
+      });
 
-    // First attempt
-    await expect(
-      processor.process(
-        createJob({
-          eventId: 'event-1',
-          ruleId: 'rule-1',
-        }),
-      ),
-    ).rejects.toThrow('Webhook failed');
+    executionService.complete.mockResolvedValue({});
+
+    await processor.process(
+      createJob({
+        eventId: 'event-1',
+        ruleId: 'rule-1',
+      }),
+    );
 
     expect(
-      actionExecutor.execute,
+      actionExecutionService.execute,
     ).toHaveBeenCalledTimes(2);
 
     expect(
-      executionService.fail,
-    ).toHaveBeenCalledTimes(1);
-
-    // Second attempt
-    await expect(
-      processor.process(
-        createJob({
-          eventId: 'event-1',
-          ruleId: 'rule-1',
-        }),
-      ),
-    ).rejects.toThrow('Webhook failed');
-
-    // Action 0 was completed already, so only action 1
-    // should execute on the retry.
-    expect(
-      actionExecutor.execute,
-    ).toHaveBeenCalledTimes(3);
+      actionExecutionService.execute,
+    ).toHaveBeenNthCalledWith(
+      1,
+      'execution-1',
+      0,
+      {
+        type: 'webhook',
+        url: 'https://example.com/first',
+      },
+    );
 
     expect(
-      actionExecutor.execute,
-    ).toHaveBeenLastCalledWith({
-      type: 'webhook',
-      url: 'https://example.com/second',
-    });
+      actionExecutionService.execute,
+    ).toHaveBeenNthCalledWith(
+      2,
+      'execution-1',
+      1,
+      {
+        type: 'webhook',
+        url: 'https://example.com/second',
+      },
+    );
 
     expect(
-      executionService.fail,
-    ).toHaveBeenCalledTimes(2);
+      executionService.complete,
+    ).toHaveBeenCalledWith(
+      'execution-1',
+      [
+        {
+          status: 200,
+        },
+        {
+          status: 201,
+        },
+      ],
+    );
   });
 });

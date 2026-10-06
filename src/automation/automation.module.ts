@@ -8,6 +8,7 @@ import { ActionExecutor } from './action-executor.service.js';
 import { MixItUpExecutor } from './executors/mixitup.executor.js';
 import { ActionParser } from './action-parser.service.js';
 import { AutomationExecutionService } from './automation-execution.service.js';
+import { AutomationActionExecutionService } from './automation-action-execution.service.js';
 
 @Module({
   controllers: [AutomationController],
@@ -20,6 +21,7 @@ import { AutomationExecutionService } from './automation-execution.service.js';
     ActionExecutor,
     ActionParser,
     AutomationExecutionService,
+    AutomationActionExecutionService,
   ],
   exports: [AutomationProcessor],
 })
