@@ -1,9 +1,11 @@
-export type ActionExecutorType =
-  | 'webhook'
-  | 'mixitup';
+import { AutomationAction } from '../types/action.types.js';
 
-export interface ActionExecutorHandler {
-  execute(
-    action: Record<string, unknown>,
-  ): Promise<unknown>;
+export type ActionExecutorType = AutomationAction['type'];
+
+export interface ActionExecutorHandler<
+  TAction extends AutomationAction = AutomationAction,
+> {
+  readonly type: TAction['type'];
+
+  execute(action: TAction): Promise<unknown>;
 }

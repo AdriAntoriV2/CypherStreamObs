@@ -7,6 +7,7 @@ import { QUEUE_NAMES } from '../queue/queue.constants.js';
 import { ConditionEvaluator } from './condition-evaluator.service.js';
 import { ActionExecutor } from './action-executor.service.js';
 import { AutomationConditions } from './types/condition.types.js';
+import { ActionParser } from './action-parser.service.js';
 
 const EXECUTION_LEASE_MS = 5 * 60 * 1_000;
 
@@ -17,6 +18,7 @@ export class AutomationProcessor extends WorkerHost {
     private readonly prisma: PrismaService,
     private readonly actionExecutor: ActionExecutor,
     private readonly conditionEvaluator: ConditionEvaluator,
+    private readonly actionParser: ActionParser,
   ) {
     super();
   }
@@ -212,9 +214,12 @@ export class AutomationProcessor extends WorkerHost {
           console.log(
             `[AutomationProcessor] Executing action ${index} (${actionType}) for execution ${execution.id}`,
           );
+          const parsedAction =
+            this.actionParser.parse(action);
+
           const result =
             await this.actionExecutor.execute(
-              action as Record<string, unknown>,
+              parsedAction,
             );
 
           await this.prisma.automationActionExecution.update({

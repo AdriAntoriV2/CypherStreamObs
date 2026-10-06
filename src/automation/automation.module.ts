@@ -6,6 +6,7 @@ import { WebhookExecutor } from './executors/webhook.executor.js';
 import { ConditionEvaluator } from './condition-evaluator.service.js';
 import { ActionExecutor } from './action-executor.service.js';
 import { MixItUpExecutor } from './executors/mixitup.executor.js';
+import { ActionParser } from './action-parser.service.js';
 
 @Module({
   controllers: [AutomationController],
@@ -16,6 +17,7 @@ import { MixItUpExecutor } from './executors/mixitup.executor.js';
     MixItUpExecutor,
     ConditionEvaluator,
     ActionExecutor,
+    ActionParser,
   ],
   exports: [AutomationProcessor],
 })

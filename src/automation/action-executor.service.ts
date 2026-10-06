@@ -7,6 +7,7 @@ import {
 } from './executors/action-executor.interface.js';
 import { WebhookExecutor } from './executors/webhook.executor.js';
 import { MixItUpExecutor } from './executors/mixitup.executor.js';
+import { AutomationAction } from './types/action.types.js';
 
 @Injectable()
 export class ActionExecutor {
@@ -29,7 +30,7 @@ export class ActionExecutor {
   }
 
   async execute(
-    action: Record<string, unknown>,
+    action: AutomationAction,
   ): Promise<unknown> {
     const type = action.type;
 
