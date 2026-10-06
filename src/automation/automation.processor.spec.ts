@@ -4,6 +4,7 @@ import { ActionParser } from './action-parser.service.js';
 import { PrismaService } from '../database/prisma.service.js';
 import { ActionExecutor } from './action-executor.service.js';
 import { ConditionEvaluator } from './condition-evaluator.service.js';
+import { AutomationExecutionService } from './automation-execution.service.js';
 
 describe('AutomationProcessor', () => {
   let processor: AutomationProcessor;
@@ -14,11 +15,6 @@ describe('AutomationProcessor', () => {
     },
     automationRule: {
       findUnique: vi.fn(),
-    },
-    automationExecution: {
-      findUnique: vi.fn(),
-      create: vi.fn(),
-      update: vi.fn(),
     },
     automationActionExecution: {
       findUnique: vi.fn(),
@@ -35,6 +31,16 @@ describe('AutomationProcessor', () => {
     matches: vi.fn(),
   };
 
+  const executionService = {
+    find: vi.fn(),
+    isCompleted: vi.fn(),
+    isRunning: vi.fn(),
+    isLeaseActive: vi.fn(),
+    start: vi.fn(),
+    complete: vi.fn(),
+    fail: vi.fn(),
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
 
@@ -45,6 +51,7 @@ describe('AutomationProcessor', () => {
       actionExecutor as unknown as ActionExecutor,
       conditionEvaluator as unknown as ConditionEvaluator,
       actionParser,
+      executionService as unknown as AutomationExecutionService,
     );
   });
 
@@ -87,11 +94,14 @@ describe('AutomationProcessor', () => {
   it('should skip an already completed execution', async () => {
     setupMatchingRule();
 
-    prisma.automationExecution.findUnique.mockResolvedValue({
+    const execution = {
       id: 'execution-1',
       status: 'COMPLETED',
       updatedAt: new Date(),
-    });
+    };
+
+    executionService.find.mockResolvedValue(execution);
+    executionService.isCompleted.mockReturnValue(true);
 
     await processor.process(
       createJob({
@@ -105,18 +115,23 @@ describe('AutomationProcessor', () => {
     ).not.toHaveBeenCalled();
 
     expect(
-      prisma.automationExecution.create,
+      executionService.start,
     ).not.toHaveBeenCalled();
   });
 
   it('should skip a fresh running execution', async () => {
     setupMatchingRule();
 
-    prisma.automationExecution.findUnique.mockResolvedValue({
+    const execution = {
       id: 'execution-1',
       status: 'RUNNING',
       updatedAt: new Date(),
-    });
+    };
+
+    executionService.find.mockResolvedValue(execution);
+    executionService.isCompleted.mockReturnValue(false);
+    executionService.isRunning.mockReturnValue(true);
+    executionService.isLeaseActive.mockReturnValue(true);
 
     await processor.process(
       createJob({
@@ -130,25 +145,33 @@ describe('AutomationProcessor', () => {
     ).not.toHaveBeenCalled();
 
     expect(
-      prisma.automationExecution.update,
+      executionService.start,
     ).not.toHaveBeenCalled();
   });
 
   it('should recover a stale running execution', async () => {
     setupMatchingRule();
 
-    prisma.automationExecution.findUnique.mockResolvedValue({
+    const execution = {
       id: 'execution-1',
       status: 'RUNNING',
       updatedAt: new Date(
         Date.now() - 10 * 60 * 1_000,
       ),
-    });
+    };
 
-    prisma.automationExecution.update.mockResolvedValue({
+    const startedExecution = {
       id: 'execution-1',
       status: 'RUNNING',
-    });
+    };
+
+    executionService.find.mockResolvedValue(execution);
+    executionService.isCompleted.mockReturnValue(false);
+    executionService.isRunning.mockReturnValue(true);
+    executionService.isLeaseActive.mockReturnValue(false);
+    executionService.start.mockResolvedValue(
+      startedExecution,
+    );
 
     prisma.automationActionExecution.findUnique.mockResolvedValue(
       null,
@@ -162,6 +185,9 @@ describe('AutomationProcessor', () => {
       {},
     );
 
+    executionService.complete.mockResolvedValue({});
+    executionService.fail.mockResolvedValue({});
+
     await processor.process(
       createJob({
         eventId: 'event-1',
@@ -170,12 +196,20 @@ describe('AutomationProcessor', () => {
     );
 
     expect(
-      prisma.automationExecution.update,
-    ).toHaveBeenCalled();
+      executionService.start,
+    ).toHaveBeenCalledWith(
+      execution,
+      'rule-1',
+      'event-1',
+    );
 
     expect(
       actionExecutor.execute,
     ).toHaveBeenCalledTimes(1);
+
+    expect(
+      executionService.complete,
+    ).toHaveBeenCalled();
   });
 
   it('should skip execution when conditions do not match', async () => {
@@ -191,7 +225,7 @@ describe('AutomationProcessor', () => {
     );
 
     expect(
-      prisma.automationExecution.findUnique,
+      executionService.find,
     ).not.toHaveBeenCalled();
 
     expect(
@@ -217,17 +251,27 @@ describe('AutomationProcessor', () => {
       ],
     });
 
-    prisma.automationExecution.findUnique
-      .mockResolvedValueOnce(null)
-      .mockResolvedValueOnce({
-        id: 'execution-1',
-        status: 'RUNNING',
-        updatedAt: new Date(
-          Date.now() - 10 * 60 * 1_000,
-        ),
-      });
+    const firstExecution = {
+      id: 'execution-1',
+      status: 'RUNNING',
+      updatedAt: new Date(),
+    };
 
-    prisma.automationExecution.create.mockResolvedValue({
+    executionService.find
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(firstExecution);
+
+    executionService.isCompleted
+      .mockReturnValue(false);
+
+    executionService.isRunning
+      .mockReturnValueOnce(false)
+      .mockReturnValueOnce(true);
+
+    executionService.isLeaseActive
+      .mockReturnValue(false);
+
+    executionService.start.mockResolvedValue({
       id: 'execution-1',
       status: 'RUNNING',
     });
@@ -251,6 +295,8 @@ describe('AutomationProcessor', () => {
     prisma.automationActionExecution.update.mockResolvedValue(
       {},
     );
+
+    executionService.fail.mockResolvedValue({});
 
     actionExecutor.execute
       .mockResolvedValueOnce({
@@ -277,6 +323,10 @@ describe('AutomationProcessor', () => {
       actionExecutor.execute,
     ).toHaveBeenCalledTimes(2);
 
+    expect(
+      executionService.fail,
+    ).toHaveBeenCalledTimes(1);
+
     // Second attempt
     await expect(
       processor.process(
@@ -299,5 +349,9 @@ describe('AutomationProcessor', () => {
       type: 'webhook',
       url: 'https://example.com/second',
     });
+
+    expect(
+      executionService.fail,
+    ).toHaveBeenCalledTimes(2);
   });
 });

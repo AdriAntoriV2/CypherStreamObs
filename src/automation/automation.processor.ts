@@ -8,8 +8,7 @@ import { ConditionEvaluator } from './condition-evaluator.service.js';
 import { ActionExecutor } from './action-executor.service.js';
 import { AutomationConditions } from './types/condition.types.js';
 import { ActionParser } from './action-parser.service.js';
-
-const EXECUTION_LEASE_MS = 5 * 60 * 1_000;
+import { AutomationExecutionService } from './automation-execution.service.js';
 
 @Injectable()
 @Processor(QUEUE_NAMES.automation)
@@ -19,6 +18,7 @@ export class AutomationProcessor extends WorkerHost {
     private readonly actionExecutor: ActionExecutor,
     private readonly conditionEvaluator: ConditionEvaluator,
     private readonly actionParser: ActionParser,
+    private readonly executionService: AutomationExecutionService,
   ) {
     super();
   }
@@ -70,74 +70,41 @@ export class AutomationProcessor extends WorkerHost {
     }
 
     let execution =
-      await this.prisma.automationExecution.findUnique({
-        where: {
-          ruleId_eventId: {
-            ruleId: rule.id,
-            eventId: event.id,
-          },
-        },
-      });
-
-    if (execution?.status === 'COMPLETED') {
-      console.log(
-        `[AutomationProcessor] Execution ${execution.id} already completed, skipping`,
+      await this.executionService.find(
+        rule.id,
+        event.id,
       );
 
+    if (this.executionService.isCompleted(execution)) {
+      console.log(
+        `[AutomationProcessor] Execution ${execution!.id} already completed, skipping`,
+      );
       return;
     }
 
-    if (execution?.status === 'RUNNING') {
-      const executionAge =
-        Date.now() - execution.updatedAt.getTime();
-
-      if (executionAge < EXECUTION_LEASE_MS) {
+    if (this.executionService.isRunning(execution)) {
+      if (
+        this.executionService.isLeaseActive(
+          execution,
+        )
+      ) {
         console.log(
-          `[AutomationProcessor] Execution ${execution.id} is still active, skipping`,
+          `[AutomationProcessor] Execution ${execution!.id} is still active, skipping`,
         );
-
         return;
       }
 
       console.log(
-        `[AutomationProcessor] Execution ${execution.id} is stale, recovering`,
+        `[AutomationProcessor] Execution ${execution!.id} is stale, recovering`,
       );
-
-      execution =
-        await this.prisma.automationExecution.update({
-          where: {
-            id: execution.id,
-          },
-          data: {
-            status: 'RUNNING',
-            result: Prisma.JsonNull,
-            completedAt: null,
-          },
-        });
     }
 
-    if (!execution) {
-      execution =
-        await this.prisma.automationExecution.create({
-          data: {
-            ruleId: rule.id,
-            eventId: event.id,
-            status: 'RUNNING',
-          },
-        });
-    } else {
-      execution =
-        await this.prisma.automationExecution.update({
-          where: {
-            id: execution.id,
-          },
-          data: {
-            status: 'RUNNING',
-            result: Prisma.JsonNull,
-            completedAt: null,
-          },
-        });
-    }
+    execution =
+      await this.executionService.start(
+        execution,
+        rule.id,
+        event.id,
+      );
 
     try {
       const actions = Array.isArray(rule.actions)
@@ -254,36 +221,19 @@ export class AutomationProcessor extends WorkerHost {
         }
       }
 
-      await this.prisma.automationExecution.update({
-        where: {
-          id: execution.id,
-        },
-        data: {
-          status: 'COMPLETED',
-          result: results as Prisma.InputJsonValue,
-          completedAt: new Date(),
-        },
-      });
+      await this.executionService.complete(
+        execution.id,
+        results,
+      );
 
       console.log(
         `[AutomationProcessor] Execution ${execution.id} completed`,
       );
     } catch (error) {
-      await this.prisma.automationExecution.update({
-        where: {
-          id: execution.id,
-        },
-        data: {
-          status: 'FAILED',
-          result: {
-            error:
-              error instanceof Error
-                ? error.message
-                : 'Unknown error',
-          },
-          completedAt: new Date(),
-        },
-      });
+      await this.executionService.fail(
+        execution.id,
+        error,
+      );
 
       throw error;
     }

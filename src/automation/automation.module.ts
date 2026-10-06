@@ -7,6 +7,7 @@ import { ConditionEvaluator } from './condition-evaluator.service.js';
 import { ActionExecutor } from './action-executor.service.js';
 import { MixItUpExecutor } from './executors/mixitup.executor.js';
 import { ActionParser } from './action-parser.service.js';
+import { AutomationExecutionService } from './automation-execution.service.js';
 
 @Module({
   controllers: [AutomationController],
@@ -18,6 +19,7 @@ import { ActionParser } from './action-parser.service.js';
     ConditionEvaluator,
     ActionExecutor,
     ActionParser,
+    AutomationExecutionService,
   ],
   exports: [AutomationProcessor],
 })
