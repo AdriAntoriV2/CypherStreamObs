@@ -9,8 +9,6 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
 
-  app.useGlobalFilters(new PrismaExceptionFilter());
-
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -18,6 +16,8 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
+
+  app.useGlobalFilters(new PrismaExceptionFilter());
 
   await app.listen(process.env.PORT ?? 3000);
 }
