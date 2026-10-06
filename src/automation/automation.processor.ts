@@ -5,6 +5,7 @@ import { Job } from 'bullmq';
 import { PrismaService } from '../database/prisma.service.js';
 import { WebhookExecutor } from './executors/webhook.executor.js';
 import { QUEUE_NAMES } from '../queue/queue.constants.js';
+import { ConditionEvaluator } from './condition-evaluator.service.js';
 
 @Injectable()
 @Processor(QUEUE_NAMES.automation)
@@ -12,6 +13,7 @@ export class AutomationProcessor extends WorkerHost {
   constructor(
     private readonly prisma: PrismaService,
     private readonly webhookExecutor: WebhookExecutor,
+    private readonly conditionEvaluator: ConditionEvaluator,
   ) {
     super();
   }
@@ -47,6 +49,19 @@ export class AutomationProcessor extends WorkerHost {
 
     if (!rule) {
       throw new Error(`Automation rule ${ruleId} not found`);
+    }
+
+    const matches = this.conditionEvaluator.matches(
+      rule.conditions,
+      event.payload as Record<string, unknown>,
+    );
+
+    if (!matches) {
+      console.log(
+        `[AutomationProcessor] Rule ${rule.id} conditions did not match event ${event.id}`,
+      );
+
+      return;
     }
 
     let execution =
