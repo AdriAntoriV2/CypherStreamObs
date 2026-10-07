@@ -26,9 +26,13 @@ import configuration from './configuration.js';
 
         //MIXITUP_PORT: Joi.number().port().default(8911),
         MIXITUP_URL: Joi.string().uri().required(),
+
+        TWITCH_CLIENT_ID: Joi.string().required(),
+        TWITCH_CLIENT_SECRET: Joi.string().required(),
+        TWITCH_REDIRECT_URI: Joi.string().uri().required(),
       }),
     }),
   ],
   exports: [ConfigModule],
 })
-export class AppConfigModule {}
+export class AppConfigModule { }

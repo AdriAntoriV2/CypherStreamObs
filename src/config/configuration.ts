@@ -23,4 +23,12 @@ export default () => ({
       process.env.MIXITUP_URL ??
       'http://127.0.0.1:8911',
   },
+
+  twitch: {
+    clientId: process.env.TWITCH_CLIENT_ID,
+    clientSecret: process.env.TWITCH_CLIENT_SECRET,
+    redirectUri:
+      process.env.TWITCH_REDIRECT_URI ??
+      'http://localhost:3000/api/twitch/oauth/callback',
+  },
 });
