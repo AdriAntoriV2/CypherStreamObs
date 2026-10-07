@@ -3,16 +3,28 @@ import { TwitchController } from './twitch.controller.js';
 import { TwitchService } from './twitch.service.js';
 import { TwitchApiClient } from './twitch-api.client.js';
 import { TwitchEventSubService } from './twitch-eventsub.service.js';
+import { TwitchAuthenticatedClient } from './twitch-authenticated.client.js';
+import { TwitchEventNormalizer } from './twitch-event-normalizer.service.js';
+import { StreamsModule } from '../streams/streams.module.js';
+import { EventsModule } from '../events/events.module.js';
+import { TwitchEventIngestionService } from './twitch-event-ingestion.service.js';
 
 @Module({
   controllers: [
     TwitchController,
   ],
-  providers: [
-    TwitchService,
-    TwitchApiClient,
-    TwitchEventSubService,
-  ],
+providers: [
+  TwitchService,
+  TwitchApiClient,
+  TwitchEventSubService,
+  TwitchAuthenticatedClient,
+  TwitchEventNormalizer,
+  TwitchEventIngestionService,
+],
+imports: [
+  EventsModule,
+  StreamsModule,
+],
   exports: [
     TwitchService,
   ],

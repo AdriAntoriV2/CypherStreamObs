@@ -20,8 +20,18 @@ export type TwitchAccountModel = runtime.Types.Result.DefaultSelection<Prisma.$T
 
 export type AggregateTwitchAccount = {
   _count: TwitchAccountCountAggregateOutputType | null
+  _avg: TwitchAccountAvgAggregateOutputType | null
+  _sum: TwitchAccountSumAggregateOutputType | null
   _min: TwitchAccountMinAggregateOutputType | null
   _max: TwitchAccountMaxAggregateOutputType | null
+}
+
+export type TwitchAccountAvgAggregateOutputType = {
+  tokenVersion: number | null
+}
+
+export type TwitchAccountSumAggregateOutputType = {
+  tokenVersion: number | null
 }
 
 export type TwitchAccountMinAggregateOutputType = {
@@ -32,6 +42,7 @@ export type TwitchAccountMinAggregateOutputType = {
   accessTokenEncrypted: string | null
   refreshTokenEncrypted: string | null
   accessTokenExpiresAt: Date | null
+  tokenVersion: number | null
   connectedAt: Date | null
   updatedAt: Date | null
 }
@@ -44,6 +55,7 @@ export type TwitchAccountMaxAggregateOutputType = {
   accessTokenEncrypted: string | null
   refreshTokenEncrypted: string | null
   accessTokenExpiresAt: Date | null
+  tokenVersion: number | null
   connectedAt: Date | null
   updatedAt: Date | null
 }
@@ -56,12 +68,21 @@ export type TwitchAccountCountAggregateOutputType = {
   accessTokenEncrypted: number
   refreshTokenEncrypted: number
   accessTokenExpiresAt: number
+  tokenVersion: number
   scopes: number
   connectedAt: number
   updatedAt: number
   _all: number
 }
 
+
+export type TwitchAccountAvgAggregateInputType = {
+  tokenVersion?: true
+}
+
+export type TwitchAccountSumAggregateInputType = {
+  tokenVersion?: true
+}
 
 export type TwitchAccountMinAggregateInputType = {
   id?: true
@@ -71,6 +92,7 @@ export type TwitchAccountMinAggregateInputType = {
   accessTokenEncrypted?: true
   refreshTokenEncrypted?: true
   accessTokenExpiresAt?: true
+  tokenVersion?: true
   connectedAt?: true
   updatedAt?: true
 }
@@ -83,6 +105,7 @@ export type TwitchAccountMaxAggregateInputType = {
   accessTokenEncrypted?: true
   refreshTokenEncrypted?: true
   accessTokenExpiresAt?: true
+  tokenVersion?: true
   connectedAt?: true
   updatedAt?: true
 }
@@ -95,6 +118,7 @@ export type TwitchAccountCountAggregateInputType = {
   accessTokenEncrypted?: true
   refreshTokenEncrypted?: true
   accessTokenExpiresAt?: true
+  tokenVersion?: true
   scopes?: true
   connectedAt?: true
   updatedAt?: true
@@ -139,6 +163,18 @@ export type TwitchAccountAggregateArgs<ExtArgs extends runtime.Types.Extensions.
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: TwitchAccountAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: TwitchAccountSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: TwitchAccountMinAggregateInputType
@@ -169,6 +205,8 @@ export type TwitchAccountGroupByArgs<ExtArgs extends runtime.Types.Extensions.In
   take?: number
   skip?: number
   _count?: TwitchAccountCountAggregateInputType | true
+  _avg?: TwitchAccountAvgAggregateInputType
+  _sum?: TwitchAccountSumAggregateInputType
   _min?: TwitchAccountMinAggregateInputType
   _max?: TwitchAccountMaxAggregateInputType
 }
@@ -181,10 +219,13 @@ export type TwitchAccountGroupByOutputType = {
   accessTokenEncrypted: string
   refreshTokenEncrypted: string
   accessTokenExpiresAt: Date
+  tokenVersion: number
   scopes: string[]
   connectedAt: Date
   updatedAt: Date
   _count: TwitchAccountCountAggregateOutputType | null
+  _avg: TwitchAccountAvgAggregateOutputType | null
+  _sum: TwitchAccountSumAggregateOutputType | null
   _min: TwitchAccountMinAggregateOutputType | null
   _max: TwitchAccountMaxAggregateOutputType | null
 }
@@ -215,6 +256,7 @@ export type TwitchAccountWhereInput = {
   accessTokenEncrypted?: Prisma.StringFilter<"TwitchAccount"> | string
   refreshTokenEncrypted?: Prisma.StringFilter<"TwitchAccount"> | string
   accessTokenExpiresAt?: Prisma.DateTimeFilter<"TwitchAccount"> | Date | string
+  tokenVersion?: Prisma.IntFilter<"TwitchAccount"> | number
   scopes?: Prisma.StringNullableListFilter<"TwitchAccount">
   connectedAt?: Prisma.DateTimeFilter<"TwitchAccount"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"TwitchAccount"> | Date | string
@@ -228,6 +270,7 @@ export type TwitchAccountOrderByWithRelationInput = {
   accessTokenEncrypted?: Prisma.SortOrder
   refreshTokenEncrypted?: Prisma.SortOrder
   accessTokenExpiresAt?: Prisma.SortOrder
+  tokenVersion?: Prisma.SortOrder
   scopes?: Prisma.SortOrder
   connectedAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -244,6 +287,7 @@ export type TwitchAccountWhereUniqueInput = Prisma.AtLeast<{
   accessTokenEncrypted?: Prisma.StringFilter<"TwitchAccount"> | string
   refreshTokenEncrypted?: Prisma.StringFilter<"TwitchAccount"> | string
   accessTokenExpiresAt?: Prisma.DateTimeFilter<"TwitchAccount"> | Date | string
+  tokenVersion?: Prisma.IntFilter<"TwitchAccount"> | number
   scopes?: Prisma.StringNullableListFilter<"TwitchAccount">
   connectedAt?: Prisma.DateTimeFilter<"TwitchAccount"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"TwitchAccount"> | Date | string
@@ -257,12 +301,15 @@ export type TwitchAccountOrderByWithAggregationInput = {
   accessTokenEncrypted?: Prisma.SortOrder
   refreshTokenEncrypted?: Prisma.SortOrder
   accessTokenExpiresAt?: Prisma.SortOrder
+  tokenVersion?: Prisma.SortOrder
   scopes?: Prisma.SortOrder
   connectedAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.TwitchAccountCountOrderByAggregateInput
+  _avg?: Prisma.TwitchAccountAvgOrderByAggregateInput
   _max?: Prisma.TwitchAccountMaxOrderByAggregateInput
   _min?: Prisma.TwitchAccountMinOrderByAggregateInput
+  _sum?: Prisma.TwitchAccountSumOrderByAggregateInput
 }
 
 export type TwitchAccountScalarWhereWithAggregatesInput = {
@@ -276,6 +323,7 @@ export type TwitchAccountScalarWhereWithAggregatesInput = {
   accessTokenEncrypted?: Prisma.StringWithAggregatesFilter<"TwitchAccount"> | string
   refreshTokenEncrypted?: Prisma.StringWithAggregatesFilter<"TwitchAccount"> | string
   accessTokenExpiresAt?: Prisma.DateTimeWithAggregatesFilter<"TwitchAccount"> | Date | string
+  tokenVersion?: Prisma.IntWithAggregatesFilter<"TwitchAccount"> | number
   scopes?: Prisma.StringNullableListFilter<"TwitchAccount">
   connectedAt?: Prisma.DateTimeWithAggregatesFilter<"TwitchAccount"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"TwitchAccount"> | Date | string
@@ -289,6 +337,7 @@ export type TwitchAccountCreateInput = {
   accessTokenEncrypted: string
   refreshTokenEncrypted: string
   accessTokenExpiresAt: Date | string
+  tokenVersion?: number
   scopes?: Prisma.TwitchAccountCreatescopesInput | string[]
   connectedAt?: Date | string
   updatedAt?: Date | string
@@ -302,6 +351,7 @@ export type TwitchAccountUncheckedCreateInput = {
   accessTokenEncrypted: string
   refreshTokenEncrypted: string
   accessTokenExpiresAt: Date | string
+  tokenVersion?: number
   scopes?: Prisma.TwitchAccountCreatescopesInput | string[]
   connectedAt?: Date | string
   updatedAt?: Date | string
@@ -315,6 +365,7 @@ export type TwitchAccountUpdateInput = {
   accessTokenEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   refreshTokenEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   accessTokenExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   scopes?: Prisma.TwitchAccountUpdatescopesInput | string[]
   connectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -328,6 +379,7 @@ export type TwitchAccountUncheckedUpdateInput = {
   accessTokenEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   refreshTokenEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   accessTokenExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   scopes?: Prisma.TwitchAccountUpdatescopesInput | string[]
   connectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -341,6 +393,7 @@ export type TwitchAccountCreateManyInput = {
   accessTokenEncrypted: string
   refreshTokenEncrypted: string
   accessTokenExpiresAt: Date | string
+  tokenVersion?: number
   scopes?: Prisma.TwitchAccountCreatescopesInput | string[]
   connectedAt?: Date | string
   updatedAt?: Date | string
@@ -354,6 +407,7 @@ export type TwitchAccountUpdateManyMutationInput = {
   accessTokenEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   refreshTokenEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   accessTokenExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   scopes?: Prisma.TwitchAccountUpdatescopesInput | string[]
   connectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -367,6 +421,7 @@ export type TwitchAccountUncheckedUpdateManyInput = {
   accessTokenEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   refreshTokenEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   accessTokenExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   scopes?: Prisma.TwitchAccountUpdatescopesInput | string[]
   connectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -388,9 +443,14 @@ export type TwitchAccountCountOrderByAggregateInput = {
   accessTokenEncrypted?: Prisma.SortOrder
   refreshTokenEncrypted?: Prisma.SortOrder
   accessTokenExpiresAt?: Prisma.SortOrder
+  tokenVersion?: Prisma.SortOrder
   scopes?: Prisma.SortOrder
   connectedAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type TwitchAccountAvgOrderByAggregateInput = {
+  tokenVersion?: Prisma.SortOrder
 }
 
 export type TwitchAccountMaxOrderByAggregateInput = {
@@ -401,6 +461,7 @@ export type TwitchAccountMaxOrderByAggregateInput = {
   accessTokenEncrypted?: Prisma.SortOrder
   refreshTokenEncrypted?: Prisma.SortOrder
   accessTokenExpiresAt?: Prisma.SortOrder
+  tokenVersion?: Prisma.SortOrder
   connectedAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -413,8 +474,13 @@ export type TwitchAccountMinOrderByAggregateInput = {
   accessTokenEncrypted?: Prisma.SortOrder
   refreshTokenEncrypted?: Prisma.SortOrder
   accessTokenExpiresAt?: Prisma.SortOrder
+  tokenVersion?: Prisma.SortOrder
   connectedAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type TwitchAccountSumOrderByAggregateInput = {
+  tokenVersion?: Prisma.SortOrder
 }
 
 export type TwitchAccountCreatescopesInput = {
@@ -436,6 +502,7 @@ export type TwitchAccountSelect<ExtArgs extends runtime.Types.Extensions.Interna
   accessTokenEncrypted?: boolean
   refreshTokenEncrypted?: boolean
   accessTokenExpiresAt?: boolean
+  tokenVersion?: boolean
   scopes?: boolean
   connectedAt?: boolean
   updatedAt?: boolean
@@ -449,6 +516,7 @@ export type TwitchAccountSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   accessTokenEncrypted?: boolean
   refreshTokenEncrypted?: boolean
   accessTokenExpiresAt?: boolean
+  tokenVersion?: boolean
   scopes?: boolean
   connectedAt?: boolean
   updatedAt?: boolean
@@ -462,6 +530,7 @@ export type TwitchAccountSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   accessTokenEncrypted?: boolean
   refreshTokenEncrypted?: boolean
   accessTokenExpiresAt?: boolean
+  tokenVersion?: boolean
   scopes?: boolean
   connectedAt?: boolean
   updatedAt?: boolean
@@ -475,12 +544,13 @@ export type TwitchAccountSelectScalar = {
   accessTokenEncrypted?: boolean
   refreshTokenEncrypted?: boolean
   accessTokenExpiresAt?: boolean
+  tokenVersion?: boolean
   scopes?: boolean
   connectedAt?: boolean
   updatedAt?: boolean
 }
 
-export type TwitchAccountOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "twitchUserId" | "login" | "displayName" | "accessTokenEncrypted" | "refreshTokenEncrypted" | "accessTokenExpiresAt" | "scopes" | "connectedAt" | "updatedAt", ExtArgs["result"]["twitchAccount"]>
+export type TwitchAccountOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "twitchUserId" | "login" | "displayName" | "accessTokenEncrypted" | "refreshTokenEncrypted" | "accessTokenExpiresAt" | "tokenVersion" | "scopes" | "connectedAt" | "updatedAt", ExtArgs["result"]["twitchAccount"]>
 
 export type $TwitchAccountPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "TwitchAccount"
@@ -493,6 +563,7 @@ export type $TwitchAccountPayload<ExtArgs extends runtime.Types.Extensions.Inter
     accessTokenEncrypted: string
     refreshTokenEncrypted: string
     accessTokenExpiresAt: Date
+    tokenVersion: number
     scopes: string[]
     connectedAt: Date
     updatedAt: Date
@@ -926,6 +997,7 @@ export interface TwitchAccountFieldRefs {
   readonly accessTokenEncrypted: Prisma.FieldRef<"TwitchAccount", 'String'>
   readonly refreshTokenEncrypted: Prisma.FieldRef<"TwitchAccount", 'String'>
   readonly accessTokenExpiresAt: Prisma.FieldRef<"TwitchAccount", 'DateTime'>
+  readonly tokenVersion: Prisma.FieldRef<"TwitchAccount", 'Int'>
   readonly scopes: Prisma.FieldRef<"TwitchAccount", 'String[]'>
   readonly connectedAt: Prisma.FieldRef<"TwitchAccount", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"TwitchAccount", 'DateTime'>

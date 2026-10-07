@@ -5,6 +5,7 @@ import { UpdateStreamDto } from './dto/update-stream.dto.js';
 
 @Injectable()
 export class StreamsService {
+  [x: string]: any;
   constructor(private readonly prisma: PrismaService) {}
 
   async create(dto: CreateStreamDto) {

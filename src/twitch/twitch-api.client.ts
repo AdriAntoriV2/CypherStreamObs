@@ -151,4 +151,35 @@ export class TwitchApiClient {
 
         return response.json();
     }
+
+    async refreshAccessToken(
+        refreshToken: string,
+    ) {
+        const response = await fetch(
+            'https://id.twitch.tv/oauth2/token',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type':
+                        'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    client_id: this.clientId,
+                    client_secret: this.clientSecret,
+                    grant_type: 'refresh_token',
+                    refresh_token: refreshToken,
+                }),
+            },
+        );
+
+        if (!response.ok) {
+            const body = await response.text();
+
+            throw new Error(
+                `Twitch OAuth token refresh failed: ${response.status} ${body}`,
+            );
+        }
+
+        return response.json() as Promise<TwitchTokenResponse>;
+    }
 }

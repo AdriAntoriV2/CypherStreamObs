@@ -153,6 +153,7 @@ export const TwitchAccountScalarFieldEnum = {
   accessTokenEncrypted: 'accessTokenEncrypted',
   refreshTokenEncrypted: 'refreshTokenEncrypted',
   accessTokenExpiresAt: 'accessTokenExpiresAt',
+  tokenVersion: 'tokenVersion',
   scopes: 'scopes',
   connectedAt: 'connectedAt',
   updatedAt: 'updatedAt'

@@ -119,6 +119,7 @@ model TwitchAccount {
   refreshTokenEncrypted String
 
   accessTokenExpiresAt DateTime
+  tokenVersion Int @default(1)
 
   scopes String[]
 
