@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
 import {
+  IsDateString,
   IsIn,
   IsInt,
   IsOptional,
@@ -33,4 +34,16 @@ export class ListExecutionsDto {
   @IsOptional()
   @IsUUID()
   ruleId?: string;
+
+  @IsOptional()
+  @IsUUID()
+  eventId?: string;
+
+  @IsOptional()
+  @IsDateString()
+  from?: string;
+
+  @IsOptional()
+  @IsDateString()
+  to?: string;
 }

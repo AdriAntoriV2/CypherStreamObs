@@ -297,6 +297,7 @@ describe('AutomationExecutionService', () => {
                         },
                     },
                     rule: true,
+                    event: true,
                 },
             });
 
@@ -521,6 +522,94 @@ describe('AutomationExecutionService', () => {
                     },
                 }),
             );
+        });
+
+        it('filters executions by eventId', async () => {
+            prisma.automationExecution.findMany.mockResolvedValue([]);
+            prisma.automationExecution.count.mockResolvedValue(0);
+
+            prisma.$transaction.mockImplementation(
+                async (queries) => Promise.all(queries),
+            );
+
+            await service.findAll(
+                1,
+                20,
+                undefined,
+                undefined,
+                '550e8400-e29b-41d4-a716-446655440000',
+            );
+
+            expect(
+                prisma.automationExecution.findMany,
+            ).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    where: {
+                        eventId:
+                            '550e8400-e29b-41d4-a716-446655440000',
+                    },
+                }),
+            );
+
+            expect(
+                prisma.automationExecution.count,
+            ).toHaveBeenCalledWith({
+                where: {
+                    eventId:
+                        '550e8400-e29b-41d4-a716-446655440000',
+                },
+            });
+        });
+
+        it('filters executions by date range', async () => {
+            prisma.automationExecution.findMany.mockResolvedValue([]);
+            prisma.automationExecution.count.mockResolvedValue(0);
+
+            prisma.$transaction.mockImplementation(
+                async (queries) => Promise.all(queries),
+            );
+
+            await service.findAll(
+                1,
+                20,
+                undefined,
+                undefined,
+                undefined,
+                '2026-10-01T00:00:00.000Z',
+                '2026-10-07T23:59:59.999Z',
+            );
+
+            expect(
+                prisma.automationExecution.findMany,
+            ).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    where: {
+                        createdAt: {
+                            gte: new Date(
+                                '2026-10-01T00:00:00.000Z',
+                            ),
+                            lte: new Date(
+                                '2026-10-07T23:59:59.999Z',
+                            ),
+                        },
+                    },
+                }),
+            );
+
+            expect(
+                prisma.automationExecution.count,
+            ).toHaveBeenCalledWith({
+                where: {
+                    createdAt: {
+                        gte: new Date(
+                            '2026-10-01T00:00:00.000Z',
+                        ),
+                        lte: new Date(
+                            '2026-10-07T23:59:59.999Z',
+                        ),
+                    },
+                },
+            });
         });
     });
 });

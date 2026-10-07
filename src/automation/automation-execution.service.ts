@@ -134,6 +134,7 @@ export class AutomationExecutionService {
             },
           },
           rule: true,
+          event: true,
         },
       });
 
@@ -151,12 +152,28 @@ export class AutomationExecutionService {
     limit = 20,
     status?: string,
     ruleId?: string,
+    eventId?: string,
+    from?: string,
+    to?: string,
   ) {
     const skip = (page - 1) * limit;
 
     const where = {
       ...(status ? { status } : {}),
       ...(ruleId ? { ruleId } : {}),
+      ...(eventId ? { eventId } : {}),
+      ...((from || to)
+        ? {
+          createdAt: {
+            ...(from
+              ? { gte: new Date(from) }
+              : {}),
+            ...(to
+              ? { lte: new Date(to) }
+              : {}),
+          },
+        }
+        : {}),
     };
 
     const [executions, total] =

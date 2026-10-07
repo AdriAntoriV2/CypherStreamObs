@@ -42,6 +42,9 @@ export class AutomationController {
       query.limit,
       query.status,
       query.ruleId,
+      query.eventId,
+      query.from,
+      query.to,
     );
   }
 }

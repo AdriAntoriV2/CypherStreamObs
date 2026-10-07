@@ -33,6 +33,8 @@ model StreamEvent {
 
   stream Stream @relation(fields: [streamId], references: [id], onDelete: Cascade)
 
+  executions AutomationExecution[]
+
   @@unique([externalId])
   @@index([streamId])
   @@index([type])
@@ -75,6 +77,8 @@ model AutomationExecution {
   completedAt DateTime?
 
   rule AutomationRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+
+  event StreamEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   actions AutomationActionExecution[]
 
