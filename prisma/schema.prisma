@@ -107,3 +107,23 @@ model AutomationActionExecution {
   @@index([executionId])
   @@index([status])
 }
+
+model TwitchAccount {
+  id String @id @default(uuid())
+
+  twitchUserId String @unique
+  login String
+  displayName String
+
+  accessTokenEncrypted String
+  refreshTokenEncrypted String
+
+  accessTokenExpiresAt DateTime
+
+  scopes String[]
+
+  connectedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([login])
+}

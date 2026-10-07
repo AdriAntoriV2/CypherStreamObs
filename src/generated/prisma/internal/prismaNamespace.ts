@@ -401,7 +401,8 @@ export const ModelName = {
   StreamEvent: 'StreamEvent',
   AutomationRule: 'AutomationRule',
   AutomationExecution: 'AutomationExecution',
-  AutomationActionExecution: 'AutomationActionExecution'
+  AutomationActionExecution: 'AutomationActionExecution',
+  TwitchAccount: 'TwitchAccount'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -417,7 +418,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "stream" | "streamEvent" | "automationRule" | "automationExecution" | "automationActionExecution"
+    modelProps: "stream" | "streamEvent" | "automationRule" | "automationExecution" | "automationActionExecution" | "twitchAccount"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -791,6 +792,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    TwitchAccount: {
+      payload: Prisma.$TwitchAccountPayload<ExtArgs>
+      fields: Prisma.TwitchAccountFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TwitchAccountFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TwitchAccountPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TwitchAccountFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TwitchAccountPayload>
+        }
+        findFirst: {
+          args: Prisma.TwitchAccountFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TwitchAccountPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TwitchAccountFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TwitchAccountPayload>
+        }
+        findMany: {
+          args: Prisma.TwitchAccountFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TwitchAccountPayload>[]
+        }
+        create: {
+          args: Prisma.TwitchAccountCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TwitchAccountPayload>
+        }
+        createMany: {
+          args: Prisma.TwitchAccountCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TwitchAccountCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TwitchAccountPayload>[]
+        }
+        delete: {
+          args: Prisma.TwitchAccountDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TwitchAccountPayload>
+        }
+        update: {
+          args: Prisma.TwitchAccountUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TwitchAccountPayload>
+        }
+        deleteMany: {
+          args: Prisma.TwitchAccountDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TwitchAccountUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TwitchAccountUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TwitchAccountPayload>[]
+        }
+        upsert: {
+          args: Prisma.TwitchAccountUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TwitchAccountPayload>
+        }
+        aggregate: {
+          args: Prisma.TwitchAccountAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTwitchAccount>
+        }
+        groupBy: {
+          args: Prisma.TwitchAccountGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TwitchAccountGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TwitchAccountCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TwitchAccountCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -898,6 +973,22 @@ export const AutomationActionExecutionScalarFieldEnum = {
 } as const
 
 export type AutomationActionExecutionScalarFieldEnum = (typeof AutomationActionExecutionScalarFieldEnum)[keyof typeof AutomationActionExecutionScalarFieldEnum]
+
+
+export const TwitchAccountScalarFieldEnum = {
+  id: 'id',
+  twitchUserId: 'twitchUserId',
+  login: 'login',
+  displayName: 'displayName',
+  accessTokenEncrypted: 'accessTokenEncrypted',
+  refreshTokenEncrypted: 'refreshTokenEncrypted',
+  accessTokenExpiresAt: 'accessTokenExpiresAt',
+  scopes: 'scopes',
+  connectedAt: 'connectedAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TwitchAccountScalarFieldEnum = (typeof TwitchAccountScalarFieldEnum)[keyof typeof TwitchAccountScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1186,6 +1277,7 @@ export type GlobalOmitConfig = {
   automationRule?: Prisma.AutomationRuleOmit
   automationExecution?: Prisma.AutomationExecutionOmit
   automationActionExecution?: Prisma.AutomationActionExecutionOmit
+  twitchAccount?: Prisma.TwitchAccountOmit
 }
 
 /* Types for Logging */

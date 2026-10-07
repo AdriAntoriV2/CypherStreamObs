@@ -66,3 +66,8 @@ export type AutomationExecution = Prisma.AutomationExecutionModel
  * 
  */
 export type AutomationActionExecution = Prisma.AutomationActionExecutionModel
+/**
+ * Model TwitchAccount
+ * 
+ */
+export type TwitchAccount = Prisma.TwitchAccountModel

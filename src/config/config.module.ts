@@ -30,6 +30,10 @@ import configuration from './configuration.js';
         TWITCH_CLIENT_ID: Joi.string().required(),
         TWITCH_CLIENT_SECRET: Joi.string().required(),
         TWITCH_REDIRECT_URI: Joi.string().uri().required(),
+        TWITCH_TOKEN_ENCRYPTION_KEY:
+          Joi.string()
+            .pattern(/^[0-9a-fA-F]{64}$/)
+            .required(),
       }),
     }),
   ],

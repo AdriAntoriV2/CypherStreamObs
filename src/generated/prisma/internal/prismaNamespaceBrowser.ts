@@ -55,7 +55,8 @@ export const ModelName = {
   StreamEvent: 'StreamEvent',
   AutomationRule: 'AutomationRule',
   AutomationExecution: 'AutomationExecution',
-  AutomationActionExecution: 'AutomationActionExecution'
+  AutomationActionExecution: 'AutomationActionExecution',
+  TwitchAccount: 'TwitchAccount'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -142,6 +143,22 @@ export const AutomationActionExecutionScalarFieldEnum = {
 } as const
 
 export type AutomationActionExecutionScalarFieldEnum = (typeof AutomationActionExecutionScalarFieldEnum)[keyof typeof AutomationActionExecutionScalarFieldEnum]
+
+
+export const TwitchAccountScalarFieldEnum = {
+  id: 'id',
+  twitchUserId: 'twitchUserId',
+  login: 'login',
+  displayName: 'displayName',
+  accessTokenEncrypted: 'accessTokenEncrypted',
+  refreshTokenEncrypted: 'refreshTokenEncrypted',
+  accessTokenExpiresAt: 'accessTokenExpiresAt',
+  scopes: 'scopes',
+  connectedAt: 'connectedAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TwitchAccountScalarFieldEnum = (typeof TwitchAccountScalarFieldEnum)[keyof typeof TwitchAccountScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -26,9 +26,12 @@ export default () => ({
 
   twitch: {
     clientId: process.env.TWITCH_CLIENT_ID,
-    clientSecret: process.env.TWITCH_CLIENT_SECRET,
+    clientSecret:
+      process.env.TWITCH_CLIENT_SECRET,
     redirectUri:
       process.env.TWITCH_REDIRECT_URI ??
       'http://localhost:3000/api/twitch/oauth/callback',
+    tokenEncryptionKey:
+      process.env.TWITCH_TOKEN_ENCRYPTION_KEY,
   },
 });
