@@ -1,12 +1,10 @@
-import {
-  Injectable,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import {
   createCipheriv,
   createDecipheriv,
   randomBytes,
-} from 'crypto';
-import { ConfigService } from '@nestjs/config';
+} from 'node:crypto';
 
 const ALGORITHM = 'aes-256-gcm';
 const IV_LENGTH = 12;
@@ -30,10 +28,7 @@ export class SecretEncryptionService {
       );
     }
 
-    this.key = Buffer.from(
-      keyHex,
-      'hex',
-    );
+    this.key = Buffer.from(keyHex, 'hex');
   }
 
   encrypt(value: string): string {
@@ -50,8 +45,7 @@ export class SecretEncryptionService {
       cipher.final(),
     ]);
 
-    const authTag =
-      cipher.getAuthTag();
+    const authTag = cipher.getAuthTag();
 
     return [
       iv.toString('base64'),
@@ -75,20 +69,20 @@ export class SecretEncryptionService {
       encryptedBase64,
     ] = parts;
 
-    const iv =
-      Buffer.from(ivBase64, 'base64');
+    const iv = Buffer.from(
+      ivBase64,
+      'base64',
+    );
 
-    const authTag =
-      Buffer.from(
-        authTagBase64,
-        'base64',
-      );
+    const authTag = Buffer.from(
+      authTagBase64,
+      'base64',
+    );
 
-    const encrypted =
-      Buffer.from(
-        encryptedBase64,
-        'base64',
-      );
+    const encrypted = Buffer.from(
+      encryptedBase64,
+      'base64',
+    );
 
     if (
       iv.length !== IV_LENGTH ||
@@ -99,20 +93,18 @@ export class SecretEncryptionService {
       );
     }
 
-    const decipher =
-      createDecipheriv(
-        ALGORITHM,
-        this.key,
-        iv,
-      );
+    const decipher = createDecipheriv(
+      ALGORITHM,
+      this.key,
+      iv,
+    );
 
     decipher.setAuthTag(authTag);
 
-    const decrypted =
-      Buffer.concat([
-        decipher.update(encrypted),
-        decipher.final(),
-      ]);
+    const decrypted = Buffer.concat([
+      decipher.update(encrypted),
+      decipher.final(),
+    ]);
 
     return decrypted.toString('utf8');
   }

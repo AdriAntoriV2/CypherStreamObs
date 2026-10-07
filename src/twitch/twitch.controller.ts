@@ -28,16 +28,9 @@ export class TwitchController {
         @Query('code') code: string,
         @Query('state') state: string,
     ) {
-        if (!code || !state) {
-            throw new BadRequestException(
-                'Missing Twitch OAuth parameters',
-            );
-        }
-
-        return this.twitchService
-            .handleOAuthCallback(
-                code,
-                state,
-            );
+        return this.twitchService.handleOAuthCallback(
+            code,
+            state,
+        );
     }
 }

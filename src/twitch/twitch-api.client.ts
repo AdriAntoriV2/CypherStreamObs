@@ -43,18 +43,16 @@ export class TwitchApiClient {
     getAuthorizationUrl(
         state: string,
     ): string {
-        const params =
-            new URLSearchParams({
-                client_id: this.clientId,
-                redirect_uri:
-                    this.redirectUri,
-                response_type: 'code',
-                scope: [
-                    'user:read:chat',
-                    'user:write:chat',
-                ].join(' '),
-                state,
-            });
+        const params = new URLSearchParams({
+            client_id: this.clientId,
+            redirect_uri: this.redirectUri,
+            response_type: 'code',
+            scope: [
+                'user:read:chat',
+                'user:write:chat',
+            ].join(' '),
+            state,
+        });
 
         return `https://id.twitch.tv/oauth2/authorize?${params.toString()}`;
     }

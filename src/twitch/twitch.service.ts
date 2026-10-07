@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -11,40 +12,36 @@ import { TwitchOAuthStateService } from './twitch-oauth-state.service.js';
 @Injectable()
 export class TwitchService {
   constructor(
-    private readonly twitchApi:
-      TwitchApiClient,
-
-    private readonly eventSub:
-      TwitchEventSubService,
-
-    private readonly prisma:
-      PrismaService,
-
-    private readonly encryption:
-      SecretEncryptionService,
-
-    private readonly oauthState:
-      TwitchOAuthStateService,
+    private readonly twitchApi: TwitchApiClient,
+    private readonly eventSub: TwitchEventSubService,
+    private readonly prisma: PrismaService,
+    private readonly encryption: SecretEncryptionService,
+    private readonly oauthState: TwitchOAuthStateService,
   ) {}
 
   async getAuthorizationUrl() {
     const state =
       await this.oauthState.create();
 
-    return this.twitchApi
-      .getAuthorizationUrl(state);
+    return this.twitchApi.getAuthorizationUrl(
+      state,
+    );
   }
 
   async handleOAuthCallback(
     code: string,
     state: string,
   ) {
-    const valid =
-      await this.oauthState.consume(
-        state,
+    if (!code || !state) {
+      throw new BadRequestException(
+        'Missing Twitch OAuth code or state',
       );
+    }
 
-    if (!valid) {
+    const validState =
+      await this.oauthState.consume(state);
+
+    if (!validState) {
       throw new UnauthorizedException(
         'Invalid or expired Twitch OAuth state',
       );
@@ -55,14 +52,20 @@ export class TwitchService {
         code,
       );
 
+    if (!token.refresh_token) {
+      throw new Error(
+        'Twitch OAuth did not return a refresh token',
+      );
+    }
+
     const user =
       await this.twitchApi.getUser(
         token.access_token,
       );
 
     if (!user) {
-      throw new UnauthorizedException(
-        'Unable to identify Twitch account',
+      throw new Error(
+        'Twitch OAuth did not return a user',
       );
     }
 
@@ -71,24 +74,15 @@ export class TwitchService {
         token.access_token,
       );
 
-    const refreshToken =
-      token.refresh_token;
-
-    if (!refreshToken) {
-      throw new Error(
-        'Twitch did not return a refresh token',
-      );
-    }
-
     const refreshTokenEncrypted =
       this.encryption.encrypt(
-        refreshToken,
+        token.refresh_token,
       );
 
     const accessTokenExpiresAt =
       new Date(
         Date.now() +
-          token.expires_in * 1000,
+          token.expires_in * 1_000,
       );
 
     const account =
