@@ -184,6 +184,7 @@ describe('AutomationProcessor', () => {
       execution,
       'rule-1',
       'event-1',
+      1,
     );
 
     expect(

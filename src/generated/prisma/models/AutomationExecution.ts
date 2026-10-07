@@ -20,8 +20,18 @@ export type AutomationExecutionModel = runtime.Types.Result.DefaultSelection<Pri
 
 export type AggregateAutomationExecution = {
   _count: AutomationExecutionCountAggregateOutputType | null
+  _avg: AutomationExecutionAvgAggregateOutputType | null
+  _sum: AutomationExecutionSumAggregateOutputType | null
   _min: AutomationExecutionMinAggregateOutputType | null
   _max: AutomationExecutionMaxAggregateOutputType | null
+}
+
+export type AutomationExecutionAvgAggregateOutputType = {
+  attempts: number | null
+}
+
+export type AutomationExecutionSumAggregateOutputType = {
+  attempts: number | null
 }
 
 export type AutomationExecutionMinAggregateOutputType = {
@@ -29,6 +39,8 @@ export type AutomationExecutionMinAggregateOutputType = {
   ruleId: string | null
   eventId: string | null
   status: string | null
+  attempts: number | null
+  lastError: string | null
   createdAt: Date | null
   updatedAt: Date | null
   completedAt: Date | null
@@ -39,6 +51,8 @@ export type AutomationExecutionMaxAggregateOutputType = {
   ruleId: string | null
   eventId: string | null
   status: string | null
+  attempts: number | null
+  lastError: string | null
   createdAt: Date | null
   updatedAt: Date | null
   completedAt: Date | null
@@ -49,7 +63,9 @@ export type AutomationExecutionCountAggregateOutputType = {
   ruleId: number
   eventId: number
   status: number
+  attempts: number
   result: number
+  lastError: number
   createdAt: number
   updatedAt: number
   completedAt: number
@@ -57,11 +73,21 @@ export type AutomationExecutionCountAggregateOutputType = {
 }
 
 
+export type AutomationExecutionAvgAggregateInputType = {
+  attempts?: true
+}
+
+export type AutomationExecutionSumAggregateInputType = {
+  attempts?: true
+}
+
 export type AutomationExecutionMinAggregateInputType = {
   id?: true
   ruleId?: true
   eventId?: true
   status?: true
+  attempts?: true
+  lastError?: true
   createdAt?: true
   updatedAt?: true
   completedAt?: true
@@ -72,6 +98,8 @@ export type AutomationExecutionMaxAggregateInputType = {
   ruleId?: true
   eventId?: true
   status?: true
+  attempts?: true
+  lastError?: true
   createdAt?: true
   updatedAt?: true
   completedAt?: true
@@ -82,7 +110,9 @@ export type AutomationExecutionCountAggregateInputType = {
   ruleId?: true
   eventId?: true
   status?: true
+  attempts?: true
   result?: true
+  lastError?: true
   createdAt?: true
   updatedAt?: true
   completedAt?: true
@@ -127,6 +157,18 @@ export type AutomationExecutionAggregateArgs<ExtArgs extends runtime.Types.Exten
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: AutomationExecutionAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: AutomationExecutionSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: AutomationExecutionMinAggregateInputType
@@ -157,6 +199,8 @@ export type AutomationExecutionGroupByArgs<ExtArgs extends runtime.Types.Extensi
   take?: number
   skip?: number
   _count?: AutomationExecutionCountAggregateInputType | true
+  _avg?: AutomationExecutionAvgAggregateInputType
+  _sum?: AutomationExecutionSumAggregateInputType
   _min?: AutomationExecutionMinAggregateInputType
   _max?: AutomationExecutionMaxAggregateInputType
 }
@@ -166,11 +210,15 @@ export type AutomationExecutionGroupByOutputType = {
   ruleId: string
   eventId: string
   status: string
+  attempts: number
   result: runtime.JsonValue | null
+  lastError: string | null
   createdAt: Date
   updatedAt: Date
   completedAt: Date | null
   _count: AutomationExecutionCountAggregateOutputType | null
+  _avg: AutomationExecutionAvgAggregateOutputType | null
+  _sum: AutomationExecutionSumAggregateOutputType | null
   _min: AutomationExecutionMinAggregateOutputType | null
   _max: AutomationExecutionMaxAggregateOutputType | null
 }
@@ -198,7 +246,9 @@ export type AutomationExecutionWhereInput = {
   ruleId?: Prisma.StringFilter<"AutomationExecution"> | string
   eventId?: Prisma.StringFilter<"AutomationExecution"> | string
   status?: Prisma.StringFilter<"AutomationExecution"> | string
+  attempts?: Prisma.IntFilter<"AutomationExecution"> | number
   result?: Prisma.JsonNullableFilter<"AutomationExecution">
+  lastError?: Prisma.StringNullableFilter<"AutomationExecution"> | string | null
   createdAt?: Prisma.DateTimeFilter<"AutomationExecution"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"AutomationExecution"> | Date | string
   completedAt?: Prisma.DateTimeNullableFilter<"AutomationExecution"> | Date | string | null
@@ -211,7 +261,9 @@ export type AutomationExecutionOrderByWithRelationInput = {
   ruleId?: Prisma.SortOrder
   eventId?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  attempts?: Prisma.SortOrder
   result?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastError?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -228,7 +280,9 @@ export type AutomationExecutionWhereUniqueInput = Prisma.AtLeast<{
   ruleId?: Prisma.StringFilter<"AutomationExecution"> | string
   eventId?: Prisma.StringFilter<"AutomationExecution"> | string
   status?: Prisma.StringFilter<"AutomationExecution"> | string
+  attempts?: Prisma.IntFilter<"AutomationExecution"> | number
   result?: Prisma.JsonNullableFilter<"AutomationExecution">
+  lastError?: Prisma.StringNullableFilter<"AutomationExecution"> | string | null
   createdAt?: Prisma.DateTimeFilter<"AutomationExecution"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"AutomationExecution"> | Date | string
   completedAt?: Prisma.DateTimeNullableFilter<"AutomationExecution"> | Date | string | null
@@ -241,13 +295,17 @@ export type AutomationExecutionOrderByWithAggregationInput = {
   ruleId?: Prisma.SortOrder
   eventId?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  attempts?: Prisma.SortOrder
   result?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastError?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.AutomationExecutionCountOrderByAggregateInput
+  _avg?: Prisma.AutomationExecutionAvgOrderByAggregateInput
   _max?: Prisma.AutomationExecutionMaxOrderByAggregateInput
   _min?: Prisma.AutomationExecutionMinOrderByAggregateInput
+  _sum?: Prisma.AutomationExecutionSumOrderByAggregateInput
 }
 
 export type AutomationExecutionScalarWhereWithAggregatesInput = {
@@ -258,7 +316,9 @@ export type AutomationExecutionScalarWhereWithAggregatesInput = {
   ruleId?: Prisma.StringWithAggregatesFilter<"AutomationExecution"> | string
   eventId?: Prisma.StringWithAggregatesFilter<"AutomationExecution"> | string
   status?: Prisma.StringWithAggregatesFilter<"AutomationExecution"> | string
+  attempts?: Prisma.IntWithAggregatesFilter<"AutomationExecution"> | number
   result?: Prisma.JsonNullableWithAggregatesFilter<"AutomationExecution">
+  lastError?: Prisma.StringNullableWithAggregatesFilter<"AutomationExecution"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"AutomationExecution"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"AutomationExecution"> | Date | string
   completedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"AutomationExecution"> | Date | string | null
@@ -268,7 +328,9 @@ export type AutomationExecutionCreateInput = {
   id?: string
   eventId: string
   status: string
+  attempts?: number
   result?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastError?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   completedAt?: Date | string | null
@@ -281,7 +343,9 @@ export type AutomationExecutionUncheckedCreateInput = {
   ruleId: string
   eventId: string
   status: string
+  attempts?: number
   result?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastError?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   completedAt?: Date | string | null
@@ -292,7 +356,9 @@ export type AutomationExecutionUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   eventId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  attempts?: Prisma.IntFieldUpdateOperationsInput | number
   result?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -305,7 +371,9 @@ export type AutomationExecutionUncheckedUpdateInput = {
   ruleId?: Prisma.StringFieldUpdateOperationsInput | string
   eventId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  attempts?: Prisma.IntFieldUpdateOperationsInput | number
   result?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -317,7 +385,9 @@ export type AutomationExecutionCreateManyInput = {
   ruleId: string
   eventId: string
   status: string
+  attempts?: number
   result?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastError?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   completedAt?: Date | string | null
@@ -327,7 +397,9 @@ export type AutomationExecutionUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   eventId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  attempts?: Prisma.IntFieldUpdateOperationsInput | number
   result?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -338,7 +410,9 @@ export type AutomationExecutionUncheckedUpdateManyInput = {
   ruleId?: Prisma.StringFieldUpdateOperationsInput | string
   eventId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  attempts?: Prisma.IntFieldUpdateOperationsInput | number
   result?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -364,10 +438,16 @@ export type AutomationExecutionCountOrderByAggregateInput = {
   ruleId?: Prisma.SortOrder
   eventId?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  attempts?: Prisma.SortOrder
   result?: Prisma.SortOrder
+  lastError?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
+}
+
+export type AutomationExecutionAvgOrderByAggregateInput = {
+  attempts?: Prisma.SortOrder
 }
 
 export type AutomationExecutionMaxOrderByAggregateInput = {
@@ -375,6 +455,8 @@ export type AutomationExecutionMaxOrderByAggregateInput = {
   ruleId?: Prisma.SortOrder
   eventId?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  attempts?: Prisma.SortOrder
+  lastError?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
@@ -385,9 +467,15 @@ export type AutomationExecutionMinOrderByAggregateInput = {
   ruleId?: Prisma.SortOrder
   eventId?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  attempts?: Prisma.SortOrder
+  lastError?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
+}
+
+export type AutomationExecutionSumOrderByAggregateInput = {
+  attempts?: Prisma.SortOrder
 }
 
 export type AutomationExecutionScalarRelationFilter = {
@@ -455,7 +543,9 @@ export type AutomationExecutionCreateWithoutRuleInput = {
   id?: string
   eventId: string
   status: string
+  attempts?: number
   result?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastError?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   completedAt?: Date | string | null
@@ -466,7 +556,9 @@ export type AutomationExecutionUncheckedCreateWithoutRuleInput = {
   id?: string
   eventId: string
   status: string
+  attempts?: number
   result?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastError?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   completedAt?: Date | string | null
@@ -507,7 +599,9 @@ export type AutomationExecutionScalarWhereInput = {
   ruleId?: Prisma.StringFilter<"AutomationExecution"> | string
   eventId?: Prisma.StringFilter<"AutomationExecution"> | string
   status?: Prisma.StringFilter<"AutomationExecution"> | string
+  attempts?: Prisma.IntFilter<"AutomationExecution"> | number
   result?: Prisma.JsonNullableFilter<"AutomationExecution">
+  lastError?: Prisma.StringNullableFilter<"AutomationExecution"> | string | null
   createdAt?: Prisma.DateTimeFilter<"AutomationExecution"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"AutomationExecution"> | Date | string
   completedAt?: Prisma.DateTimeNullableFilter<"AutomationExecution"> | Date | string | null
@@ -517,7 +611,9 @@ export type AutomationExecutionCreateWithoutActionsInput = {
   id?: string
   eventId: string
   status: string
+  attempts?: number
   result?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastError?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   completedAt?: Date | string | null
@@ -529,7 +625,9 @@ export type AutomationExecutionUncheckedCreateWithoutActionsInput = {
   ruleId: string
   eventId: string
   status: string
+  attempts?: number
   result?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastError?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   completedAt?: Date | string | null
@@ -555,7 +653,9 @@ export type AutomationExecutionUpdateWithoutActionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   eventId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  attempts?: Prisma.IntFieldUpdateOperationsInput | number
   result?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -567,7 +667,9 @@ export type AutomationExecutionUncheckedUpdateWithoutActionsInput = {
   ruleId?: Prisma.StringFieldUpdateOperationsInput | string
   eventId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  attempts?: Prisma.IntFieldUpdateOperationsInput | number
   result?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -577,7 +679,9 @@ export type AutomationExecutionCreateManyRuleInput = {
   id?: string
   eventId: string
   status: string
+  attempts?: number
   result?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastError?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   completedAt?: Date | string | null
@@ -587,7 +691,9 @@ export type AutomationExecutionUpdateWithoutRuleInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   eventId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  attempts?: Prisma.IntFieldUpdateOperationsInput | number
   result?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -598,7 +704,9 @@ export type AutomationExecutionUncheckedUpdateWithoutRuleInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   eventId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  attempts?: Prisma.IntFieldUpdateOperationsInput | number
   result?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -609,7 +717,9 @@ export type AutomationExecutionUncheckedUpdateManyWithoutRuleInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   eventId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  attempts?: Prisma.IntFieldUpdateOperationsInput | number
   result?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -651,7 +761,9 @@ export type AutomationExecutionSelect<ExtArgs extends runtime.Types.Extensions.I
   ruleId?: boolean
   eventId?: boolean
   status?: boolean
+  attempts?: boolean
   result?: boolean
+  lastError?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   completedAt?: boolean
@@ -665,7 +777,9 @@ export type AutomationExecutionSelectCreateManyAndReturn<ExtArgs extends runtime
   ruleId?: boolean
   eventId?: boolean
   status?: boolean
+  attempts?: boolean
   result?: boolean
+  lastError?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   completedAt?: boolean
@@ -677,7 +791,9 @@ export type AutomationExecutionSelectUpdateManyAndReturn<ExtArgs extends runtime
   ruleId?: boolean
   eventId?: boolean
   status?: boolean
+  attempts?: boolean
   result?: boolean
+  lastError?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   completedAt?: boolean
@@ -689,13 +805,15 @@ export type AutomationExecutionSelectScalar = {
   ruleId?: boolean
   eventId?: boolean
   status?: boolean
+  attempts?: boolean
   result?: boolean
+  lastError?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   completedAt?: boolean
 }
 
-export type AutomationExecutionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ruleId" | "eventId" | "status" | "result" | "createdAt" | "updatedAt" | "completedAt", ExtArgs["result"]["automationExecution"]>
+export type AutomationExecutionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ruleId" | "eventId" | "status" | "attempts" | "result" | "lastError" | "createdAt" | "updatedAt" | "completedAt", ExtArgs["result"]["automationExecution"]>
 export type AutomationExecutionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   rule?: boolean | Prisma.AutomationRuleDefaultArgs<ExtArgs>
   actions?: boolean | Prisma.AutomationExecution$actionsArgs<ExtArgs>
@@ -719,7 +837,9 @@ export type $AutomationExecutionPayload<ExtArgs extends runtime.Types.Extensions
     ruleId: string
     eventId: string
     status: string
+    attempts: number
     result: runtime.JsonValue | null
+    lastError: string | null
     createdAt: Date
     updatedAt: Date
     completedAt: Date | null
@@ -1152,7 +1272,9 @@ export interface AutomationExecutionFieldRefs {
   readonly ruleId: Prisma.FieldRef<"AutomationExecution", 'String'>
   readonly eventId: Prisma.FieldRef<"AutomationExecution", 'String'>
   readonly status: Prisma.FieldRef<"AutomationExecution", 'String'>
+  readonly attempts: Prisma.FieldRef<"AutomationExecution", 'Int'>
   readonly result: Prisma.FieldRef<"AutomationExecution", 'Json'>
+  readonly lastError: Prisma.FieldRef<"AutomationExecution", 'String'>
   readonly createdAt: Prisma.FieldRef<"AutomationExecution", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"AutomationExecution", 'DateTime'>
   readonly completedAt: Prisma.FieldRef<"AutomationExecution", 'DateTime'>

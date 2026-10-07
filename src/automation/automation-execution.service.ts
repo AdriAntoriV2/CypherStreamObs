@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '../generated/prisma/client.js';
 import { PrismaService } from '../database/prisma.service.js';
 
@@ -8,7 +8,7 @@ const EXECUTION_LEASE_MS = 5 * 60 * 1_000;
 export class AutomationExecutionService {
   constructor(
     private readonly prisma: PrismaService,
-  ) {}
+  ) { }
 
   async find(
     ruleId: string,
@@ -58,6 +58,7 @@ export class AutomationExecutionService {
     } | null,
     ruleId: string,
     eventId: string,
+    attempt: number,
   ) {
     if (!execution) {
       return this.prisma.automationExecution.create({
@@ -65,6 +66,8 @@ export class AutomationExecutionService {
           ruleId,
           eventId,
           status: 'RUNNING',
+          attempts: attempt,
+          lastError: null,
         },
       });
     }
@@ -75,7 +78,9 @@ export class AutomationExecutionService {
       },
       data: {
         status: 'RUNNING',
+        attempts: attempt,
         result: Prisma.JsonNull,
+        lastError: null,
         completedAt: null,
       },
     });
@@ -86,12 +91,11 @@ export class AutomationExecutionService {
     result: unknown,
   ) {
     return this.prisma.automationExecution.update({
-      where: {
-        id: executionId,
-      },
+      where: { id: executionId },
       data: {
         status: 'COMPLETED',
         result: result as any,
+        lastError: null,
         completedAt: new Date(),
       },
     });
@@ -101,20 +105,92 @@ export class AutomationExecutionService {
     executionId: string,
     error: unknown,
   ) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : 'Unknown error';
+
     return this.prisma.automationExecution.update({
-      where: {
-        id: executionId,
-      },
+      where: { id: executionId },
       data: {
         status: 'FAILED',
+        lastError: message,
         result: {
-          error:
-            error instanceof Error
-              ? error.message
-              : 'Unknown error',
+          error: message,
         },
         completedAt: new Date(),
       },
     });
+  }
+
+  async findById(id: string) {
+    const execution =
+      await this.prisma.automationExecution.findUnique({
+        where: { id },
+        include: {
+          actions: {
+            orderBy: {
+              actionIndex: 'asc',
+            },
+          },
+          rule: true,
+        },
+      });
+
+    if (!execution) {
+      throw new NotFoundException(
+        `Automation execution ${id} not found`,
+      );
+    }
+
+    return execution;
+  }
+
+  async findAll(
+    page = 1,
+    limit = 20,
+    status?: string,
+    ruleId?: string,
+  ) {
+    const skip = (page - 1) * limit;
+
+    const where = {
+      ...(status ? { status } : {}),
+      ...(ruleId ? { ruleId } : {}),
+    };
+
+    const [executions, total] =
+      await this.prisma.$transaction([
+        this.prisma.automationExecution.findMany({
+          skip,
+          take: limit,
+          where,
+          orderBy: {
+            createdAt: 'desc',
+          },
+          include: {
+            rule: true,
+            actions: {
+              orderBy: {
+                actionIndex: 'asc',
+              },
+            },
+          },
+        }),
+
+        this.prisma.automationExecution.count({
+          where,
+        }),
+      ]);
+
+    return {
+      data: executions,
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 }

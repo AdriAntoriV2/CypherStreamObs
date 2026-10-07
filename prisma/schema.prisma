@@ -66,10 +66,12 @@ model AutomationExecution {
   eventId   String
 
   status    String
+  attempts  Int      @default(0)
   result    Json?
+  lastError String?
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   completedAt DateTime?
 
   rule AutomationRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)

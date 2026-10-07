@@ -25,8 +25,13 @@ export class AutomationProcessor extends WorkerHost {
     console.log(
       `[AutomationProcessor] Processing job ${job.id}:`,
       job.name,
+      `attempt ${job.attemptsMade + 1}/${job.opts?.attempts ?? 1}`,
       job.data,
     );
+
+    if (job.name !== 'automation.execute') {
+      return;
+    }
 
     if (job.name !== 'automation.execute') {
       return;
@@ -96,12 +101,14 @@ export class AutomationProcessor extends WorkerHost {
         `[AutomationProcessor] Execution ${execution!.id} is stale, recovering`,
       );
     }
-
+    const attempt =
+      (job.attemptsMade ?? 0) + 1;
     execution =
       await this.executionService.start(
         execution,
         rule.id,
         event.id,
+        attempt,
       );
 
     try {

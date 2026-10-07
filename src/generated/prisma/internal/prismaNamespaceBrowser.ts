@@ -118,7 +118,9 @@ export const AutomationExecutionScalarFieldEnum = {
   ruleId: 'ruleId',
   eventId: 'eventId',
   status: 'status',
+  attempts: 'attempts',
   result: 'result',
+  lastError: 'lastError',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   completedAt: 'completedAt'

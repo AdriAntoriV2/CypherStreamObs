@@ -64,6 +64,7 @@ describe('MixItUpExecutor', () => {
     await expect(
       executor.execute({
         type: 'mixitup',
+        command: '',
       }),
     ).rejects.toThrow(
       'MixItUp action requires a command',
