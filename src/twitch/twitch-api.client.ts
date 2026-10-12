@@ -208,8 +208,46 @@ export class TwitchApiClient {
 
         if (!response.ok) {
             const body = await response.text();
+
             throw new Error(
                 `Twitch chat message failed: ${response.status} ${body}`,
+            );
+        }
+
+        let result: {
+            data?: Array<{
+                is_sent?: boolean;
+                drop_reason?: {
+                    code?: string;
+                    message?: string;
+                } | null;
+            }>;
+        };
+
+        try {
+            result = await response.json();
+        } catch {
+            throw new Error(
+                'Twitch chat message returned an invalid JSON response',
+            );
+        }
+
+        const delivery = result.data?.[0];
+
+        if (!delivery || typeof delivery.is_sent !== 'boolean') {
+            throw new Error(
+                'Twitch chat message returned an unexpected response',
+            );
+        }
+
+        if (!delivery.is_sent) {
+            const reason = delivery.drop_reason;
+            const details = reason
+                ? `${reason.code ?? 'unknown'}: ${reason.message ?? 'No reason provided'}`
+                : 'No reason provided';
+
+            throw new Error(
+                `Twitch did not send the chat message: ${details}`,
             );
         }
     }

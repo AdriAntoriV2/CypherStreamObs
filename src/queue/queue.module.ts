@@ -54,6 +54,7 @@ export const REDIS_CLIENT = Symbol('REDIS_CLIENT');
     QueueService,
     AutomationQueueService,
     REDIS_CLIENT,
+    BullModule,
   ],
 })
 export class QueueModule {}

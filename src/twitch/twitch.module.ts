@@ -9,26 +9,32 @@ import { StreamsModule } from '../streams/streams.module.js';
 import { EventsModule } from '../events/events.module.js';
 import { TwitchEventIngestionService } from './twitch-event-ingestion.service.js';
 import { CommandsModule } from '../commands/commands.module.js';
+import { SecurityModule } from '../common/security/security.module.js';
+import { TwitchOAuthStateService } from './twitch-oauth-state.service.js';
+import { QueueModule } from '../queue/queue.module.js';
 
 @Module({
   controllers: [
     TwitchController,
   ],
-providers: [
-  TwitchService,
-  TwitchApiClient,
-  TwitchEventSubService,
-  TwitchAuthenticatedClient,
-  TwitchEventNormalizer,
-  TwitchEventIngestionService,
-],
-imports: [
-  EventsModule,
-  StreamsModule,
-  CommandsModule,
-],
+  providers: [
+    TwitchService,
+    TwitchApiClient,
+    TwitchEventSubService,
+    TwitchAuthenticatedClient,
+    TwitchEventNormalizer,
+    TwitchEventIngestionService,
+    TwitchOAuthStateService,
+  ],
+  imports: [
+    EventsModule,
+    StreamsModule,
+    CommandsModule,
+    SecurityModule,
+    QueueModule,
+  ],
   exports: [
     TwitchService,
   ],
 })
-export class TwitchModule {}
+export class TwitchModule { }

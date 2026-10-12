@@ -12,6 +12,7 @@ import { SongRequestService } from './song-request.service.js';
 import { SongResolutionProcessor } from './song-resolution.processor.js';
 import { MpvPlaybackEngine } from './mpv-playback.engine.js';
 import { PLAYBACK_ENGINE } from './playback-engine.js';
+import { PlaybackControllerService } from './playback-controller.service.js';
 
 @Module({
   imports: [CommandsModule, QueueModule],
@@ -25,6 +26,7 @@ import { PLAYBACK_ENGINE } from './playback-engine.js';
     YouTubeResolverService,
     SongResolutionProcessor,
     MpvPlaybackEngine,
+    PlaybackControllerService,
     {
       provide: PLAYBACK_ENGINE,
       useExisting: MpvPlaybackEngine,
