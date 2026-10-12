@@ -4,7 +4,7 @@
 /build
 
 # Generated Prisma Client
-/src/generated/prisma/
+/src/generated/*
 
 # TypeScript build cache
 *.tsbuildinfo
