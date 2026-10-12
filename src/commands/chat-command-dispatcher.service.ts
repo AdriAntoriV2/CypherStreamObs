@@ -2,6 +2,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ChatCommandParser } from './chat-command-parser.service.js';
 import { CommandRouter } from './command-router.service.js';
+import { ChatCommandsService } from '../chat-commands/chat-commands.service.js';
+import { ChatCommandContext } from './types/chat-command.types.js';
 
 interface TwitchChatMessagePayload {
   message?: {
@@ -21,6 +23,7 @@ export class ChatCommandDispatcher {
   constructor(
     private readonly parser: ChatCommandParser,
     private readonly router: CommandRouter,
+    private readonly chatCommands: ChatCommandsService,
   ) { }
 
   async dispatch(
@@ -51,7 +54,7 @@ export class ChatCommandDispatcher {
       return null;;
     }
 
-    const result: unknown = await this.router.execute({
+    const context: ChatCommandContext = {
       command: parsed.command,
       args: parsed.args,
       rawMessage,
@@ -61,7 +64,13 @@ export class ChatCommandDispatcher {
         displayName,
       },
       streamId,
-    });
+    };
+
+    let result: unknown = await this.router.execute(context);
+
+    if (result === null) {
+      result = await this.chatCommands.executeCustom(context);
+    }
 
     if (
       result !== null &&

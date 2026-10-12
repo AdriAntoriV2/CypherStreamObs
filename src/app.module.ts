@@ -15,6 +15,7 @@ import { RequestIdMiddleware } from './common/middleware/request-id.middleware.j
 import { TwitchModule } from './twitch/twitch.module.js';
 import { CommandsModule } from './commands/commands.module.js';
 import { SongRequestModule } from './song-request/song-request.module.js';
+import { ChatCommandsModule } from './chat-commands/chat-commands.module.js';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { SongRequestModule } from './song-request/song-request.module.js';
     TwitchModule,
     CommandsModule,
     SongRequestModule,
+    ChatCommandsModule,
   ],
 })
 export class AppModule implements NestModule {

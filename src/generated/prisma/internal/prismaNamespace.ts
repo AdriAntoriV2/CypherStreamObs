@@ -1070,6 +1070,7 @@ export type TwitchAccountScalarFieldEnum = (typeof TwitchAccountScalarFieldEnum)
 export const ChatCommandScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  response: 'response',
   enabled: 'enabled',
   cooldownSeconds: 'cooldownSeconds',
   createdAt: 'createdAt',

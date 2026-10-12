@@ -37,6 +37,7 @@ export type ChatCommandSumAggregateOutputType = {
 export type ChatCommandMinAggregateOutputType = {
   id: string | null
   name: string | null
+  response: string | null
   enabled: boolean | null
   cooldownSeconds: number | null
   createdAt: Date | null
@@ -46,6 +47,7 @@ export type ChatCommandMinAggregateOutputType = {
 export type ChatCommandMaxAggregateOutputType = {
   id: string | null
   name: string | null
+  response: string | null
   enabled: boolean | null
   cooldownSeconds: number | null
   createdAt: Date | null
@@ -55,6 +57,7 @@ export type ChatCommandMaxAggregateOutputType = {
 export type ChatCommandCountAggregateOutputType = {
   id: number
   name: number
+  response: number
   enabled: number
   cooldownSeconds: number
   createdAt: number
@@ -74,6 +77,7 @@ export type ChatCommandSumAggregateInputType = {
 export type ChatCommandMinAggregateInputType = {
   id?: true
   name?: true
+  response?: true
   enabled?: true
   cooldownSeconds?: true
   createdAt?: true
@@ -83,6 +87,7 @@ export type ChatCommandMinAggregateInputType = {
 export type ChatCommandMaxAggregateInputType = {
   id?: true
   name?: true
+  response?: true
   enabled?: true
   cooldownSeconds?: true
   createdAt?: true
@@ -92,6 +97,7 @@ export type ChatCommandMaxAggregateInputType = {
 export type ChatCommandCountAggregateInputType = {
   id?: true
   name?: true
+  response?: true
   enabled?: true
   cooldownSeconds?: true
   createdAt?: true
@@ -188,6 +194,7 @@ export type ChatCommandGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inte
 export type ChatCommandGroupByOutputType = {
   id: string
   name: string
+  response: string
   enabled: boolean
   cooldownSeconds: number
   createdAt: Date
@@ -220,6 +227,7 @@ export type ChatCommandWhereInput = {
   NOT?: Prisma.ChatCommandWhereInput | Prisma.ChatCommandWhereInput[]
   id?: Prisma.StringFilter<"ChatCommand"> | string
   name?: Prisma.StringFilter<"ChatCommand"> | string
+  response?: Prisma.StringFilter<"ChatCommand"> | string
   enabled?: Prisma.BoolFilter<"ChatCommand"> | boolean
   cooldownSeconds?: Prisma.IntFilter<"ChatCommand"> | number
   createdAt?: Prisma.DateTimeFilter<"ChatCommand"> | Date | string
@@ -229,6 +237,7 @@ export type ChatCommandWhereInput = {
 export type ChatCommandOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  response?: Prisma.SortOrder
   enabled?: Prisma.SortOrder
   cooldownSeconds?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -241,6 +250,7 @@ export type ChatCommandWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.ChatCommandWhereInput | Prisma.ChatCommandWhereInput[]
   OR?: Prisma.ChatCommandWhereInput[]
   NOT?: Prisma.ChatCommandWhereInput | Prisma.ChatCommandWhereInput[]
+  response?: Prisma.StringFilter<"ChatCommand"> | string
   enabled?: Prisma.BoolFilter<"ChatCommand"> | boolean
   cooldownSeconds?: Prisma.IntFilter<"ChatCommand"> | number
   createdAt?: Prisma.DateTimeFilter<"ChatCommand"> | Date | string
@@ -250,6 +260,7 @@ export type ChatCommandWhereUniqueInput = Prisma.AtLeast<{
 export type ChatCommandOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  response?: Prisma.SortOrder
   enabled?: Prisma.SortOrder
   cooldownSeconds?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -267,6 +278,7 @@ export type ChatCommandScalarWhereWithAggregatesInput = {
   NOT?: Prisma.ChatCommandScalarWhereWithAggregatesInput | Prisma.ChatCommandScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"ChatCommand"> | string
   name?: Prisma.StringWithAggregatesFilter<"ChatCommand"> | string
+  response?: Prisma.StringWithAggregatesFilter<"ChatCommand"> | string
   enabled?: Prisma.BoolWithAggregatesFilter<"ChatCommand"> | boolean
   cooldownSeconds?: Prisma.IntWithAggregatesFilter<"ChatCommand"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ChatCommand"> | Date | string
@@ -276,6 +288,7 @@ export type ChatCommandScalarWhereWithAggregatesInput = {
 export type ChatCommandCreateInput = {
   id?: string
   name: string
+  response: string
   enabled?: boolean
   cooldownSeconds?: number
   createdAt?: Date | string
@@ -285,6 +298,7 @@ export type ChatCommandCreateInput = {
 export type ChatCommandUncheckedCreateInput = {
   id?: string
   name: string
+  response: string
   enabled?: boolean
   cooldownSeconds?: number
   createdAt?: Date | string
@@ -294,6 +308,7 @@ export type ChatCommandUncheckedCreateInput = {
 export type ChatCommandUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  response?: Prisma.StringFieldUpdateOperationsInput | string
   enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cooldownSeconds?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -303,6 +318,7 @@ export type ChatCommandUpdateInput = {
 export type ChatCommandUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  response?: Prisma.StringFieldUpdateOperationsInput | string
   enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cooldownSeconds?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -312,6 +328,7 @@ export type ChatCommandUncheckedUpdateInput = {
 export type ChatCommandCreateManyInput = {
   id?: string
   name: string
+  response: string
   enabled?: boolean
   cooldownSeconds?: number
   createdAt?: Date | string
@@ -321,6 +338,7 @@ export type ChatCommandCreateManyInput = {
 export type ChatCommandUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  response?: Prisma.StringFieldUpdateOperationsInput | string
   enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cooldownSeconds?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -330,6 +348,7 @@ export type ChatCommandUpdateManyMutationInput = {
 export type ChatCommandUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  response?: Prisma.StringFieldUpdateOperationsInput | string
   enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cooldownSeconds?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -339,6 +358,7 @@ export type ChatCommandUncheckedUpdateManyInput = {
 export type ChatCommandCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  response?: Prisma.SortOrder
   enabled?: Prisma.SortOrder
   cooldownSeconds?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -352,6 +372,7 @@ export type ChatCommandAvgOrderByAggregateInput = {
 export type ChatCommandMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  response?: Prisma.SortOrder
   enabled?: Prisma.SortOrder
   cooldownSeconds?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -361,6 +382,7 @@ export type ChatCommandMaxOrderByAggregateInput = {
 export type ChatCommandMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  response?: Prisma.SortOrder
   enabled?: Prisma.SortOrder
   cooldownSeconds?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -376,6 +398,7 @@ export type ChatCommandSumOrderByAggregateInput = {
 export type ChatCommandSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  response?: boolean
   enabled?: boolean
   cooldownSeconds?: boolean
   createdAt?: boolean
@@ -385,6 +408,7 @@ export type ChatCommandSelect<ExtArgs extends runtime.Types.Extensions.InternalA
 export type ChatCommandSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  response?: boolean
   enabled?: boolean
   cooldownSeconds?: boolean
   createdAt?: boolean
@@ -394,6 +418,7 @@ export type ChatCommandSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
 export type ChatCommandSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  response?: boolean
   enabled?: boolean
   cooldownSeconds?: boolean
   createdAt?: boolean
@@ -403,13 +428,14 @@ export type ChatCommandSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
 export type ChatCommandSelectScalar = {
   id?: boolean
   name?: boolean
+  response?: boolean
   enabled?: boolean
   cooldownSeconds?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ChatCommandOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "enabled" | "cooldownSeconds" | "createdAt" | "updatedAt", ExtArgs["result"]["chatCommand"]>
+export type ChatCommandOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "response" | "enabled" | "cooldownSeconds" | "createdAt" | "updatedAt", ExtArgs["result"]["chatCommand"]>
 
 export type $ChatCommandPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ChatCommand"
@@ -417,6 +443,7 @@ export type $ChatCommandPayload<ExtArgs extends runtime.Types.Extensions.Interna
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     name: string
+    response: string
     enabled: boolean
     cooldownSeconds: number
     createdAt: Date
@@ -846,6 +873,7 @@ export interface Prisma__ChatCommandClient<T, Null = never, ExtArgs extends runt
 export interface ChatCommandFieldRefs {
   readonly id: Prisma.FieldRef<"ChatCommand", 'String'>
   readonly name: Prisma.FieldRef<"ChatCommand", 'String'>
+  readonly response: Prisma.FieldRef<"ChatCommand", 'String'>
   readonly enabled: Prisma.FieldRef<"ChatCommand", 'Boolean'>
   readonly cooldownSeconds: Prisma.FieldRef<"ChatCommand", 'Int'>
   readonly createdAt: Prisma.FieldRef<"ChatCommand", 'DateTime'>
