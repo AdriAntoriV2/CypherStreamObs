@@ -100,6 +100,45 @@ export class TwitchEventSubService
     );
   }
 
+  private async syncCurrentStream(): Promise<void> {
+    if (!this.accessToken || !this.broadcasterUserId) {
+      throw new Error(
+        'Twitch credentials are unavailable',
+      );
+    }
+
+    const liveStream = await this.twitchApi.getLiveStream(
+      this.accessToken,
+      this.broadcasterUserId,
+    );
+
+    if (!liveStream) {
+      this.logger.log(
+        'Twitch channel is currently offline',
+      );
+      return;
+    }
+
+    const activeStream =
+      await this.streamsService.findActive();
+
+    if (activeStream) {
+      this.logger.log(
+        `Active StreamOps stream already exists: ${activeStream.id}`,
+      );
+      return;
+    }
+
+    const stream = await this.streamsService.create({
+      title: liveStream.title,
+      startedAt: liveStream.started_at,
+    });
+
+    this.logger.log(
+      `Recovered active StreamOps stream for existing Twitch broadcast: ${stream.id}`,
+    );
+  }
+
   private async handleMessage(
     message: TwitchEventSubMessage,
   ) {
@@ -151,6 +190,17 @@ export class TwitchEventSubService
     this.logger.log(
       `Twitch EventSub session established: ${session.id}`,
     );
+
+    try {
+      await this.syncCurrentStream();
+    } catch (error) {
+      this.logger.error(
+        'Failed to sync current Twitch stream',
+        error instanceof Error
+          ? error.stack
+          : String(error),
+      );
+    }
 
     await this.subscribe();
   }
@@ -233,13 +283,27 @@ export class TwitchEventSubService
       ];
 
     for (const subscription of subscriptions) {
-      await this.twitchApi.createEventSubSubscription(
-        this.accessToken,
-        this.session.id,
-        subscription.type,
-        subscription.version,
-        subscription.condition,
-      );
+      try {
+        const result =
+          await this.twitchApi.createEventSubSubscription(
+            this.accessToken,
+            this.session.id,
+            subscription.type,
+            subscription.version,
+            subscription.condition,
+          );
+
+        this.logger.log(
+          `EventSub subscription accepted: ${subscription.type} v${subscription.version}`,
+        );
+      } catch (error) {
+        this.logger.error(
+          `EventSub subscription failed: ${subscription.type} v${subscription.version}`,
+          error instanceof Error
+            ? error.message
+            : String(error),
+        );
+      }
     }
   }
 
@@ -264,6 +328,10 @@ export class TwitchEventSubService
 
     const subscriptionType =
       subscription.type;
+
+    this.logger.debug(
+      `EventSub notification received: ${String(subscriptionType)}`,
+    );
 
     const normalized =
       this.normalizer.normalize(
@@ -300,24 +368,32 @@ export class TwitchEventSubService
       normalized.payload,
     );
 
-    if (
-      subscriptionType === 'channel.chat.message' &&
-      ingested
-    ) {
-      const reply =
-        await this.chatCommandDispatcher.dispatch(
-          normalized.payload,
-          ingested.streamId,
+    if (subscriptionType === 'channel.chat.message') {
+      this.logger.log(
+        `Chat message received; ingestion result: ${ingested ? 'accepted' : 'ignored'}`,
+      );
+
+      if (ingested) {
+        const reply =
+          await this.chatCommandDispatcher.dispatch(
+            normalized.payload,
+            ingested.streamId,
+          );
+
+        this.logger.log(
+          `Chat command dispatch completed; reply: ${reply ? 'generated' : 'none'}`,
         );
 
-      if (reply && this.accessToken && this.broadcasterUserId) {
-        await this.twitchApi.sendChatMessage(
-          this.accessToken,
-          this.broadcasterUserId,
-          this.broadcasterUserId,
-          reply,
-        );
+        if (reply && this.accessToken && this.broadcasterUserId) {
+          await this.twitchApi.sendChatMessage(
+            this.accessToken,
+            this.broadcasterUserId,
+            this.broadcasterUserId,
+            reply,
+          );
+        }
       }
+
     }
   }
 

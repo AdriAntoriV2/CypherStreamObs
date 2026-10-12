@@ -194,12 +194,10 @@ export class MpvPlaybackEngine
 
     private connectSocket(): Promise<void> {
         return new Promise((resolve, reject) => {
-            const socket = net.createConnection(this.ipcPath);
+            const deadline = Date.now() + 5000;
+            let currentSocket: Socket | undefined;
+            let retryTimer: ReturnType<typeof setTimeout> | undefined;
             let settled = false;
-
-            const timeout = setTimeout(() => {
-                finish(new Error('Timed out connecting to mpv IPC socket'));
-            }, 5000);
 
             const finish = (error?: Error) => {
                 if (settled) {
@@ -209,38 +207,76 @@ export class MpvPlaybackEngine
                 settled = true;
                 clearTimeout(timeout);
 
+                if (retryTimer) {
+                    clearTimeout(retryTimer);
+                }
+
                 if (error) {
-                    socket.destroy();
+                    currentSocket?.destroy();
                     reject(error);
                 } else {
                     resolve();
                 }
             };
 
-            socket.once('connect', () => {
-                this.socket = socket;
+            const timeout = setTimeout(() => {
+                finish(
+                    new Error(
+                        `Timed out connecting to mpv IPC socket: ${this.ipcPath}`,
+                    ),
+                );
+            }, 5000);
 
-                socket.on('data', (data: Buffer) => {
-                    this.handleSocketData(data.toString('utf8'));
+            const attempt = () => {
+                if (settled) {
+                    return;
+                }
+
+                const socket = net.createConnection(this.ipcPath);
+                currentSocket = socket;
+
+                socket.once('connect', () => {
+                    this.socket = socket;
+
+                    socket.on('data', (data: Buffer) => {
+                        this.handleSocketData(data.toString('utf8'));
+                    });
+
+                    socket.on('error', (error) => {
+                        this.rejectPendingCommands(error);
+                        this.logger.warn(`mpv IPC error: ${error.message}`);
+                    });
+
+                    socket.on('close', () => {
+                        if (this.socket === socket) {
+                            this.socket = undefined;
+                        }
+                    });
+
+                    finish();
                 });
 
-                socket.on('error', (error) => {
-                    this.rejectPendingCommands(error);
-                    this.logger.warn(`mpv IPC error: ${error.message}`);
-                });
+                socket.once('error', () => {
+                    socket.destroy();
 
-                socket.on('close', () => {
-                    if (this.socket === socket) {
-                        this.socket = undefined;
+                    if (settled) {
+                        return;
                     }
+
+                    if (Date.now() >= deadline) {
+                        finish(
+                            new Error(
+                                `Timed out connecting to mpv IPC socket: ${this.ipcPath}`,
+                            ),
+                        );
+                        return;
+                    }
+
+                    retryTimer = setTimeout(attempt, 100);
                 });
+            };
 
-                finish();
-            });
-
-            socket.once('error', (error) => {
-                finish(error);
-            });
+            attempt();
         });
     }
 

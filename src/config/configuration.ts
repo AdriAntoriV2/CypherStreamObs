@@ -29,6 +29,14 @@ export default () => ({
       'http://localhost:3000/api/twitch/oauth/callback',
     tokenEncryptionKey:
       process.env.TWITCH_TOKEN_ENCRYPTION_KEY,
+    scopes: [
+      'user:read:chat',
+      'user:write:chat',
+      'moderator:read:followers',
+      'channel:read:subscriptions',
+      'bits:read',
+      'channel:read:redemptions',
+    ],
   },
 
   songRequest: {

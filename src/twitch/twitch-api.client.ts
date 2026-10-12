@@ -47,14 +47,52 @@ export class TwitchApiClient {
             client_id: this.clientId,
             redirect_uri: this.redirectUri,
             response_type: 'code',
-            scope: [
-                'user:read:chat',
-                'user:write:chat',
-            ].join(' '),
+            scope: this.config
+                .getOrThrow<string[]>('twitch.scopes')
+                .join(' '),
             state,
         });
 
         return `https://id.twitch.tv/oauth2/authorize?${params.toString()}`;
+    }
+
+    async getLiveStream(
+        accessToken: string,
+        userId: string,
+    ): Promise<{
+        title: string;
+        started_at: string;
+    } | null> {
+        const params = new URLSearchParams({
+            user_id: userId,
+        });
+
+        const response = await fetch(
+            `https://api.twitch.tv/helix/streams?${params.toString()}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                    'Client-Id': this.clientId,
+                },
+            },
+        );
+
+        if (!response.ok) {
+            const body = await response.text();
+
+            throw new Error(
+                `Twitch live-stream lookup failed: ${response.status} ${body}`,
+            );
+        }
+
+        const body = await response.json() as {
+            data: Array<{
+                title: string;
+                started_at: string;
+            }>;
+        };
+
+        return body.data[0] ?? null;
     }
 
     async exchangeCode(code: string) {

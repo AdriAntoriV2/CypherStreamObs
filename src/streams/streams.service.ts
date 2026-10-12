@@ -5,8 +5,7 @@ import { UpdateStreamDto } from './dto/update-stream.dto.js';
 
 @Injectable()
 export class StreamsService {
-  [x: string]: any;
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async create(dto: CreateStreamDto) {
     return this.prisma.stream.create({
@@ -52,6 +51,17 @@ export class StreamsService {
         endedAt: dto.endedAt
           ? new Date(dto.endedAt)
           : undefined,
+      },
+    });
+  }
+
+  async findActive() {
+    return this.prisma.stream.findFirst({
+      where: {
+        endedAt: null,
+      },
+      orderBy: {
+        startedAt: 'desc',
       },
     });
   }

@@ -29,6 +29,7 @@ export class SongRequestHandler implements ChatCommandHandler {
 
       return {
         ok: true,
+        message: 'Song request added to the queue!',
         request,
       };
     } catch (error) {
