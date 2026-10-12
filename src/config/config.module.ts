@@ -34,6 +34,15 @@ import configuration from './configuration.js';
           Joi.string()
             .pattern(/^[0-9a-fA-F]{64}$/)
             .required(),
+        SONG_REQUEST_QUEUE_LIMIT: Joi.number()
+          .integer()
+          .min(1)
+          .default(10),
+
+        MPV_PATH: Joi.string().default('mpv'),
+        MPV_IPC_PATH: Joi.string()
+          .default('/tmp/streamops-mpv.sock'),
+        RADIO_URL: Joi.string().uri().optional(),
       }),
     }),
   ],

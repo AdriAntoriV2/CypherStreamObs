@@ -9,18 +9,23 @@ import type {
   SongRequest,
 } from './song-request.types.js';
 import { QUEUE_NAMES } from '../queue/queue.constants.js';
-
-const DEFAULT_QUEUE_LIMIT = 10;
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class SongRequestService implements OnModuleInit {
-  private readonly queueLimit = DEFAULT_QUEUE_LIMIT;
+  private readonly queueLimit: number;
 
   constructor(
     private readonly repository: SongRequestRepository,
     @InjectQueue(QUEUE_NAMES.songResolution)
     private readonly resolutionQueue: Queue,
-  ) {}
+    private readonly configService: ConfigService,
+  ) {
+    this.queueLimit =
+      this.configService.getOrThrow<number>(
+        'songRequest.queueLimit',
+      );
+  }
 
   async onModuleInit(): Promise<void> {
     // Both the request list and resolution jobs are ephemeral.
