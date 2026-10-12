@@ -32,6 +32,25 @@ export class TwitchAuthenticatedClient {
         private readonly config: ConfigService,
     ) { }
 
+    async getAccessToken(accountId: string): Promise<string> {
+        const TOKEN_REFRESH_BUFFER_MS = 60 * 1_000;
+
+        const account = await this.getAccountTokens(accountId);
+
+        const tokenExpiresSoon =
+            account.accessTokenExpiresAt.getTime() - Date.now() <=
+            TOKEN_REFRESH_BUFFER_MS;
+
+        if (tokenExpiresSoon) {
+            return this.refresh(account);
+        }
+
+        return this.encryption.decrypt(
+            account.accessTokenEncrypted,
+        );
+    }
+
+
     async request(
         accountId: string,
         url: string,
