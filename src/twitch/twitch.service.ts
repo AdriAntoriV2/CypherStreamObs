@@ -24,7 +24,7 @@ export class TwitchService implements OnModuleInit {
     private readonly prisma: PrismaService,
     private readonly encryption: SecretEncryptionService,
     private readonly oauthState: TwitchOAuthStateService,
-  ) {}
+  ) { }
 
   async onModuleInit(): Promise<void> {
     const account = await this.prisma.twitchAccount.findFirst({
@@ -68,10 +68,11 @@ export class TwitchService implements OnModuleInit {
     }
   }
 
-  async getAuthorizationUrl() {
+  async getAuthorizationUrl(): Promise<{ url: string; state: string }> {
     const state = await this.oauthState.create();
+    const url = this.twitchApi.getAuthorizationUrl(state);
 
-    return this.twitchApi.getAuthorizationUrl(state);
+    return { url, state };
   }
 
   async handleOAuthCallback(code: string, state: string) {

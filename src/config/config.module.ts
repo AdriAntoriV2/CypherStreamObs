@@ -34,6 +34,14 @@ import configuration from './configuration.js';
           Joi.string()
             .pattern(/^[0-9a-fA-F]{64}$/)
             .required(),
+        TWITCH_ADMIN_USER_ID: Joi.string()
+          .pattern(/^\d+$/)
+          .required(),
+
+        SESSION_SECRET: Joi.string()
+          .min(32)
+          .required(),
+
         SONG_REQUEST_QUEUE_LIMIT: Joi.number()
           .integer()
           .min(1)

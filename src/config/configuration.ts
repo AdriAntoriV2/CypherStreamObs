@@ -20,6 +20,11 @@ export default () => ({
   //     'http://127.0.0.1:8911',
   // },
 
+  session: {
+    secret: process.env.SESSION_SECRET,
+    cookieSecure: process.env.NODE_ENV === 'production',
+  },
+
   twitch: {
     clientId: process.env.TWITCH_CLIENT_ID,
     clientSecret:
@@ -37,6 +42,7 @@ export default () => ({
       'bits:read',
       'channel:read:redemptions',
     ],
+    adminUserId: process.env.TWITCH_ADMIN_USER_ID,
   },
 
   songRequest: {
