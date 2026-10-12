@@ -9,6 +9,9 @@ import { ChatCommandAdminGuard } from './chat-command-admin.guard.js';
     ChatCommandsService,
     ChatCommandAdminGuard,
   ],
-  exports: [ChatCommandsService],
+  exports: [
+    ChatCommandsService,
+    ChatCommandAdminGuard,
+  ],
 })
 export class ChatCommandsModule {}

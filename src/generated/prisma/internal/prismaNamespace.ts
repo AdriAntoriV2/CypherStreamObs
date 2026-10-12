@@ -403,7 +403,11 @@ export const ModelName = {
   AutomationExecution: 'AutomationExecution',
   AutomationActionExecution: 'AutomationActionExecution',
   TwitchAccount: 'TwitchAccount',
-  ChatCommand: 'ChatCommand'
+  ChatCommand: 'ChatCommand',
+  PointPoolEvent: 'PointPoolEvent',
+  PointPoolRedemption: 'PointPoolRedemption',
+  PointPoolGoal: 'PointPoolGoal',
+  PointPoolAdjustment: 'PointPoolAdjustment'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -419,7 +423,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "stream" | "streamEvent" | "automationRule" | "automationExecution" | "automationActionExecution" | "twitchAccount" | "chatCommand"
+    modelProps: "stream" | "streamEvent" | "automationRule" | "automationExecution" | "automationActionExecution" | "twitchAccount" | "chatCommand" | "pointPoolEvent" | "pointPoolRedemption" | "pointPoolGoal" | "pointPoolAdjustment"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -941,6 +945,302 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PointPoolEvent: {
+      payload: Prisma.$PointPoolEventPayload<ExtArgs>
+      fields: Prisma.PointPoolEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PointPoolEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PointPoolEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolEventPayload>
+        }
+        findFirst: {
+          args: Prisma.PointPoolEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PointPoolEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolEventPayload>
+        }
+        findMany: {
+          args: Prisma.PointPoolEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolEventPayload>[]
+        }
+        create: {
+          args: Prisma.PointPoolEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolEventPayload>
+        }
+        createMany: {
+          args: Prisma.PointPoolEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PointPoolEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolEventPayload>[]
+        }
+        delete: {
+          args: Prisma.PointPoolEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolEventPayload>
+        }
+        update: {
+          args: Prisma.PointPoolEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.PointPoolEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PointPoolEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PointPoolEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.PointPoolEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolEventPayload>
+        }
+        aggregate: {
+          args: Prisma.PointPoolEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePointPoolEvent>
+        }
+        groupBy: {
+          args: Prisma.PointPoolEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PointPoolEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PointPoolEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PointPoolEventCountAggregateOutputType> | number
+        }
+      }
+    }
+    PointPoolRedemption: {
+      payload: Prisma.$PointPoolRedemptionPayload<ExtArgs>
+      fields: Prisma.PointPoolRedemptionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PointPoolRedemptionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolRedemptionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PointPoolRedemptionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolRedemptionPayload>
+        }
+        findFirst: {
+          args: Prisma.PointPoolRedemptionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolRedemptionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PointPoolRedemptionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolRedemptionPayload>
+        }
+        findMany: {
+          args: Prisma.PointPoolRedemptionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolRedemptionPayload>[]
+        }
+        create: {
+          args: Prisma.PointPoolRedemptionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolRedemptionPayload>
+        }
+        createMany: {
+          args: Prisma.PointPoolRedemptionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PointPoolRedemptionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolRedemptionPayload>[]
+        }
+        delete: {
+          args: Prisma.PointPoolRedemptionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolRedemptionPayload>
+        }
+        update: {
+          args: Prisma.PointPoolRedemptionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolRedemptionPayload>
+        }
+        deleteMany: {
+          args: Prisma.PointPoolRedemptionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PointPoolRedemptionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PointPoolRedemptionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolRedemptionPayload>[]
+        }
+        upsert: {
+          args: Prisma.PointPoolRedemptionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolRedemptionPayload>
+        }
+        aggregate: {
+          args: Prisma.PointPoolRedemptionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePointPoolRedemption>
+        }
+        groupBy: {
+          args: Prisma.PointPoolRedemptionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PointPoolRedemptionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PointPoolRedemptionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PointPoolRedemptionCountAggregateOutputType> | number
+        }
+      }
+    }
+    PointPoolGoal: {
+      payload: Prisma.$PointPoolGoalPayload<ExtArgs>
+      fields: Prisma.PointPoolGoalFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PointPoolGoalFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolGoalPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PointPoolGoalFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolGoalPayload>
+        }
+        findFirst: {
+          args: Prisma.PointPoolGoalFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolGoalPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PointPoolGoalFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolGoalPayload>
+        }
+        findMany: {
+          args: Prisma.PointPoolGoalFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolGoalPayload>[]
+        }
+        create: {
+          args: Prisma.PointPoolGoalCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolGoalPayload>
+        }
+        createMany: {
+          args: Prisma.PointPoolGoalCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PointPoolGoalCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolGoalPayload>[]
+        }
+        delete: {
+          args: Prisma.PointPoolGoalDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolGoalPayload>
+        }
+        update: {
+          args: Prisma.PointPoolGoalUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolGoalPayload>
+        }
+        deleteMany: {
+          args: Prisma.PointPoolGoalDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PointPoolGoalUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PointPoolGoalUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolGoalPayload>[]
+        }
+        upsert: {
+          args: Prisma.PointPoolGoalUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolGoalPayload>
+        }
+        aggregate: {
+          args: Prisma.PointPoolGoalAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePointPoolGoal>
+        }
+        groupBy: {
+          args: Prisma.PointPoolGoalGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PointPoolGoalGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PointPoolGoalCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PointPoolGoalCountAggregateOutputType> | number
+        }
+      }
+    }
+    PointPoolAdjustment: {
+      payload: Prisma.$PointPoolAdjustmentPayload<ExtArgs>
+      fields: Prisma.PointPoolAdjustmentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PointPoolAdjustmentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolAdjustmentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PointPoolAdjustmentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolAdjustmentPayload>
+        }
+        findFirst: {
+          args: Prisma.PointPoolAdjustmentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolAdjustmentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PointPoolAdjustmentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolAdjustmentPayload>
+        }
+        findMany: {
+          args: Prisma.PointPoolAdjustmentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolAdjustmentPayload>[]
+        }
+        create: {
+          args: Prisma.PointPoolAdjustmentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolAdjustmentPayload>
+        }
+        createMany: {
+          args: Prisma.PointPoolAdjustmentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PointPoolAdjustmentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolAdjustmentPayload>[]
+        }
+        delete: {
+          args: Prisma.PointPoolAdjustmentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolAdjustmentPayload>
+        }
+        update: {
+          args: Prisma.PointPoolAdjustmentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolAdjustmentPayload>
+        }
+        deleteMany: {
+          args: Prisma.PointPoolAdjustmentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PointPoolAdjustmentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PointPoolAdjustmentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolAdjustmentPayload>[]
+        }
+        upsert: {
+          args: Prisma.PointPoolAdjustmentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointPoolAdjustmentPayload>
+        }
+        aggregate: {
+          args: Prisma.PointPoolAdjustmentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePointPoolAdjustment>
+        }
+        groupBy: {
+          args: Prisma.PointPoolAdjustmentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PointPoolAdjustmentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PointPoolAdjustmentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PointPoolAdjustmentCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1078,6 +1378,59 @@ export const ChatCommandScalarFieldEnum = {
 } as const
 
 export type ChatCommandScalarFieldEnum = (typeof ChatCommandScalarFieldEnum)[keyof typeof ChatCommandScalarFieldEnum]
+
+
+export const PointPoolEventScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  status: 'status',
+  startedAt: 'startedAt',
+  endedAt: 'endedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PointPoolEventScalarFieldEnum = (typeof PointPoolEventScalarFieldEnum)[keyof typeof PointPoolEventScalarFieldEnum]
+
+
+export const PointPoolRedemptionScalarFieldEnum = {
+  id: 'id',
+  twitchRedemptionId: 'twitchRedemptionId',
+  userId: 'userId',
+  userLogin: 'userLogin',
+  userDisplayName: 'userDisplayName',
+  rewardId: 'rewardId',
+  rewardTitle: 'rewardTitle',
+  pointsCost: 'pointsCost',
+  redeemedAt: 'redeemedAt',
+  createdAt: 'createdAt',
+  pointPoolEventId: 'pointPoolEventId'
+} as const
+
+export type PointPoolRedemptionScalarFieldEnum = (typeof PointPoolRedemptionScalarFieldEnum)[keyof typeof PointPoolRedemptionScalarFieldEnum]
+
+
+export const PointPoolGoalScalarFieldEnum = {
+  id: 'id',
+  targetPoints: 'targetPoints',
+  description: 'description',
+  createdAt: 'createdAt',
+  pointPoolEventId: 'pointPoolEventId'
+} as const
+
+export type PointPoolGoalScalarFieldEnum = (typeof PointPoolGoalScalarFieldEnum)[keyof typeof PointPoolGoalScalarFieldEnum]
+
+
+export const PointPoolAdjustmentScalarFieldEnum = {
+  id: 'id',
+  amount: 'amount',
+  attribution: 'attribution',
+  reason: 'reason',
+  createdAt: 'createdAt',
+  pointPoolEventId: 'pointPoolEventId'
+} as const
+
+export type PointPoolAdjustmentScalarFieldEnum = (typeof PointPoolAdjustmentScalarFieldEnum)[keyof typeof PointPoolAdjustmentScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1368,6 +1721,10 @@ export type GlobalOmitConfig = {
   automationActionExecution?: Prisma.AutomationActionExecutionOmit
   twitchAccount?: Prisma.TwitchAccountOmit
   chatCommand?: Prisma.ChatCommandOmit
+  pointPoolEvent?: Prisma.PointPoolEventOmit
+  pointPoolRedemption?: Prisma.PointPoolRedemptionOmit
+  pointPoolGoal?: Prisma.PointPoolGoalOmit
+  pointPoolAdjustment?: Prisma.PointPoolAdjustmentOmit
 }
 
 /* Types for Logging */

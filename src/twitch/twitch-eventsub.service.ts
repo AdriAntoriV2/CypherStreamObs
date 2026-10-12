@@ -14,6 +14,7 @@ import { TwitchEventNormalizer } from './twitch-event-normalizer.service.js';
 import { StreamsService } from '../streams/streams.service.js';
 import { TwitchEventIngestionService } from './twitch-event-ingestion.service.js';
 import { ChatCommandDispatcher } from '../commands/chat-command-dispatcher.service.js';
+import { PointPoolService } from '../point-pool/point-pool.service.js';
 
 @Injectable()
 export class TwitchEventSubService
@@ -35,6 +36,7 @@ export class TwitchEventSubService
     private readonly normalizer: TwitchEventNormalizer,
     private readonly ingestionService: TwitchEventIngestionService,
     private readonly chatCommandDispatcher: ChatCommandDispatcher,
+    private readonly pointPoolService: PointPoolService,
   ) { }
 
   async connect(
@@ -360,6 +362,13 @@ export class TwitchEventSubService
       );
 
       return;
+    }
+
+    if (
+      subscriptionType ===
+      'channel.channel_points_custom_reward_redemption.add'
+    ) {
+      await this.pointPoolService.recordRedemption(event);
     }
 
     const ingested = await this.ingestionService.ingest(

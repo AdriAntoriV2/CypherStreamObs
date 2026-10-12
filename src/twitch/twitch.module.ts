@@ -12,6 +12,7 @@ import { CommandsModule } from '../commands/commands.module.js';
 import { SecurityModule } from '../common/security/security.module.js';
 import { TwitchOAuthStateService } from './twitch-oauth-state.service.js';
 import { QueueModule } from '../queue/queue.module.js';
+import { PointPoolModule } from '../point-pool/point-pool.module.js';
 
 @Module({
   controllers: [
@@ -32,6 +33,7 @@ import { QueueModule } from '../queue/queue.module.js';
     CommandsModule,
     SecurityModule,
     QueueModule,
+    PointPoolModule,
   ],
   exports: [
     TwitchService,

@@ -57,7 +57,11 @@ export const ModelName = {
   AutomationExecution: 'AutomationExecution',
   AutomationActionExecution: 'AutomationActionExecution',
   TwitchAccount: 'TwitchAccount',
-  ChatCommand: 'ChatCommand'
+  ChatCommand: 'ChatCommand',
+  PointPoolEvent: 'PointPoolEvent',
+  PointPoolRedemption: 'PointPoolRedemption',
+  PointPoolGoal: 'PointPoolGoal',
+  PointPoolAdjustment: 'PointPoolAdjustment'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -174,6 +178,59 @@ export const ChatCommandScalarFieldEnum = {
 } as const
 
 export type ChatCommandScalarFieldEnum = (typeof ChatCommandScalarFieldEnum)[keyof typeof ChatCommandScalarFieldEnum]
+
+
+export const PointPoolEventScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  status: 'status',
+  startedAt: 'startedAt',
+  endedAt: 'endedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PointPoolEventScalarFieldEnum = (typeof PointPoolEventScalarFieldEnum)[keyof typeof PointPoolEventScalarFieldEnum]
+
+
+export const PointPoolRedemptionScalarFieldEnum = {
+  id: 'id',
+  twitchRedemptionId: 'twitchRedemptionId',
+  userId: 'userId',
+  userLogin: 'userLogin',
+  userDisplayName: 'userDisplayName',
+  rewardId: 'rewardId',
+  rewardTitle: 'rewardTitle',
+  pointsCost: 'pointsCost',
+  redeemedAt: 'redeemedAt',
+  createdAt: 'createdAt',
+  pointPoolEventId: 'pointPoolEventId'
+} as const
+
+export type PointPoolRedemptionScalarFieldEnum = (typeof PointPoolRedemptionScalarFieldEnum)[keyof typeof PointPoolRedemptionScalarFieldEnum]
+
+
+export const PointPoolGoalScalarFieldEnum = {
+  id: 'id',
+  targetPoints: 'targetPoints',
+  description: 'description',
+  createdAt: 'createdAt',
+  pointPoolEventId: 'pointPoolEventId'
+} as const
+
+export type PointPoolGoalScalarFieldEnum = (typeof PointPoolGoalScalarFieldEnum)[keyof typeof PointPoolGoalScalarFieldEnum]
+
+
+export const PointPoolAdjustmentScalarFieldEnum = {
+  id: 'id',
+  amount: 'amount',
+  attribution: 'attribution',
+  reason: 'reason',
+  createdAt: 'createdAt',
+  pointPoolEventId: 'pointPoolEventId'
+} as const
+
+export type PointPoolAdjustmentScalarFieldEnum = (typeof PointPoolAdjustmentScalarFieldEnum)[keyof typeof PointPoolAdjustmentScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -52,3 +52,23 @@ export type TwitchAccount = Prisma.TwitchAccountModel
  * 
  */
 export type ChatCommand = Prisma.ChatCommandModel
+/**
+ * Model PointPoolEvent
+ * 
+ */
+export type PointPoolEvent = Prisma.PointPoolEventModel
+/**
+ * Model PointPoolRedemption
+ * 
+ */
+export type PointPoolRedemption = Prisma.PointPoolRedemptionModel
+/**
+ * Model PointPoolGoal
+ * 
+ */
+export type PointPoolGoal = Prisma.PointPoolGoalModel
+/**
+ * Model PointPoolAdjustment
+ * 
+ */
+export type PointPoolAdjustment = Prisma.PointPoolAdjustmentModel

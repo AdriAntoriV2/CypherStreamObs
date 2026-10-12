@@ -16,6 +16,7 @@ import { TwitchModule } from './twitch/twitch.module.js';
 import { CommandsModule } from './commands/commands.module.js';
 import { SongRequestModule } from './song-request/song-request.module.js';
 import { ChatCommandsModule } from './chat-commands/chat-commands.module.js';
+import { PointPoolModule } from './point-pool/point-pool.module.js';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { ChatCommandsModule } from './chat-commands/chat-commands.module.js';
     CommandsModule,
     SongRequestModule,
     ChatCommandsModule,
+    PointPoolModule,
   ],
 })
 export class AppModule implements NestModule {

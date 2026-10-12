@@ -144,3 +144,64 @@ model ChatCommand {
 
   @@index([enabled])
 }
+
+model PointPoolEvent {
+  id        String   @id @default(uuid())
+  name      String
+  status    String   @default("DRAFT")
+  startedAt DateTime?
+  endedAt   DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  redemptions PointPoolRedemption[]
+  goals       PointPoolGoal[]
+  adjustments PointPoolAdjustment[]
+  @@index([status])
+  @@index([createdAt])
+}
+
+model PointPoolRedemption {
+  id                String   @id @default(uuid())
+  twitchRedemptionId String   @unique
+  userId             String
+  userLogin          String
+  userDisplayName    String
+  rewardId           String
+  rewardTitle        String
+  pointsCost         Int
+  redeemedAt         DateTime
+  createdAt          DateTime @default(now())
+
+  pointPoolEventId String
+  pointPoolEvent   PointPoolEvent @relation(fields: [pointPoolEventId], references: [id], onDelete: Cascade)
+
+  @@index([pointPoolEventId, redeemedAt])
+  @@index([userId])
+}
+
+
+model PointPoolGoal {
+  id          String   @id @default(uuid())
+  targetPoints Int
+  description String
+  createdAt   DateTime @default(now())
+
+  pointPoolEventId String
+  pointPoolEvent   PointPoolEvent @relation(fields: [pointPoolEventId], references: [id], onDelete: Cascade)
+
+  @@index([pointPoolEventId, createdAt])
+}
+
+model PointPoolAdjustment {
+  id          String   @id @default(uuid())
+  amount      Int
+  attribution String   @default("GreedyKAITO")
+  reason      String?
+  createdAt   DateTime @default(now())
+
+  pointPoolEventId String
+  pointPoolEvent   PointPoolEvent @relation(fields: [pointPoolEventId], references: [id], onDelete: Cascade)
+
+  @@index([pointPoolEventId, createdAt])
+}
