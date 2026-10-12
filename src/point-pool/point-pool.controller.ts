@@ -25,6 +25,11 @@ export class PointPoolController {
         return this.pointPoolService.findAll();
     }
 
+    @Get('active/progress')
+    getActiveProgress() {
+        return this.pointPoolService.getActiveProgress();
+    }
+
     @Get('events/:id')
     findOne(@Param('id') id: string) {
         return this.pointPoolService.findOne(id);

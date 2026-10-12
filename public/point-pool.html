@@ -1,0 +1,356 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StreamOps Point Pool</title>
+
+  <style>
+    :root {
+      --accent: #a78bfa;
+      --accent-bright: #c4b5fd;
+      --panel: rgba(17, 24, 39, 0.94);
+      --text: #f9fafb;
+      --muted: #9ca3af;
+      --track: #374151;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 12px;
+      background: transparent;
+      color: var(--text);
+      font-family: Inter, system-ui, sans-serif;
+    }
+
+    #overlay {
+      display: none;
+      padding: 22px;
+      border: 1px solid rgba(167, 139, 250, 0.3);
+      border-radius: 18px;
+      background: var(--panel);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.22);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 16px;
+    }
+
+    .eyebrow {
+      color: var(--accent-bright);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 5px 0;
+      font-size: 25px;
+      overflow-wrap: anywhere;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    #percent {
+      color: var(--accent-bright);
+      font-size: 34px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .bar-area {
+      position: relative;
+      margin-top: 25px;
+      padding-bottom: 25px;
+    }
+
+    .track {
+      height: 16px;
+      overflow: hidden;
+      border-radius: 20px;
+      background: var(--track);
+    }
+
+    #fill {
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #7c3aed, var(--accent-bright));
+      transition: width 0.8s ease;
+    }
+
+    #markers {
+      position: absolute;
+      top: -5px;
+      left: 0;
+      right: 0;
+      height: 26px;
+      pointer-events: none;
+    }
+
+    .marker {
+      position: absolute;
+      width: 4px;
+      height: 26px;
+      transform: translateX(-50%);
+      border: 1px solid #111827;
+      border-radius: 4px;
+      background: white;
+    }
+
+    .scale {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .goals {
+      display: grid;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .goal {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid #374151;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.025);
+    }
+
+    .goal.unlocked {
+      border-color: rgba(167, 139, 250, 0.65);
+      background: rgba(124, 58, 237, 0.12);
+    }
+
+    .goal-icon {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      flex-shrink: 0;
+      border-radius: 10px;
+      background: #374151;
+      font-size: 21px;
+    }
+
+    .unlocked .goal-icon {
+      background: #6d28d9;
+    }
+
+    .goal-info {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .goal-name {
+      font-size: 15px;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    .goal-detail {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .status {
+      flex-shrink: 0;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .unlocked .status {
+      color: var(--accent-bright);
+    }
+
+    #empty {
+      padding: 24px;
+      border-radius: 14px;
+      background: var(--panel);
+      color: var(--muted);
+      text-align: center;
+    }
+
+    #error {
+      display: none;
+      margin-top: 8px;
+      color: #fca5a5;
+      font-size: 12px;
+    }
+
+    @media (max-width: 480px) {
+      #overlay { padding: 16px; }
+      h1 { font-size: 19px; }
+      #percent { font-size: 27px; }
+      .goal { gap: 8px; padding: 9px; }
+      .goal-name { font-size: 13px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="empty">Waiting for a Point Pool to start...</div>
+
+  <main id="overlay">
+    <header class="header">
+      <div>
+        <div class="eyebrow">Community Challenge</div>
+        <h1 id="pool-name">Point Pool</h1>
+        <div class="subtitle" id="total">0 points collected</div>
+      </div>
+      <div id="percent">0%</div>
+    </header>
+
+    <section class="bar-area">
+      <div class="track">
+        <div id="fill"></div>
+      </div>
+      <div id="markers"></div>
+      <div class="scale">
+        <span>0</span>
+        <span id="target-label">0 points</span>
+      </div>
+    </section>
+
+    <section class="goals" id="goals"></section>
+    <div id="error"></div>
+  </main>
+
+  <script>
+    // Change this if your NestJS app does not use the /api prefix.
+    const API_URL = '/api/point-pool/active/progress';
+    const REFRESH_MS = 5000;
+
+    const $ = (id) => document.getElementById(id);
+    const number = (value) => Number(value).toLocaleString('en-US');
+
+    function render(data) {
+      const pool = data.pool;
+      const goals = Array.isArray(data.goals) ? data.goals : [];
+      const total = Math.max(0, Number(data.totalPoints) || 0);
+
+      if (!pool) {
+        $('overlay').style.display = 'none';
+        $('empty').style.display = 'block';
+        $('error').style.display = 'none';
+        return;
+      }
+
+      $('empty').style.display = 'none';
+      $('overlay').style.display = 'block';
+      $('error').style.display = 'none';
+
+      // The highest milestone defines 100% progress.
+      const target = goals.reduce(
+        (highest, goal) =>
+          Math.max(highest, Number(goal.targetPoints) || 0),
+        0
+      );
+
+      const percent = target > 0
+        ? Math.floor((total / target) * 100)
+        : 0;
+
+      $('pool-name').textContent = pool.name;
+      $('total').textContent = `${number(total)} points collected`;
+      $('percent').textContent = `${percent}%`;
+      $('fill').style.width = `${Math.min(100, percent)}%`;
+      $('target-label').textContent =
+        target > 0 ? `${number(target)} points` : 'No goals yet';
+
+      const sortedGoals = [...goals].sort(
+        (a, b) => a.targetPoints - b.targetPoints
+      );
+
+      $('markers').replaceChildren();
+
+      for (const goal of sortedGoals) {
+        if (target <= 0) break;
+
+        const marker = document.createElement('div');
+        marker.className = 'marker';
+        marker.style.left =
+          `${(goal.targetPoints / target) * 100}%`;
+        $('markers').appendChild(marker);
+      }
+
+      const container = $('goals');
+      container.replaceChildren();
+
+      for (const goal of sortedGoals) {
+        const goalTarget = Number(goal.targetPoints) || 0;
+        const unlocked = total >= goalTarget;
+        const remaining = Math.max(0, goalTarget - total);
+
+        const card = document.createElement('article');
+        card.className = `goal${unlocked ? ' unlocked' : ''}`;
+
+        const icon = document.createElement('div');
+        icon.className = 'goal-icon';
+        icon.textContent = unlocked ? '✓' : '🎯';
+
+        const info = document.createElement('div');
+        info.className = 'goal-info';
+
+        const name = document.createElement('div');
+        name.className = 'goal-name';
+        name.textContent = goal.description;
+
+        const detail = document.createElement('div');
+        detail.className = 'goal-detail';
+        detail.textContent = unlocked
+          ? `${number(goalTarget)} points · Milestone reached`
+          : `${number(goalTarget)} points · ${number(remaining)} remaining`;
+
+        const status = document.createElement('div');
+        status.className = 'status';
+        status.textContent = unlocked ? 'UNLOCKED' : 'LOCKED';
+
+        info.append(name, detail);
+        card.append(icon, info, status);
+        container.appendChild(card);
+      }
+    }
+
+    async function refresh() {
+      try {
+        const response = await fetch(API_URL, {
+          cache: 'no-store',
+          credentials: 'same-origin',
+        });
+
+        if (!response.ok) {
+          throw new Error(`API returned HTTP ${response.status}`);
+        }
+
+        render(await response.json());
+      } catch (error) {
+        $('error').style.display = 'block';
+        $('error').textContent =
+          'Unable to connect to StreamOps. Retrying...';
+        console.error('Point Pool overlay:', error);
+      }
+    }
+
+    refresh();
+    setInterval(refresh, REFRESH_MS);
+  </script>
+</body>
+</html>

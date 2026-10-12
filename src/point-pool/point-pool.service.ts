@@ -291,6 +291,31 @@ export class PointPoolService {
         };
     }
 
+    async getActiveProgress() {
+        const pool = await this.prisma.pointPoolEvent.findFirst({
+            where: { status: 'ACTIVE' },
+            orderBy: { startedAt: 'desc' },
+        });
+
+        if (!pool) {
+            return {
+                pool: null,
+                totalPoints: 0,
+                goals: [],
+            };
+        }
+
+        const [totalPoints, goals] = await Promise.all([
+            this.calculateTotalPoints(pool.id),
+            this.prisma.pointPoolGoal.findMany({
+                where: { pointPoolEventId: pool.id },
+                orderBy: { targetPoints: 'asc' },
+            }),
+        ]);
+
+        return { pool, totalPoints, goals };
+    }
+
     async recordRedemption(event: Record<string, unknown>) {
         const redemptionId = event.id;
         const userId = event.user_id;

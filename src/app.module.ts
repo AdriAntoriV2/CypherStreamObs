@@ -3,6 +3,8 @@ import {
   Module,
   NestModule,
 } from '@nestjs/common';
+import { join } from 'node:path';
+import { ServeStaticModule } from '@nestjs/serve-static';
 
 import { AppConfigModule } from './config/config.module.js';
 import { DatabaseModule } from './database/database.module.js';
@@ -32,6 +34,13 @@ import { PointPoolModule } from './point-pool/point-pool.module.js';
     SongRequestModule,
     ChatCommandsModule,
     PointPoolModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), 'public'),
+      serveRoot: '/overlay',
+      serveStaticOptions: {
+        index: 'point-pool.html',
+      },
+    }),
   ],
 })
 export class AppModule implements NestModule {
