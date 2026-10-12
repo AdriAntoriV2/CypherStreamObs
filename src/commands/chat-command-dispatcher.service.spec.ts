@@ -88,6 +88,6 @@ describe('ChatCommandDispatcher', () => {
         },
         'stream-123',
       ),
-    ).resolves.toBeUndefined();
+    ).resolves.toBeNull();
   });
 });

@@ -182,4 +182,35 @@ export class TwitchApiClient {
 
         return response.json() as Promise<TwitchTokenResponse>;
     }
+
+    async sendChatMessage(
+        accessToken: string,
+        broadcasterId: string,
+        senderId: string,
+        message: string,
+    ): Promise<void> {
+        const response = await fetch(
+            'https://api.twitch.tv/helix/chat/messages',
+            {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                    'Client-Id': this.clientId,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    broadcaster_id: broadcasterId,
+                    sender_id: senderId,
+                    message,
+                }),
+            },
+        );
+
+        if (!response.ok) {
+            const body = await response.text();
+            throw new Error(
+                `Twitch chat message failed: ${response.status} ${body}`,
+            );
+        }
+    }
 }

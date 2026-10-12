@@ -304,10 +304,20 @@ export class TwitchEventSubService
       subscriptionType === 'channel.chat.message' &&
       ingested
     ) {
-      await this.chatCommandDispatcher.dispatch(
-        normalized.payload,
-        ingested.streamId,
-      );
+      const reply =
+        await this.chatCommandDispatcher.dispatch(
+          normalized.payload,
+          ingested.streamId,
+        );
+
+      if (reply && this.accessToken && this.broadcasterUserId) {
+        await this.twitchApi.sendChatMessage(
+          this.accessToken,
+          this.broadcasterUserId,
+          this.broadcasterUserId,
+          reply,
+        );
+      }
     }
   }
 

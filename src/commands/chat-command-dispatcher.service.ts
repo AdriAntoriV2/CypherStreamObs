@@ -21,12 +21,12 @@ export class ChatCommandDispatcher {
   constructor(
     private readonly parser: ChatCommandParser,
     private readonly router: CommandRouter,
-  ) {}
+  ) { }
 
   async dispatch(
     payload: TwitchChatMessagePayload,
     streamId: string,
-  ): Promise<void> {
+  ): Promise<string | null> {
     const rawMessage = payload.message?.text;
 
     const userId = payload.chatter_user_id;
@@ -42,16 +42,16 @@ export class ChatCommandDispatcher {
       this.logger.warn(
         'Ignoring malformed Twitch chat message',
       );
-      return;
+      return null;;
     }
 
     const parsed = this.parser.parse(rawMessage);
 
     if (!parsed) {
-      return;
+      return null;;
     }
 
-    await this.router.execute({
+    const result: unknown = await this.router.execute({
       command: parsed.command,
       args: parsed.args,
       rawMessage,
@@ -62,5 +62,17 @@ export class ChatCommandDispatcher {
       },
       streamId,
     });
+
+    if (
+      result !== null &&
+      typeof result === 'object' &&
+      'message' in result &&
+      typeof result.message === 'string' &&
+      result.message.length > 0
+    ) {
+      return result.message;
+    }
+
+    return null;
   }
 }
