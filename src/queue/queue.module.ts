@@ -28,6 +28,9 @@ export const REDIS_CLIENT = Symbol('REDIS_CLIENT');
       {
         name: QUEUE_NAMES.automation,
       },
+      {
+  name: QUEUE_NAMES.songResolution,
+},
     ),
   ],
 

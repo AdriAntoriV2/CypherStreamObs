@@ -1,8 +1,8 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Redis } from 'ioredis';
-import { SongRequestRepository } from './song.request.repository.js';
-import { SongRequest } from './song.request.types.js';
+import { SongRequestRepository } from './song-request.repository.js';
+import { SongRequest } from './song-request.types.js';
 
 describe('SongRequestRepository', () => {
   const redis = {
@@ -16,13 +16,14 @@ describe('SongRequestRepository', () => {
 
   const request: SongRequest = {
     id: 'request-1',
-    query: 'test song',
+    query: '米津玄師 Lemon',
     requester: {
       id: 'user-1',
-      login: 'testuser',
-      displayName: 'Test User',
+      login: 'viewer',
+      displayName: 'Viewer',
     },
-    requestedAt: '2026-10-12T00:00:00.000Z',
+    requestedAt: new Date().toISOString(),
+    status: 'resolving',
   };
 
   beforeEach(() => {

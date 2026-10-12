@@ -5,9 +5,11 @@ import { QueueModule } from '../queue/queue.module.js';
 import { QueueHandler } from './handlers/queue.handler.js';
 import { SkipHandler } from './handlers/skip.handler.js';
 import { SongRequestHandler } from './handlers/song-request.handler.js';
-import { SongRequestCommandRegistration } from './song.request-command-registration.service.js';
-import { SongRequestRepository } from './song.request.repository.js';
-import { SongRequestService } from './song.request.service.js';
+import { SongRequestCommandRegistration } from './song-request-command-registration.service.js';
+import { SongRequestRepository } from './song-request.repository.js';
+import { YouTubeResolverService } from './youtube-resolver.service.js';
+import { SongRequestService } from './song-request.service.js';
+import { SongResolutionProcessor } from './song-resolution.processor.js';
 
 @Module({
   imports: [CommandsModule, QueueModule],
@@ -18,6 +20,8 @@ import { SongRequestService } from './song.request.service.js';
     QueueHandler,
     SkipHandler,
     SongRequestCommandRegistration,
+    YouTubeResolverService,
+    SongResolutionProcessor,
   ],
   exports: [SongRequestService],
 })

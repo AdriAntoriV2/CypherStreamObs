@@ -1,7 +1,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { ChatCommandContext, ChatCommandHandler } from '../../commands/types/chat-command.types.js';
-import { SongRequestService } from '../song.request.service.js';
+import { SongRequestService } from '../song-request.service.js';
 
 @Injectable()
 export class QueueHandler implements ChatCommandHandler {

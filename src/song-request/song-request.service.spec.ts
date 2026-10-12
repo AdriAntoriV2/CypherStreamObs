@@ -1,7 +1,7 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { SongRequestRepository } from './song.request.repository.js';
-import { SongRequestService } from './song.request.service.js';
+import { SongRequestRepository } from './song-request.repository.js';
+import { SongRequestService } from './song-request.service.js';
 
 
 describe('SongRequestService', () => {
@@ -10,6 +10,12 @@ describe('SongRequestService', () => {
     enqueue: vi.fn(),
     snapshot: vi.fn(),
     skipCurrent: vi.fn(),
+    remove: vi.fn().mockResolvedValue(true),
+  };
+
+  const resolutionQueue = {
+    add: vi.fn().mockResolvedValue({}),
+    drain: vi.fn().mockResolvedValue(undefined),
   };
 
   let service: SongRequestService;
@@ -18,6 +24,7 @@ describe('SongRequestService', () => {
     vi.resetAllMocks();
     service = new SongRequestService(
       repository as unknown as SongRequestRepository,
+      resolutionQueue as never,
     );
   });
 
@@ -55,7 +62,7 @@ describe('SongRequestService', () => {
           displayName: 'Test User',
         },
       }),
-    ).rejects.toThrow('A song URL or search query is required');
+    ).rejects.toThrow('A YouTube URL or search query is required');
 
     expect(repository.enqueue).not.toHaveBeenCalled();
   });

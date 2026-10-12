@@ -1,11 +1,14 @@
 
-import {
-  Injectable,
-  OnModuleInit,
-} from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
+import { InjectQueue } from '@nestjs/bullmq';
+import type { Queue } from 'bullmq';
 import { randomUUID } from 'node:crypto';
-import { SongRequest, SongQueueSnapshot } from './song.request.types.js';
-import { SongRequestRepository } from './song.request.repository.js';
+import { SongRequestRepository } from './song-request.repository.js';
+import type {
+  SongQueueSnapshot,
+  SongRequest,
+} from './song-request.types.js';
+import { QUEUE_NAMES } from '../queue/queue.constants.js';
 
 const DEFAULT_QUEUE_LIMIT = 10;
 
@@ -15,11 +18,14 @@ export class SongRequestService implements OnModuleInit {
 
   constructor(
     private readonly repository: SongRequestRepository,
+    @InjectQueue(QUEUE_NAMES.songResolution)
+    private readonly resolutionQueue: Queue,
   ) {}
 
   async onModuleInit(): Promise<void> {
-    // Song requests are intentionally ephemeral across app restarts.
+    // Both the request list and resolution jobs are ephemeral.
     await this.repository.clear();
+    await this.resolutionQueue.drain(true);
   }
 
   async addRequest(input: {
@@ -29,7 +35,7 @@ export class SongRequestService implements OnModuleInit {
     const query = input.query.trim();
 
     if (!query) {
-      throw new Error('A song URL or search query is required');
+      throw new Error('A YouTube URL or search query is required');
     }
 
     const request: SongRequest = {
@@ -37,6 +43,7 @@ export class SongRequestService implements OnModuleInit {
       query,
       requester: input.requester,
       requestedAt: new Date().toISOString(),
+      status: 'resolving',
     };
 
     const added = await this.repository.enqueue(
@@ -48,6 +55,26 @@ export class SongRequestService implements OnModuleInit {
       throw new Error(
         `The song request queue is full (${this.queueLimit} pending requests)`,
       );
+    }
+
+    try {
+      await this.resolutionQueue.add(
+        'song.resolve',
+        { requestId: request.id },
+        {
+          jobId: request.id,
+          attempts: 3,
+          backoff: {
+            type: 'exponential',
+            delay: 1_000,
+          },
+          removeOnComplete: true,
+          removeOnFail: true,
+        },
+      );
+    } catch (error) {
+      await this.repository.remove(request.id);
+      throw error;
     }
 
     return request;
