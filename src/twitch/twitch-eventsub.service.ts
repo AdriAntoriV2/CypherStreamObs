@@ -13,11 +13,11 @@ import { EventsService } from '../events/events.service.js';
 import { TwitchEventNormalizer } from './twitch-event-normalizer.service.js';
 import { StreamsService } from '../streams/streams.service.js';
 import { TwitchEventIngestionService } from './twitch-event-ingestion.service.js';
+import { ChatCommandDispatcher } from '../commands/chat-command-dispatcher.service.js';
 
 @Injectable()
 export class TwitchEventSubService
   implements OnModuleDestroy {
-  [x: string]: any;
   private readonly logger =
     new Logger(TwitchEventSubService.name);
 
@@ -26,6 +26,7 @@ export class TwitchEventSubService
 
   private accessToken: string | null = null;
   private broadcasterUserId: string | null = null;
+  prisma: any;
 
   constructor(
     private readonly twitchApi: TwitchApiClient,
@@ -33,6 +34,7 @@ export class TwitchEventSubService
     private readonly eventsService: EventsService,
     private readonly normalizer: TwitchEventNormalizer,
     private readonly ingestionService: TwitchEventIngestionService,
+    private readonly chatCommandDispatcher: ChatCommandDispatcher,
   ) { }
 
   async connect(
@@ -169,58 +171,66 @@ export class TwitchEventSubService
       version: string;
       condition: Record<string, string>;
     }[] = [
-      {
-        type: 'stream.online',
-        version: '1',
-        condition: {
-          broadcaster_user_id:
-            this.broadcasterUserId,
+        {
+          type: 'stream.online',
+          version: '1',
+          condition: {
+            broadcaster_user_id:
+              this.broadcasterUserId,
+          },
         },
-      },
-      {
-        type: 'stream.offline',
-        version: '1',
-        condition: {
-          broadcaster_user_id:
-            this.broadcasterUserId,
+        {
+          type: 'stream.offline',
+          version: '1',
+          condition: {
+            broadcaster_user_id:
+              this.broadcasterUserId,
+          },
         },
-      },
-      {
-        type: 'channel.follow',
-        version: '2',
-        condition: {
-          broadcaster_user_id:
-            this.broadcasterUserId,
-          moderator_user_id:
-            this.broadcasterUserId,
+        {
+          type: 'channel.follow',
+          version: '2',
+          condition: {
+            broadcaster_user_id:
+              this.broadcasterUserId,
+            moderator_user_id:
+              this.broadcasterUserId,
+          },
         },
-      },
-      {
-        type: 'channel.subscribe',
-        version: '1',
-        condition: {
-          broadcaster_user_id:
-            this.broadcasterUserId,
+        {
+          type: 'channel.subscribe',
+          version: '1',
+          condition: {
+            broadcaster_user_id:
+              this.broadcasterUserId,
+          },
         },
-      },
-      {
-        type: 'channel.cheer',
-        version: '1',
-        condition: {
-          broadcaster_user_id:
-            this.broadcasterUserId,
+        {
+          type: 'channel.cheer',
+          version: '1',
+          condition: {
+            broadcaster_user_id:
+              this.broadcasterUserId,
+          },
         },
-      },
-      {
-        type:
-          'channel.channel_points_custom_reward_redemption.add',
-        version: '1',
-        condition: {
-          broadcaster_user_id:
-            this.broadcasterUserId,
+        {
+          type:
+            'channel.channel_points_custom_reward_redemption.add',
+          version: '1',
+          condition: {
+            broadcaster_user_id:
+              this.broadcasterUserId,
+          },
         },
-      },
-    ];
+        {
+          type: 'channel.chat.message',
+          version: '1',
+          condition: {
+            broadcaster_user_id: this.broadcasterUserId,
+            user_id: this.broadcasterUserId,
+          },
+        },
+      ];
 
     for (const subscription of subscriptions) {
       await this.twitchApi.createEventSubSubscription(
@@ -284,11 +294,21 @@ export class TwitchEventSubService
       return;
     }
 
-    await this.ingestion.ingest(
+    const ingested = await this.ingestionService.ingest(
       normalized.type,
       normalized.externalId,
       normalized.payload,
     );
+
+    if (
+      subscriptionType === 'channel.chat.message' &&
+      ingested
+    ) {
+      await this.chatCommandDispatcher.dispatch(
+        normalized.payload,
+        ingested.streamId,
+      );
+    }
   }
 
   private async handleReconnect(

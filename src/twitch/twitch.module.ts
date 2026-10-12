@@ -8,6 +8,7 @@ import { TwitchEventNormalizer } from './twitch-event-normalizer.service.js';
 import { StreamsModule } from '../streams/streams.module.js';
 import { EventsModule } from '../events/events.module.js';
 import { TwitchEventIngestionService } from './twitch-event-ingestion.service.js';
+import { CommandsModule } from '../commands/commands.module.js';
 
 @Module({
   controllers: [
@@ -24,6 +25,7 @@ providers: [
 imports: [
   EventsModule,
   StreamsModule,
+  CommandsModule,
 ],
   exports: [
     TwitchService,

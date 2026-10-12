@@ -1,15 +1,19 @@
+
 import { Module } from '@nestjs/common';
-import { CommandRouter } from './command-router.service.js';
+import { ChatCommandDispatcher } from './chat-command-dispatcher.service.js';
 import { ChatCommandParser } from './chat-command-parser.service.js';
+import { CommandRouter } from './command-router.service.js';
 
 @Module({
   providers: [
-    CommandRouter,
     ChatCommandParser,
+    CommandRouter,
+    ChatCommandDispatcher,
   ],
   exports: [
-    CommandRouter,
     ChatCommandParser,
+    CommandRouter,
+    ChatCommandDispatcher,
   ],
 })
 export class CommandsModule {}
