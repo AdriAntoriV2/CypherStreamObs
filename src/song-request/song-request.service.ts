@@ -11,9 +11,18 @@ import type {
 import { QUEUE_NAMES } from '../queue/queue.constants.js';
 import { ConfigService } from '@nestjs/config';
 
+type ResolutionWaiter = {
+  resolve: (request: SongRequest) => void;
+  reject: (error: Error) => void;
+};
+
 @Injectable()
 export class SongRequestService implements OnModuleInit {
   private readonly queueLimit: number;
+  private readonly resolutionWaiters = new Map<
+    string,
+    ResolutionWaiter
+  >();
 
   constructor(
     private readonly repository: SongRequestRepository,
@@ -33,14 +42,34 @@ export class SongRequestService implements OnModuleInit {
     await this.resolutionQueue.drain(true);
   }
 
+
   async addRequest(input: {
     query: string;
     requester: SongRequest['requester'];
   }): Promise<SongRequest> {
+    return this.enqueueRequest(input, false);
+  }
+
+  async addRequestAndWait(input: {
+    query: string;
+    requester: SongRequest['requester'];
+  }): Promise<SongRequest> {
+    return this.enqueueRequest(input, true);
+  }
+
+  private async enqueueRequest(
+    input: {
+      query: string;
+      requester: SongRequest['requester'];
+    },
+    waitForResolution: boolean,
+  ): Promise<SongRequest> {
     const query = input.query.trim();
 
     if (!query) {
-      throw new Error('A YouTube URL or search query is required');
+      throw new Error(
+        'A YouTube URL or search query is required',
+      );
     }
 
     const request: SongRequest = {
@@ -62,6 +91,23 @@ export class SongRequestService implements OnModuleInit {
       );
     }
 
+    let resolutionPromise: Promise<SongRequest> | undefined;
+
+    if (waitForResolution) {
+      resolutionPromise = new Promise<SongRequest>(
+        (resolve, reject) => {
+          this.resolutionWaiters.set(request.id, {
+            resolve,
+            reject,
+          });
+        },
+      );
+
+      // The worker could finish before this method reaches its await.
+      // Attach a handler now to avoid an unhandled rejection.
+      void resolutionPromise.catch(() => { });
+    }
+
     try {
       await this.resolutionQueue.add(
         'song.resolve',
@@ -78,11 +124,39 @@ export class SongRequestService implements OnModuleInit {
         },
       );
     } catch (error) {
+      this.resolutionWaiters.delete(request.id);
       await this.repository.remove(request.id);
       throw error;
     }
 
-    return request;
+    return resolutionPromise
+      ? await resolutionPromise
+      : request;
+  }
+
+  notifyResolution(request: SongRequest): void {
+    const waiter = this.resolutionWaiters.get(request.id);
+
+    if (!waiter) {
+      return;
+    }
+
+    this.resolutionWaiters.delete(request.id);
+    waiter.resolve(request);
+  }
+
+  notifyResolutionFailure(
+    requestId: string,
+    message: string,
+  ): void {
+    const waiter = this.resolutionWaiters.get(requestId);
+
+    if (!waiter) {
+      return;
+    }
+
+    this.resolutionWaiters.delete(requestId);
+    waiter.reject(new Error(message));
   }
 
   getQueue(): Promise<SongQueueSnapshot> {

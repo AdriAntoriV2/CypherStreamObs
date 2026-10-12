@@ -9,7 +9,7 @@ export class SongRequestHandler implements ChatCommandHandler {
 
   constructor(
     private readonly songRequests: SongRequestService,
-  ) {}
+  ) { }
 
   async execute(context: ChatCommandContext) {
     const query = context.args.join(' ').trim();
@@ -22,24 +22,23 @@ export class SongRequestHandler implements ChatCommandHandler {
     }
 
     try {
-      const request = await this.songRequests.addRequest({
+      const request = await this.songRequests.addRequestAndWait({
         query,
         requester: context.user,
       });
 
       return {
         ok: true,
-        message: 'Song request added to the queue!',
+        message: `Song added: ${request.track?.title ?? query}`,
         request,
       };
-    } catch (error) {
+    }
+    catch (error) {
       return {
         ok: false,
-        message:
-          error instanceof Error
-            ? error.message
-            : 'Unable to add song request',
+        message: 'Unable to find or load that video.'
       };
+
     }
   }
 }

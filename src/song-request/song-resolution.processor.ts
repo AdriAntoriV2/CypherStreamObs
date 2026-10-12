@@ -6,6 +6,8 @@ import { QUEUE_NAMES } from '../queue/queue.constants.js';
 import { SongRequestRepository } from './song-request.repository.js';
 import { YouTubeResolverService } from './youtube-resolver.service.js';
 import { PlaybackControllerService } from './playback-controller.service.js';
+import { SongRequestService } from './song-request.service.js';
+import type { SongRequest } from './song-request.types.js';
 
 interface SongResolutionJob {
   requestId: string;
@@ -22,6 +24,7 @@ export class SongResolutionProcessor extends WorkerHost {
     private readonly repository: SongRequestRepository,
     private readonly resolver: YouTubeResolverService,
     private readonly playbackController: PlaybackControllerService,
+    private readonly songRequestService: SongRequestService,
   ) {
     super();
   }
@@ -43,12 +46,18 @@ export class SongResolutionProcessor extends WorkerHost {
     try {
       const track = await this.resolver.resolve(request.query);
 
-      await this.repository.update({
+      const resolvedRequest: SongRequest = {
         ...request,
         status: 'ready',
         track,
         error: undefined,
-      });
+      };
+
+      await this.repository.update(resolvedRequest);
+
+      // Notify !sr that resolution succeeded.
+      this.songRequestService.notifyResolution(resolvedRequest);
+
       await this.playbackController.startNext();
 
       this.logger.log(
@@ -61,14 +70,22 @@ export class SongResolutionProcessor extends WorkerHost {
           : 'Unknown YouTube resolution error';
 
       const attempts = Number(job.opts.attempts ?? 1);
+      const isFinalAttempt =
+        job.attemptsMade + 1 >= attempts;
 
-      if (job.attemptsMade + 1 >= attempts) {
+      if (isFinalAttempt) {
         await this.repository.update({
           ...request,
           status: 'failed',
           error: message,
           track: undefined,
         });
+
+        // Notify !sr only after all retries have failed.
+        this.songRequestService.notifyResolutionFailure(
+          request.id,
+          message,
+        );
 
         this.logger.warn(
           `Song request ${request.id} failed: ${message}`,
