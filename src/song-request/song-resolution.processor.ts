@@ -5,6 +5,7 @@ import type { Job } from 'bullmq';
 import { QUEUE_NAMES } from '../queue/queue.constants.js';
 import { SongRequestRepository } from './song-request.repository.js';
 import { YouTubeResolverService } from './youtube-resolver.service.js';
+import { PlaybackControllerService } from './playback-controller.service.js';
 
 interface SongResolutionJob {
   requestId: string;
@@ -20,6 +21,7 @@ export class SongResolutionProcessor extends WorkerHost {
   constructor(
     private readonly repository: SongRequestRepository,
     private readonly resolver: YouTubeResolverService,
+    private readonly playbackController: PlaybackControllerService,
   ) {
     super();
   }
@@ -47,6 +49,7 @@ export class SongResolutionProcessor extends WorkerHost {
         track,
         error: undefined,
       });
+      await this.playbackController.startNext();
 
       this.logger.log(
         `Resolved "${track.title}" for request ${request.id}`,

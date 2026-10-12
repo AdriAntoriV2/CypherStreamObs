@@ -1,18 +1,16 @@
-
 import { Injectable } from '@nestjs/common';
-import { ChatCommandContext, ChatCommandHandler } from '../../commands/types/chat-command.types.js';
-import { SongRequestService } from '../song-request.service.js';
+import type { ChatCommandContext, ChatCommandHandler } from '../../commands/types/chat-command.types.js';
+import { PlaybackControllerService } from '../playback-controller.service.js';
 
 @Injectable()
 export class SkipHandler implements ChatCommandHandler {
   readonly command = 'skip';
-
   constructor(
-    private readonly songRequests: SongRequestService,
+    private readonly playbackController: PlaybackControllerService,
   ) {}
 
   async execute(_context: ChatCommandContext) {
-    const skipped = await this.songRequests.skipCurrent();
+    const skipped = await this.playbackController.skip();
 
     if (!skipped) {
       return {
@@ -23,7 +21,7 @@ export class SkipHandler implements ChatCommandHandler {
 
     return {
       ok: true,
-      message: 'Current track removed.',
+      message: 'Skipped the current track.',
     };
   }
 }
