@@ -62,6 +62,63 @@ describe('SongRequestRepository', () => {
     });
   });
 
+  it('claims a ready request atomically', async () => {
+    const readyRequest: SongRequest = {
+      ...request,
+      status: 'ready',
+      track: {
+        id: 'youtube-1',
+        title: 'Test Song',
+        url: 'https://www.youtube.com/watch?v=youtube-1',
+        duration: 180,
+        thumbnail: null,
+        uploader: 'Test Artist',
+      },
+    };
+
+    redis.eval.mockResolvedValue(JSON.stringify(readyRequest));
+
+    await expect(repository.claimNextReady()).resolves.toEqual(
+      readyRequest,
+    );
+
+    expect(redis.eval).toHaveBeenCalledWith(
+      expect.any(String),
+      2,
+      'streamops:song-request:v1:pending',
+      'streamops:song-request:v1:current',
+    );
+  });
+
+  it('returns null when no request can be claimed', async () => {
+    redis.eval.mockResolvedValue(null);
+
+    await expect(repository.claimNextReady()).resolves.toBeNull();
+  });
+
+  it('completes the current request only when its ID matches', async () => {
+    redis.eval.mockResolvedValue(1);
+
+    await expect(
+      repository.completeCurrent('request-1'),
+    ).resolves.toBe(true);
+
+    expect(redis.eval).toHaveBeenCalledWith(
+      expect.any(String),
+      1,
+      'streamops:song-request:v1:current',
+      'request-1',
+    );
+  });
+
+  it('returns false when the current request cannot be completed', async () => {
+    redis.eval.mockResolvedValue(0);
+
+    await expect(
+      repository.completeCurrent('stale-request'),
+    ).resolves.toBe(false);
+  });
+
   it('clears only the song-request keys', async () => {
     redis.del.mockResolvedValue(2);
 

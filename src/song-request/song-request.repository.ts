@@ -59,12 +59,52 @@ const REMOVE_SCRIPT = `
   return 0
 `;
 
+const CLAIM_NEXT_SCRIPT = `
+  if redis.call('EXISTS', KEYS[2]) == 1 then
+    return false
+  end
+
+  while redis.call('LLEN', KEYS[1]) > 0 do
+    local item = redis.call('LINDEX', KEYS[1], 0)
+    local request = cjson.decode(item)
+
+    if request.status == 'failed' then
+      redis.call('LPOP', KEYS[1])
+    elseif request.status ~= 'ready' then
+      return false
+    else
+      item = redis.call('LPOP', KEYS[1])
+      redis.call('SET', KEYS[2], item)
+      return item
+    end
+  end
+
+  return false
+`;
+
+const COMPLETE_CURRENT_SCRIPT = `
+  local item = redis.call('GET', KEYS[1])
+
+  if not item then
+    return 0
+  end
+
+  local request = cjson.decode(item)
+
+  if request.id ~= ARGV[1] then
+    return 0
+  end
+
+  redis.call('DEL', KEYS[1])
+  return 1
+`;
+
 @Injectable()
 export class SongRequestRepository {
   constructor(
     @Inject(REDIS_CLIENT)
     private readonly redis: Redis,
-  ) {}
+  ) { }
 
   async enqueue(
     request: SongRequest,
@@ -133,6 +173,32 @@ export class SongRequestRepository {
       ),
       limit,
     };
+  }
+
+  async claimNextReady(): Promise<SongRequest | null> {
+    const result = await this.redis.eval(
+      CLAIM_NEXT_SCRIPT,
+      2,
+      PENDING_KEY,
+      CURRENT_KEY,
+    );
+
+    if (typeof result !== 'string') {
+      return null;
+    }
+
+    return JSON.parse(result) as SongRequest;
+  }
+
+  async completeCurrent(requestId: string): Promise<boolean> {
+    const result = await this.redis.eval(
+      COMPLETE_CURRENT_SCRIPT,
+      1,
+      CURRENT_KEY,
+      requestId,
+    );
+
+    return Number(result) === 1;
   }
 
   async skipCurrent(): Promise<boolean> {
