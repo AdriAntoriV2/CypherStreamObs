@@ -40,8 +40,7 @@ import configuration from './configuration.js';
           .default(10),
 
         MPV_PATH: Joi.string().default('mpv'),
-        MPV_IPC_PATH: Joi.string()
-          .default('/tmp/streamops-mpv.sock'),
+        MPV_IPC_PATH: Joi.string().default('/tmp/streamops-mpv.sock'),
         RADIO_URL: Joi.string().uri().optional(),
       }),
     }),

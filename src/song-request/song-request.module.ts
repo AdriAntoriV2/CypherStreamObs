@@ -10,6 +10,8 @@ import { SongRequestRepository } from './song-request.repository.js';
 import { YouTubeResolverService } from './youtube-resolver.service.js';
 import { SongRequestService } from './song-request.service.js';
 import { SongResolutionProcessor } from './song-resolution.processor.js';
+import { MpvPlaybackEngine } from './mpv-playback.engine.js';
+import { PLAYBACK_ENGINE } from './playback-engine.js';
 
 @Module({
   imports: [CommandsModule, QueueModule],
@@ -22,6 +24,11 @@ import { SongResolutionProcessor } from './song-resolution.processor.js';
     SongRequestCommandRegistration,
     YouTubeResolverService,
     SongResolutionProcessor,
+    MpvPlaybackEngine,
+    {
+      provide: PLAYBACK_ENGINE,
+      useExisting: MpvPlaybackEngine,
+    },
   ],
   exports: [SongRequestService],
 })
