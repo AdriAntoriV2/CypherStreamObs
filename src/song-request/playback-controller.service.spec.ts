@@ -1,3 +1,4 @@
+
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ConfigService } from '@nestjs/config';
 import { PlaybackControllerService } from './playback-controller.service.js';
@@ -16,6 +17,7 @@ describe('PlaybackControllerService', () => {
     playTrack: vi.fn(),
     stopTrack: vi.fn(),
     startRadio: vi.fn(),
+    onTrackEnded: vi.fn(),
   };
 
   const configService = {
@@ -48,6 +50,7 @@ describe('PlaybackControllerService', () => {
     vi.resetAllMocks();
 
     configService.getOrThrow.mockReturnValue(10);
+    engine.onTrackEnded.mockReturnValue(vi.fn());
 
     repository.claimNextReady.mockResolvedValue(null);
     repository.completeCurrent.mockResolvedValue(true);
@@ -68,12 +71,30 @@ describe('PlaybackControllerService', () => {
     );
   });
 
+  it('subscribes to track-ended events', () => {
+    expect(engine.onTrackEnded).toHaveBeenCalledOnce();
+    expect(engine.onTrackEnded).toHaveBeenCalledWith(
+      expect.any(Function),
+    );
+  });
+
+  it('unsubscribes from track-ended events on destruction', () => {
+    const unsubscribe = engine.onTrackEnded.mock.results[0]?.value;
+
+    controller.onModuleDestroy();
+
+    expect(unsubscribe).toHaveBeenCalledOnce();
+  });
+
   it('plays the next ready request', async () => {
     repository.claimNextReady.mockResolvedValue(request);
 
     await expect(controller.startNext()).resolves.toEqual(request);
 
-    expect(engine.playTrack).toHaveBeenCalledWith(request.track);
+    expect(engine.playTrack).toHaveBeenCalledWith(
+      request.track,
+      request.id,
+    );
     expect(engine.startRadio).not.toHaveBeenCalled();
   });
 
@@ -107,7 +128,9 @@ describe('PlaybackControllerService', () => {
       controller.handleTrackEnded('request-1'),
     ).resolves.toBe(true);
 
-    expect(repository.completeCurrent).toHaveBeenCalledWith('request-1');
+    expect(repository.completeCurrent).toHaveBeenCalledWith(
+      'request-1',
+    );
     expect(engine.startRadio).toHaveBeenCalledOnce();
   });
 

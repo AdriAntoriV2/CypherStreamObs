@@ -1,140 +1,179 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+
+import {
+  Inject,
+  Injectable,
+  Logger,
+  OnModuleDestroy,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { SongRequestRepository } from './song-request.repository.js';
 import type { SongRequest } from './song-request.types.js';
 import {
-    PLAYBACK_ENGINE,
-    type PlaybackEngine,
+  PLAYBACK_ENGINE,
+  type PlaybackEngine,
 } from './playback-engine.js';
-import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class PlaybackControllerService {
-    private readonly logger = new Logger(
-        PlaybackControllerService.name,
+export class PlaybackControllerService implements OnModuleDestroy {
+  private readonly logger = new Logger(
+    PlaybackControllerService.name,
+  );
+
+  private readonly queueLimit: number;
+
+  // Serialize lifecycle operations to prevent skip/end races.
+  private transition: Promise<void> = Promise.resolve();
+
+  private readonly unsubscribeTrackEnded: () => void;
+
+  constructor(
+    private readonly repository: SongRequestRepository,
+    @Inject(PLAYBACK_ENGINE)
+    private readonly engine: PlaybackEngine,
+    private readonly configService: ConfigService,
+  ) {
+    this.queueLimit =
+      this.configService.getOrThrow<number>(
+        'songRequest.queueLimit',
+      );
+
+    this.unsubscribeTrackEnded = this.engine.onTrackEnded(
+      (requestId) => {
+        void this.handleTrackEnded(requestId).catch(
+          (error: unknown) => {
+            this.logger.error(
+              `Failed to advance playback after track ${requestId} ended`,
+              error instanceof Error
+                ? error.stack
+                : String(error),
+            );
+          },
+        );
+      },
     );
-    private readonly queueLimit: number;
-    // Serialize lifecycle operations to prevent skip/end races.
-    private transition: Promise<void> = Promise.resolve();
+  }
 
-    constructor(
-        private readonly repository: SongRequestRepository,
-        @Inject(PLAYBACK_ENGINE)
-        private readonly engine: PlaybackEngine,
-        private readonly configService: ConfigService,
-    ) {
-        this.queueLimit =
-            this.configService.getOrThrow<number>(
-                'songRequest.queueLimit',
-            );
-    }
+  onModuleDestroy(): void {
+    this.unsubscribeTrackEnded();
+  }
 
-    private serialize<T>(operation: () => Promise<T>): Promise<T> {
-        const result = this.transition.then(operation, operation);
+  private serialize<T>(
+    operation: () => Promise<T>,
+  ): Promise<T> {
+    const result = this.transition.then(
+      operation,
+      operation,
+    );
 
-        this.transition = result.then(
-            () => undefined,
-            () => undefined,
+    this.transition = result.then(
+      () => undefined,
+      () => undefined,
+    );
+
+    return result;
+  }
+
+  startNext(): Promise<SongRequest | null> {
+    return this.serialize(() => this.startNextUnlocked());
+  }
+
+  handleTrackEnded(requestId: string): Promise<boolean> {
+    return this.serialize(async () => {
+      const completed =
+        await this.repository.completeCurrent(requestId);
+
+      // Ignore stale mpv events for tracks that are no longer current.
+      if (!completed) {
+        this.logger.debug(
+          `Ignoring stale playback completion for ${requestId}`,
+        );
+        return false;
+      }
+
+      await this.startNextUnlocked();
+      return true;
+    });
+  }
+
+  skip(): Promise<boolean> {
+    return this.serialize(async () => {
+      const snapshot = await this.repository.snapshot(
+        this.queueLimit,
+      );
+
+      if (!snapshot.current) {
+        return false;
+      }
+
+      const currentId = snapshot.current.id;
+
+      // Stop the old track before advancing to the next one.
+      await this.engine.stopTrack();
+
+      const completed =
+        await this.repository.completeCurrent(currentId);
+
+      if (!completed) {
+        return false;
+      }
+
+      await this.startNextUnlocked();
+      return true;
+    });
+  }
+
+  private async startNextUnlocked(): Promise<SongRequest | null> {
+    const request = await this.repository.claimNextReady();
+
+    if (request) {
+      if (request.status !== 'ready' || !request.track) {
+        this.logger.error(
+          `Claimed request ${request.id} has no playable track`,
         );
 
-        return result;
-    }
+        await this.repository.completeCurrent(request.id);
+        return this.startNextUnlocked();
+      }
 
-    startNext(): Promise<SongRequest | null> {
-        return this.serialize(() => this.startNextUnlocked());
-    }
-
-    handleTrackEnded(requestId: string): Promise<boolean> {
-        return this.serialize(async () => {
-            const completed =
-                await this.repository.completeCurrent(requestId);
-
-            // Ignore stale mpv events for tracks that are no longer current.
-            if (!completed) {
-                this.logger.debug(
-                    `Ignoring stale playback completion for ${requestId}`,
-                );
-                return false;
-            }
-
-            await this.startNextUnlocked();
-            return true;
-        });
-    }
-
-    skip(): Promise<boolean> {
-        return this.serialize(async () => {
-            const snapshot = await this.repository.snapshot(
-                this.queueLimit,
-            );
-
-            if (!snapshot.current) {
-                return false;
-            }
-
-            const currentId = snapshot.current.id;
-
-            // Stop the old track before advancing to the next one.
-            await this.engine.stopTrack();
-
-            const completed =
-                await this.repository.completeCurrent(currentId);
-
-            if (!completed) {
-                return false;
-            }
-
-            await this.startNextUnlocked();
-            return true;
-        });
-    }
-
-    private async startNextUnlocked(): Promise<SongRequest | null> {
-        const request = await this.repository.claimNextReady();
-
-        if (request) {
-            if (request.status !== 'ready' || !request.track) {
-                this.logger.error(
-                    `Claimed request ${request.id} has no playable track`,
-                );
-
-                await this.repository.completeCurrent(request.id);
-                return this.startNextUnlocked();
-            }
-
-            try {
-                await this.engine.playTrack(request.track);
-
-                this.logger.log(
-                    `Started "${request.track.title}" (${request.id})`,
-                );
-
-                return request;
-            } catch (error) {
-                const message =
-                    error instanceof Error ? error.message : String(error);
-
-                this.logger.error(
-                    `Failed to start request ${request.id}: ${message}`,
-                );
-
-                await this.repository.completeCurrent(request.id);
-
-                // Don't leave the queue stuck if mpv rejects a track.
-                return this.startNextUnlocked();
-            }
-        }
-
-        const snapshot = await this.repository.snapshot(
-            this.queueLimit,
+      try {
+        await this.engine.playTrack(
+          request.track,
+          request.id,
         );
 
-        // Another request may be playing, or the queue head may
-        // still be resolving. Preserve request order in either case.
-        if (snapshot.current || snapshot.pending.length > 0) {
-            return null;
-        }
+        this.logger.log(
+          `Started "${request.track.title}" (${request.id})`,
+        );
 
-        await this.engine.startRadio();
-        return null;
+        return request;
+      } catch (error) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : String(error);
+
+        this.logger.error(
+          `Failed to start request ${request.id}: ${message}`,
+        );
+
+        await this.repository.completeCurrent(request.id);
+
+        // Don't leave the queue stuck if mpv rejects a track.
+        return this.startNextUnlocked();
+      }
     }
+
+    const snapshot = await this.repository.snapshot(
+      this.queueLimit,
+    );
+
+    // Another request may be playing, or the queue head may
+    // still be resolving. Preserve request order in either case.
+    if (snapshot.current || snapshot.pending.length > 0) {
+      return null;
+    }
+
+    await this.engine.startRadio();
+    return null;
+  }
 }
