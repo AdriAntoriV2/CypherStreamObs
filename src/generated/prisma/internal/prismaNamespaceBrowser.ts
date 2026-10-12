@@ -56,7 +56,8 @@ export const ModelName = {
   AutomationRule: 'AutomationRule',
   AutomationExecution: 'AutomationExecution',
   AutomationActionExecution: 'AutomationActionExecution',
-  TwitchAccount: 'TwitchAccount'
+  TwitchAccount: 'TwitchAccount',
+  ChatCommand: 'ChatCommand'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -160,6 +161,18 @@ export const TwitchAccountScalarFieldEnum = {
 } as const
 
 export type TwitchAccountScalarFieldEnum = (typeof TwitchAccountScalarFieldEnum)[keyof typeof TwitchAccountScalarFieldEnum]
+
+
+export const ChatCommandScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  enabled: 'enabled',
+  cooldownSeconds: 'cooldownSeconds',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ChatCommandScalarFieldEnum = (typeof ChatCommandScalarFieldEnum)[keyof typeof ChatCommandScalarFieldEnum]
 
 
 export const SortOrder = {

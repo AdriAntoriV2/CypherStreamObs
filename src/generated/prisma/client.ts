@@ -71,3 +71,8 @@ export type AutomationActionExecution = Prisma.AutomationActionExecutionModel
  * 
  */
 export type TwitchAccount = Prisma.TwitchAccountModel
+/**
+ * Model ChatCommand
+ * 
+ */
+export type ChatCommand = Prisma.ChatCommandModel

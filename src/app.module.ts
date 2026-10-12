@@ -13,6 +13,7 @@ import { StreamsModule } from './streams/streams.module.js';
 import { AutomationModule } from './automation/automation.module.js';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware.js';
 import { TwitchModule } from './twitch/twitch.module.js';
+import { CommandsModule } from './commands/commands.module.js';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { TwitchModule } from './twitch/twitch.module.js';
     StreamsModule,
     AutomationModule,
     TwitchModule,
+    CommandsModule,
   ],
 })
 export class AppModule implements NestModule {

@@ -402,7 +402,8 @@ export const ModelName = {
   AutomationRule: 'AutomationRule',
   AutomationExecution: 'AutomationExecution',
   AutomationActionExecution: 'AutomationActionExecution',
-  TwitchAccount: 'TwitchAccount'
+  TwitchAccount: 'TwitchAccount',
+  ChatCommand: 'ChatCommand'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -418,7 +419,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "stream" | "streamEvent" | "automationRule" | "automationExecution" | "automationActionExecution" | "twitchAccount"
+    modelProps: "stream" | "streamEvent" | "automationRule" | "automationExecution" | "automationActionExecution" | "twitchAccount" | "chatCommand"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -866,6 +867,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ChatCommand: {
+      payload: Prisma.$ChatCommandPayload<ExtArgs>
+      fields: Prisma.ChatCommandFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ChatCommandFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatCommandPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ChatCommandFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatCommandPayload>
+        }
+        findFirst: {
+          args: Prisma.ChatCommandFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatCommandPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ChatCommandFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatCommandPayload>
+        }
+        findMany: {
+          args: Prisma.ChatCommandFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatCommandPayload>[]
+        }
+        create: {
+          args: Prisma.ChatCommandCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatCommandPayload>
+        }
+        createMany: {
+          args: Prisma.ChatCommandCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ChatCommandCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatCommandPayload>[]
+        }
+        delete: {
+          args: Prisma.ChatCommandDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatCommandPayload>
+        }
+        update: {
+          args: Prisma.ChatCommandUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatCommandPayload>
+        }
+        deleteMany: {
+          args: Prisma.ChatCommandDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ChatCommandUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ChatCommandUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatCommandPayload>[]
+        }
+        upsert: {
+          args: Prisma.ChatCommandUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatCommandPayload>
+        }
+        aggregate: {
+          args: Prisma.ChatCommandAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateChatCommand>
+        }
+        groupBy: {
+          args: Prisma.ChatCommandGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ChatCommandGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ChatCommandCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ChatCommandCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -990,6 +1065,18 @@ export const TwitchAccountScalarFieldEnum = {
 } as const
 
 export type TwitchAccountScalarFieldEnum = (typeof TwitchAccountScalarFieldEnum)[keyof typeof TwitchAccountScalarFieldEnum]
+
+
+export const ChatCommandScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  enabled: 'enabled',
+  cooldownSeconds: 'cooldownSeconds',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ChatCommandScalarFieldEnum = (typeof ChatCommandScalarFieldEnum)[keyof typeof ChatCommandScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1279,6 +1366,7 @@ export type GlobalOmitConfig = {
   automationExecution?: Prisma.AutomationExecutionOmit
   automationActionExecution?: Prisma.AutomationActionExecutionOmit
   twitchAccount?: Prisma.TwitchAccountOmit
+  chatCommand?: Prisma.ChatCommandOmit
 }
 
 /* Types for Logging */

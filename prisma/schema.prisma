@@ -128,3 +128,15 @@ model TwitchAccount {
 
   @@index([login])
 }
+
+model ChatCommand {
+  id String @id @default(uuid())
+
+  name String @unique
+  enabled Boolean @default(true)
+
+  cooldownSeconds Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
