@@ -2,7 +2,7 @@ import {
   ConflictException,
   Injectable,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '../generated/prisma/client.js';
 import { PrismaService } from '../database/prisma.service.js';
 import { QueueService } from '../queue/queue.service.js';
 import { CreateEventDto } from './dto/create-event.dto.js';

@@ -2,7 +2,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '../generated/prisma/client.js';
 import { PrismaService } from '../database/prisma.service.js';
 import { CreateRuleDto } from './dto/create-rule.dto.js';
 
