@@ -18,9 +18,9 @@ import configuration from './configuration.js';
 
         DATABASE_URL: Joi.string().uri().required(),
 
-        REDIS_HOST: Joi.string().required(),
-
-        REDIS_PORT: Joi.number().port().default(6379),
+        REDIS_URL: Joi.string()
+          .uri({ scheme: ['redis', 'rediss'] })
+          .default('redis://localhost:6379'),
 
         //MIXITUP_HOST: Joi.string().required(),
 

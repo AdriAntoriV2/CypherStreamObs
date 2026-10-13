@@ -23,6 +23,11 @@ export * from './enums.js';
  */
 export type Stream = Prisma.StreamModel
 /**
+ * Model FirstRedemption
+ * 
+ */
+export type FirstRedemption = Prisma.FirstRedemptionModel
+/**
  * Model StreamEvent
  * 
  */

@@ -16,9 +16,25 @@ model Stream {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  events StreamEvent[]
+  events          StreamEvent[]
+  firstRedemption FirstRedemption?
 
   @@index([startedAt])
+}
+
+model FirstRedemption {
+  id                String   @id @default(uuid())
+  streamId          String   @unique
+  twitchRedemptionId String   @unique
+  userId             String
+  userLogin          String
+  userDisplayName    String
+  redeemedAt         DateTime
+  createdAt          DateTime @default(now())
+
+  stream Stream @relation(fields: [streamId], references: [id], onDelete: Cascade)
+
+  @@index([redeemedAt])
 }
 
 model StreamEvent {

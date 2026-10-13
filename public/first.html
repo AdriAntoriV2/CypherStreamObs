@@ -1,0 +1,50 @@
+<script>
+  const text = document.getElementById('text');
+  const time = document.getElementById('time');
+
+  let frozen = false;
+
+  function formatElapsed(ms) {
+    return `${ms} ms`;
+  }
+
+  async function refresh() {
+    try {
+      const response = await fetch('/api/first-overlay/current', {
+        cache: 'no-store',
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const state = await response.json();
+
+      if (!state.active) {
+        text.textContent = '';
+        time.textContent = '';
+        text.classList.remove('frozen');
+        frozen = false;
+        return;
+      }
+
+      if (state.winner) {
+        text.textContent = state.winner.displayName;
+        time.textContent = formatElapsed(state.winner.elapsedMs);
+        text.classList.add('frozen');
+        frozen = true;
+        return;
+      }
+
+      if (!frozen) {
+        text.textContent = '';
+        time.textContent = formatElapsed(state.elapsedMs);
+      }
+    } catch (error) {
+      console.error('Failed to refresh First overlay:', error);
+    }
+  }
+
+  refresh();
+  setInterval(refresh, 300);
+</script>

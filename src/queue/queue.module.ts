@@ -8,16 +8,38 @@ import { AutomationQueueService } from './automation-queue.service.js';
 
 export const REDIS_CLIENT = Symbol('REDIS_CLIENT');
 
+function getBullRedisConnection(redisUrl: string) {
+  const url = new URL(redisUrl);
+
+  if (!['redis:', 'rediss:'].includes(url.protocol)) {
+    throw new Error('REDIS_URL must use redis:// or rediss://');
+  }
+
+  const database = url.pathname.replace(/^\//, '');
+
+  return {
+    host: url.hostname,
+    port: Number(url.port || 6379),
+    ...(url.username
+      ? { username: decodeURIComponent(url.username) }
+      : {}),
+    ...(url.password
+      ? { password: decodeURIComponent(url.password) }
+      : {}),
+    ...(database ? { db: Number(database) } : {}),
+    ...(url.protocol === 'rediss:' ? { tls: {} } : {}),
+  };
+}
+
 @Module({
   imports: [
     BullModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        connection: {
-          host: config.getOrThrow<string>('redis.host'),
-          port: config.getOrThrow<number>('redis.port'),
-        },
+        connection: getBullRedisConnection(
+          config.getOrThrow<string>('redis.url'),
+        ),
       }),
     }),
 
@@ -29,8 +51,8 @@ export const REDIS_CLIENT = Symbol('REDIS_CLIENT');
         name: QUEUE_NAMES.automation,
       },
       {
-  name: QUEUE_NAMES.songResolution,
-},
+        name: QUEUE_NAMES.songResolution,
+      },
     ),
   ],
 
@@ -42,10 +64,9 @@ export const REDIS_CLIENT = Symbol('REDIS_CLIENT');
       provide: REDIS_CLIENT,
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
-        return new Redis({
-          host: config.getOrThrow<string>('redis.host'),
-          port: config.getOrThrow<number>('redis.port'),
-        });
+        return new Redis(
+          config.getOrThrow<string>('redis.url'),
+        );
       },
     },
   ],

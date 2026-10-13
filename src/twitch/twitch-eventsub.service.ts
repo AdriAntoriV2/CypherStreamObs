@@ -15,6 +15,7 @@ import { StreamsService } from '../streams/streams.service.js';
 import { TwitchEventIngestionService } from './twitch-event-ingestion.service.js';
 import { ChatCommandDispatcher } from '../commands/chat-command-dispatcher.service.js';
 import { PointPoolService } from '../point-pool/point-pool.service.js';
+import { FirstOverlayService } from '../first-overlay/first-overlay.service.js';
 
 @Injectable()
 export class TwitchEventSubService
@@ -37,6 +38,7 @@ export class TwitchEventSubService
     private readonly ingestionService: TwitchEventIngestionService,
     private readonly chatCommandDispatcher: ChatCommandDispatcher,
     private readonly pointPoolService: PointPoolService,
+    private readonly firstOverlayService: FirstOverlayService,
   ) { }
 
   async connect(
@@ -368,6 +370,7 @@ export class TwitchEventSubService
       subscriptionType ===
       'channel.channel_points_custom_reward_redemption.add'
     ) {
+      await this.firstOverlayService.recordRedemption(event);
       await this.pointPoolService.recordRedemption(event);
     }
 

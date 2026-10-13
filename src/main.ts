@@ -13,10 +13,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const config = app.get(ConfigService);
   const sessionRedis = createClient({
-    socket: {
-      host: config.getOrThrow<string>('redis.host'),
-      port: config.getOrThrow<number>('redis.port'),
-    },
+    url: config.getOrThrow<string>('redis.url'),
   });
 
   sessionRedis.on('error', (error) => {

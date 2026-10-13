@@ -19,6 +19,7 @@ import { CommandsModule } from './commands/commands.module.js';
 import { SongRequestModule } from './song-request/song-request.module.js';
 import { ChatCommandsModule } from './chat-commands/chat-commands.module.js';
 import { PointPoolModule } from './point-pool/point-pool.module.js';
+import { FirstOverlayModule } from './first-overlay/first-overlay.module.js';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { PointPoolModule } from './point-pool/point-pool.module.js';
     SongRequestModule,
     ChatCommandsModule,
     PointPoolModule,
+    FirstOverlayModule,
     ServeStaticModule.forRoot({
       rootPath: join(process.cwd(), 'public'),
       serveRoot: '/overlay',

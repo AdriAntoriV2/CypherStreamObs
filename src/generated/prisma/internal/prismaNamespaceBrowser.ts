@@ -52,6 +52,7 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   Stream: 'Stream',
+  FirstRedemption: 'FirstRedemption',
   StreamEvent: 'StreamEvent',
   AutomationRule: 'AutomationRule',
   AutomationExecution: 'AutomationExecution',
@@ -90,6 +91,20 @@ export const StreamScalarFieldEnum = {
 } as const
 
 export type StreamScalarFieldEnum = (typeof StreamScalarFieldEnum)[keyof typeof StreamScalarFieldEnum]
+
+
+export const FirstRedemptionScalarFieldEnum = {
+  id: 'id',
+  streamId: 'streamId',
+  twitchRedemptionId: 'twitchRedemptionId',
+  userId: 'userId',
+  userLogin: 'userLogin',
+  userDisplayName: 'userDisplayName',
+  redeemedAt: 'redeemedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type FirstRedemptionScalarFieldEnum = (typeof FirstRedemptionScalarFieldEnum)[keyof typeof FirstRedemptionScalarFieldEnum]
 
 
 export const StreamEventScalarFieldEnum = {

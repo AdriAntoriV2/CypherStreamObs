@@ -398,6 +398,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   Stream: 'Stream',
+  FirstRedemption: 'FirstRedemption',
   StreamEvent: 'StreamEvent',
   AutomationRule: 'AutomationRule',
   AutomationExecution: 'AutomationExecution',
@@ -423,7 +424,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "stream" | "streamEvent" | "automationRule" | "automationExecution" | "automationActionExecution" | "twitchAccount" | "chatCommand" | "pointPoolEvent" | "pointPoolRedemption" | "pointPoolGoal" | "pointPoolAdjustment"
+    modelProps: "stream" | "firstRedemption" | "streamEvent" | "automationRule" | "automationExecution" | "automationActionExecution" | "twitchAccount" | "chatCommand" | "pointPoolEvent" | "pointPoolRedemption" | "pointPoolGoal" | "pointPoolAdjustment"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -498,6 +499,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.StreamCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.StreamCountAggregateOutputType> | number
+        }
+      }
+    }
+    FirstRedemption: {
+      payload: Prisma.$FirstRedemptionPayload<ExtArgs>
+      fields: Prisma.FirstRedemptionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.FirstRedemptionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FirstRedemptionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.FirstRedemptionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FirstRedemptionPayload>
+        }
+        findFirst: {
+          args: Prisma.FirstRedemptionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FirstRedemptionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.FirstRedemptionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FirstRedemptionPayload>
+        }
+        findMany: {
+          args: Prisma.FirstRedemptionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FirstRedemptionPayload>[]
+        }
+        create: {
+          args: Prisma.FirstRedemptionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FirstRedemptionPayload>
+        }
+        createMany: {
+          args: Prisma.FirstRedemptionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.FirstRedemptionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FirstRedemptionPayload>[]
+        }
+        delete: {
+          args: Prisma.FirstRedemptionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FirstRedemptionPayload>
+        }
+        update: {
+          args: Prisma.FirstRedemptionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FirstRedemptionPayload>
+        }
+        deleteMany: {
+          args: Prisma.FirstRedemptionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.FirstRedemptionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.FirstRedemptionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FirstRedemptionPayload>[]
+        }
+        upsert: {
+          args: Prisma.FirstRedemptionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FirstRedemptionPayload>
+        }
+        aggregate: {
+          args: Prisma.FirstRedemptionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateFirstRedemption>
+        }
+        groupBy: {
+          args: Prisma.FirstRedemptionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FirstRedemptionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.FirstRedemptionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FirstRedemptionCountAggregateOutputType> | number
         }
       }
     }
@@ -1292,6 +1367,20 @@ export const StreamScalarFieldEnum = {
 export type StreamScalarFieldEnum = (typeof StreamScalarFieldEnum)[keyof typeof StreamScalarFieldEnum]
 
 
+export const FirstRedemptionScalarFieldEnum = {
+  id: 'id',
+  streamId: 'streamId',
+  twitchRedemptionId: 'twitchRedemptionId',
+  userId: 'userId',
+  userLogin: 'userLogin',
+  userDisplayName: 'userDisplayName',
+  redeemedAt: 'redeemedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type FirstRedemptionScalarFieldEnum = (typeof FirstRedemptionScalarFieldEnum)[keyof typeof FirstRedemptionScalarFieldEnum]
+
+
 export const StreamEventScalarFieldEnum = {
   id: 'id',
   streamId: 'streamId',
@@ -1715,6 +1804,7 @@ export interface PrismaClientOptionsWithAdapter extends PrismaClientBaseOptions 
 export type PrismaClientOptions = PrismaClientOptionsWithAccelerateUrl | PrismaClientOptionsWithAdapter
 export type GlobalOmitConfig = {
   stream?: Prisma.StreamOmit
+  firstRedemption?: Prisma.FirstRedemptionOmit
   streamEvent?: Prisma.StreamEventOmit
   automationRule?: Prisma.AutomationRuleOmit
   automationExecution?: Prisma.AutomationExecutionOmit

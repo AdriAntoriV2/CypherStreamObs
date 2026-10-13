@@ -13,6 +13,7 @@ import { SecurityModule } from '../common/security/security.module.js';
 import { TwitchOAuthStateService } from './twitch-oauth-state.service.js';
 import { QueueModule } from '../queue/queue.module.js';
 import { PointPoolModule } from '../point-pool/point-pool.module.js';
+import { FirstOverlayModule } from '../first-overlay/first-overlay.module.js';
 
 @Module({
   controllers: [
@@ -34,6 +35,7 @@ import { PointPoolModule } from '../point-pool/point-pool.module.js';
     SecurityModule,
     QueueModule,
     PointPoolModule,
+    FirstOverlayModule,
   ],
   exports: [
     TwitchService,

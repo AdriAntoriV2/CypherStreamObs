@@ -191,6 +191,7 @@ export type StreamWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Stream"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Stream"> | Date | string
   events?: Prisma.StreamEventListRelationFilter
+  firstRedemption?: Prisma.XOR<Prisma.FirstRedemptionNullableScalarRelationFilter, Prisma.FirstRedemptionWhereInput> | null
 }
 
 export type StreamOrderByWithRelationInput = {
@@ -201,6 +202,7 @@ export type StreamOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   events?: Prisma.StreamEventOrderByRelationAggregateInput
+  firstRedemption?: Prisma.FirstRedemptionOrderByWithRelationInput
 }
 
 export type StreamWhereUniqueInput = Prisma.AtLeast<{
@@ -214,6 +216,7 @@ export type StreamWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Stream"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Stream"> | Date | string
   events?: Prisma.StreamEventListRelationFilter
+  firstRedemption?: Prisma.XOR<Prisma.FirstRedemptionNullableScalarRelationFilter, Prisma.FirstRedemptionWhereInput> | null
 }, "id">
 
 export type StreamOrderByWithAggregationInput = {
@@ -248,6 +251,7 @@ export type StreamCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   events?: Prisma.StreamEventCreateNestedManyWithoutStreamInput
+  firstRedemption?: Prisma.FirstRedemptionCreateNestedOneWithoutStreamInput
 }
 
 export type StreamUncheckedCreateInput = {
@@ -258,6 +262,7 @@ export type StreamUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   events?: Prisma.StreamEventUncheckedCreateNestedManyWithoutStreamInput
+  firstRedemption?: Prisma.FirstRedemptionUncheckedCreateNestedOneWithoutStreamInput
 }
 
 export type StreamUpdateInput = {
@@ -268,6 +273,7 @@ export type StreamUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   events?: Prisma.StreamEventUpdateManyWithoutStreamNestedInput
+  firstRedemption?: Prisma.FirstRedemptionUpdateOneWithoutStreamNestedInput
 }
 
 export type StreamUncheckedUpdateInput = {
@@ -278,6 +284,7 @@ export type StreamUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   events?: Prisma.StreamEventUncheckedUpdateManyWithoutStreamNestedInput
+  firstRedemption?: Prisma.FirstRedemptionUncheckedUpdateOneWithoutStreamNestedInput
 }
 
 export type StreamCreateManyInput = {
@@ -351,6 +358,20 @@ export type NullableDateTimeFieldUpdateOperationsInput = {
   set?: Date | string | null
 }
 
+export type StreamCreateNestedOneWithoutFirstRedemptionInput = {
+  create?: Prisma.XOR<Prisma.StreamCreateWithoutFirstRedemptionInput, Prisma.StreamUncheckedCreateWithoutFirstRedemptionInput>
+  connectOrCreate?: Prisma.StreamCreateOrConnectWithoutFirstRedemptionInput
+  connect?: Prisma.StreamWhereUniqueInput
+}
+
+export type StreamUpdateOneRequiredWithoutFirstRedemptionNestedInput = {
+  create?: Prisma.XOR<Prisma.StreamCreateWithoutFirstRedemptionInput, Prisma.StreamUncheckedCreateWithoutFirstRedemptionInput>
+  connectOrCreate?: Prisma.StreamCreateOrConnectWithoutFirstRedemptionInput
+  upsert?: Prisma.StreamUpsertWithoutFirstRedemptionInput
+  connect?: Prisma.StreamWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.StreamUpdateToOneWithWhereWithoutFirstRedemptionInput, Prisma.StreamUpdateWithoutFirstRedemptionInput>, Prisma.StreamUncheckedUpdateWithoutFirstRedemptionInput>
+}
+
 export type StreamCreateNestedOneWithoutEventsInput = {
   create?: Prisma.XOR<Prisma.StreamCreateWithoutEventsInput, Prisma.StreamUncheckedCreateWithoutEventsInput>
   connectOrCreate?: Prisma.StreamCreateOrConnectWithoutEventsInput
@@ -365,6 +386,62 @@ export type StreamUpdateOneRequiredWithoutEventsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.StreamUpdateToOneWithWhereWithoutEventsInput, Prisma.StreamUpdateWithoutEventsInput>, Prisma.StreamUncheckedUpdateWithoutEventsInput>
 }
 
+export type StreamCreateWithoutFirstRedemptionInput = {
+  id?: string
+  title: string
+  startedAt: Date | string
+  endedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  events?: Prisma.StreamEventCreateNestedManyWithoutStreamInput
+}
+
+export type StreamUncheckedCreateWithoutFirstRedemptionInput = {
+  id?: string
+  title: string
+  startedAt: Date | string
+  endedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  events?: Prisma.StreamEventUncheckedCreateNestedManyWithoutStreamInput
+}
+
+export type StreamCreateOrConnectWithoutFirstRedemptionInput = {
+  where: Prisma.StreamWhereUniqueInput
+  create: Prisma.XOR<Prisma.StreamCreateWithoutFirstRedemptionInput, Prisma.StreamUncheckedCreateWithoutFirstRedemptionInput>
+}
+
+export type StreamUpsertWithoutFirstRedemptionInput = {
+  update: Prisma.XOR<Prisma.StreamUpdateWithoutFirstRedemptionInput, Prisma.StreamUncheckedUpdateWithoutFirstRedemptionInput>
+  create: Prisma.XOR<Prisma.StreamCreateWithoutFirstRedemptionInput, Prisma.StreamUncheckedCreateWithoutFirstRedemptionInput>
+  where?: Prisma.StreamWhereInput
+}
+
+export type StreamUpdateToOneWithWhereWithoutFirstRedemptionInput = {
+  where?: Prisma.StreamWhereInput
+  data: Prisma.XOR<Prisma.StreamUpdateWithoutFirstRedemptionInput, Prisma.StreamUncheckedUpdateWithoutFirstRedemptionInput>
+}
+
+export type StreamUpdateWithoutFirstRedemptionInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  events?: Prisma.StreamEventUpdateManyWithoutStreamNestedInput
+}
+
+export type StreamUncheckedUpdateWithoutFirstRedemptionInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  events?: Prisma.StreamEventUncheckedUpdateManyWithoutStreamNestedInput
+}
+
 export type StreamCreateWithoutEventsInput = {
   id?: string
   title: string
@@ -372,6 +449,7 @@ export type StreamCreateWithoutEventsInput = {
   endedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  firstRedemption?: Prisma.FirstRedemptionCreateNestedOneWithoutStreamInput
 }
 
 export type StreamUncheckedCreateWithoutEventsInput = {
@@ -381,6 +459,7 @@ export type StreamUncheckedCreateWithoutEventsInput = {
   endedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  firstRedemption?: Prisma.FirstRedemptionUncheckedCreateNestedOneWithoutStreamInput
 }
 
 export type StreamCreateOrConnectWithoutEventsInput = {
@@ -406,6 +485,7 @@ export type StreamUpdateWithoutEventsInput = {
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  firstRedemption?: Prisma.FirstRedemptionUpdateOneWithoutStreamNestedInput
 }
 
 export type StreamUncheckedUpdateWithoutEventsInput = {
@@ -415,6 +495,7 @@ export type StreamUncheckedUpdateWithoutEventsInput = {
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  firstRedemption?: Prisma.FirstRedemptionUncheckedUpdateOneWithoutStreamNestedInput
 }
 
 
@@ -456,6 +537,7 @@ export type StreamSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   createdAt?: boolean
   updatedAt?: boolean
   events?: boolean | Prisma.Stream$eventsArgs<ExtArgs>
+  firstRedemption?: boolean | Prisma.Stream$firstRedemptionArgs<ExtArgs>
   _count?: boolean | Prisma.StreamCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["stream"]>
 
@@ -489,6 +571,7 @@ export type StreamSelectScalar = {
 export type StreamOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "startedAt" | "endedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["stream"]>
 export type StreamInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   events?: boolean | Prisma.Stream$eventsArgs<ExtArgs>
+  firstRedemption?: boolean | Prisma.Stream$firstRedemptionArgs<ExtArgs>
   _count?: boolean | Prisma.StreamCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type StreamIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -498,6 +581,7 @@ export type $StreamPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   name: "Stream"
   objects: {
     events: Prisma.$StreamEventPayload<ExtArgs>[]
+    firstRedemption: Prisma.$FirstRedemptionPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -901,6 +985,7 @@ readonly fields: StreamFieldRefs;
 export interface Prisma__StreamClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   events<T extends Prisma.Stream$eventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Stream$eventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StreamEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  firstRedemption<T extends Prisma.Stream$firstRedemptionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Stream$firstRedemptionArgs<ExtArgs>>): Prisma.Prisma__FirstRedemptionClient<runtime.Types.Result.GetResult<Prisma.$FirstRedemptionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1350,6 +1435,25 @@ export type Stream$eventsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.StreamEventScalarFieldEnum | Prisma.StreamEventScalarFieldEnum[]
+}
+
+/**
+ * Stream.firstRedemption
+ */
+export type Stream$firstRedemptionArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the FirstRedemption
+   */
+  select?: Prisma.FirstRedemptionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the FirstRedemption
+   */
+  omit?: Prisma.FirstRedemptionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.FirstRedemptionInclude<ExtArgs> | null
+  where?: Prisma.FirstRedemptionWhereInput
 }
 
 /**

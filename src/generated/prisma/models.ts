@@ -9,6 +9,7 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/Stream.js'
+export type * from './models/FirstRedemption.js'
 export type * from './models/StreamEvent.js'
 export type * from './models/AutomationRule.js'
 export type * from './models/AutomationExecution.js'
