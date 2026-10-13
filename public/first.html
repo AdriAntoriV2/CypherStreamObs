@@ -1,50 +1,109 @@
-<script>
-  const text = document.getElementById('text');
-  const time = document.getElementById('time');
 
-  let frozen = false;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>First Redemption Overlay</title>
 
-  function formatElapsed(ms) {
-    return `${ms} ms`;
-  }
-
-  async function refresh() {
-    try {
-      const response = await fetch('/api/first-overlay/current', {
-        cache: 'no-store',
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-
-      const state = await response.json();
-
-      if (!state.active) {
-        text.textContent = '';
-        time.textContent = '';
-        text.classList.remove('frozen');
-        frozen = false;
-        return;
-      }
-
-      if (state.winner) {
-        text.textContent = state.winner.displayName;
-        time.textContent = formatElapsed(state.winner.elapsedMs);
-        text.classList.add('frozen');
-        frozen = true;
-        return;
-      }
-
-      if (!frozen) {
-        text.textContent = '';
-        time.textContent = formatElapsed(state.elapsedMs);
-      }
-    } catch (error) {
-      console.error('Failed to refresh First overlay:', error);
+  <style>
+    html,
+    body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      background: transparent;
+      font-family: Arial, sans-serif;
     }
-  }
 
-  refresh();
-  setInterval(refresh, 300);
-</script>
+    #container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: white;
+      text-align: center;
+    }
+
+    #text {
+      font-size: 36px;
+      font-weight: bold;
+      text-transform: capitalize;
+    }
+
+    #time {
+      font-size: 24px;
+      margin-top: 10px;
+      opacity: 0.9;
+      transition: all 0.3s;
+    }
+
+    .frozen {
+      color: gold;
+      transform: scale(1.1);
+    }
+  </style>
+</head>
+
+<body>
+  <div id="container">
+    <div id="text">Waiting for First...</div>
+    <div id="time"></div>
+  </div>
+
+  <script>
+    const text = document.getElementById('text');
+    const time = document.getElementById('time');
+
+    let frozen = false;
+
+    function formatElapsed(ms) {
+      const seconds = Math.floor(ms / 1000);
+      const milliseconds = Math.floor(ms % 1000);
+
+      return `${seconds}.${String(milliseconds).padStart(3, '0')} s`;
+    }
+
+    async function refresh() {
+      try {
+        const response = await fetch('/api/first-overlay/current', {
+          cache: 'no-store',
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const state = await response.json();
+
+        if (!state.active) {
+          text.textContent = 'Waiting for First...';
+          time.textContent = '';
+          text.classList.remove('frozen');
+          frozen = false;
+          return;
+        }
+
+        if (state.winner) {
+          text.textContent = state.winner.displayName;
+          time.textContent = formatElapsed(state.winner.elapsedMs);
+          text.classList.add('frozen');
+          frozen = true;
+          return;
+        }
+
+        frozen = false;
+        text.textContent = 'Waiting for First...';
+        time.textContent = formatElapsed(state.elapsedMs);
+        text.classList.remove('frozen');
+      } catch (error) {
+        console.error('Failed to refresh First overlay:', error);
+      }
+    }
+
+    refresh();
+    setInterval(refresh, 300);
+  </script>
+</body>
+</html>
