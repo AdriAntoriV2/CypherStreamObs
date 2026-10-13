@@ -52,7 +52,9 @@ export default () => ({
     mpvPath: process.env.MPV_PATH ?? 'mpv',
     ipcPath:
       process.env.MPV_IPC_PATH ??
-      '/tmp/streamops-mpv.sock',
+      (process.platform === 'win32'
+        ? '\\\\.\\pipe\\streamops-mpv'
+        : '/tmp/streamops-mpv.sock'),
     radioUrl: process.env.RADIO_URL,
   },
 });

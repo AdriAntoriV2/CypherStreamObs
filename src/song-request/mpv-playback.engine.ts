@@ -121,7 +121,9 @@ export class MpvPlaybackEngine
             this.pendingCommands.delete(id);
         }
 
-        await unlink(this.ipcPath).catch(() => undefined);
+        if (process.platform !== 'win32') {
+            await unlink(this.ipcPath).catch(() => undefined);
+        }
     }
 
     private async ensureConnected(): Promise<void> {
@@ -147,8 +149,9 @@ export class MpvPlaybackEngine
     }
 
     private async startProcessAndConnect(): Promise<void> {
-        await unlink(this.ipcPath).catch(() => undefined);
-
+        if (process.platform !== 'win32') {
+            await unlink(this.ipcPath).catch(() => undefined);
+        }
         const child = spawn(
             this.mpvPath,
             [
@@ -188,6 +191,13 @@ export class MpvPlaybackEngine
 
             this.logger.warn(error.message);
         });
+
+        await new Promise<void>((resolve, reject) => {
+            child.once('spawn', resolve);
+            child.once('error', reject);
+        });
+
+        await this.connectSocket();
 
         await this.connectSocket();
     }

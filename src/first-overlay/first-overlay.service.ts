@@ -10,17 +10,21 @@ export class FirstOverlayService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly streamsService: StreamsService,
-  ) {}
+  ) { }
 
   async recordRedemption(event: Record<string, unknown>) {
     const reward = event.reward;
 
-    if (
-      typeof reward !== 'object' ||
-      reward === null ||
-      !('title' in reward) ||
-      reward.title !== 'First'
-    ) {
+    if (typeof reward !== 'object' || reward === null || !('title' in reward)) {
+      return null;
+    }
+
+    const rewardTitle =
+      typeof reward.title === 'string'
+        ? reward.title.replace(/[^a-z]/gi, '').toLowerCase()
+        : '';
+
+    if (rewardTitle !== 'first') {
       return null;
     }
 
@@ -94,12 +98,12 @@ export class FirstOverlayService {
       elapsedMs,
       winner: winner
         ? {
-            displayName: winner.userDisplayName,
-            elapsedMs: Math.max(
-              0,
-              winner.redeemedAt.getTime() - stream.startedAt.getTime(),
-            ),
-          }
+          displayName: winner.userDisplayName,
+          elapsedMs: Math.max(
+            0,
+            winner.redeemedAt.getTime() - stream.startedAt.getTime(),
+          ),
+        }
         : null,
     };
   }
