@@ -4,6 +4,7 @@ import {
   Injectable,
   Logger,
   OnModuleInit,
+  ServiceUnavailableException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service.js';
@@ -12,6 +13,7 @@ import { TwitchApiClient } from './twitch-api.client.js';
 import { TwitchAuthenticatedClient } from './twitch-authenticated.client.js';
 import { TwitchEventSubService } from './twitch-eventsub.service.js';
 import { TwitchOAuthStateService } from './twitch-oauth-state.service.js';
+import { TwitchShoutoutInfo } from './types/twitch-eventsub.types.js';
 
 @Injectable()
 export class TwitchService implements OnModuleInit {
@@ -157,5 +159,29 @@ export class TwitchService implements OnModuleInit {
       scopes: account.scopes,
       connectedAt: account.connectedAt,
     };
+  }
+
+  async getShoutoutInfo(
+    username: string,
+  ): Promise<TwitchShoutoutInfo | null> {
+    const account = await this.prisma.twitchAccount.findFirst({
+      orderBy: {
+        connectedAt: 'desc',
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!account) {
+      throw new ServiceUnavailableException(
+        'Twitch is not connected.',
+      );
+    }
+
+    return this.authenticatedClient.getShoutoutInfo(
+      account.id,
+      username,
+    );
   }
 }

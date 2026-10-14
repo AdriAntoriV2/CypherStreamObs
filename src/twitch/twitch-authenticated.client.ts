@@ -1,4 +1,5 @@
 import {
+    BadRequestException,
     Injectable,
     UnauthorizedException,
 } from '@nestjs/common';
@@ -6,6 +7,7 @@ import { PrismaService } from '../database/prisma.service.js';
 import { SecretEncryptionService } from '../common/security/secret-encryption.service.js';
 import { TwitchApiClient } from './twitch-api.client.js';
 import { ConfigService } from '@nestjs/config';
+import { TwitchShoutoutInfo, TwitchUser } from './types/twitch-eventsub.types.js';
 
 interface TwitchAccountTokens {
     id: string;
@@ -19,6 +21,28 @@ interface TwitchApiRequestOptions
     extends RequestInit {
     retryOnUnauthorized?: boolean;
 }
+
+interface TwitchUsersResponse {
+    data: Array<{
+        id: string;
+        login: string;
+        display_name: string;
+    }>;
+}
+
+interface TwitchChannelsResponse {
+    data: Array<{
+        game_name: string;
+        title: string;
+    }>;
+}
+
+interface TwitchStreamsResponse {
+    data: Array<{
+        user_id: string;
+    }>;
+}
+
 
 @Injectable()
 export class TwitchAuthenticatedClient {
@@ -295,4 +319,69 @@ export class TwitchAuthenticatedClient {
         return response.json();
     }
 
+    async getShoutoutInfo(
+        accountId: string,
+        username: string,
+    ): Promise<TwitchShoutoutInfo | null> {
+        const login = username.trim().replace(/^@/, '').toLowerCase();
+
+        if (!/^[a-z0-9_]{1,25}$/.test(login)) {
+            throw new BadRequestException('Invalid Twitch username.');
+        }
+
+        const userUrl = new URL('https://api.twitch.tv/helix/users');
+        userUrl.searchParams.set('login', login);
+
+        const userResponse = await this.request(
+            accountId,
+            userUrl.toString(),
+        );
+
+        if (!userResponse.ok) {
+            throw new Error(
+                `Failed to fetch Twitch user: ${userResponse.status}`,
+            );
+        }
+
+        const users = await userResponse.json() as TwitchUsersResponse;
+        const user = users.data[0];
+
+        if (!user) {
+            return null;
+        }
+
+        const channelsUrl = new URL(
+            'https://api.twitch.tv/helix/channels',
+        );
+        channelsUrl.searchParams.set('broadcaster_id', user.id);
+
+        const streamsUrl = new URL(
+            'https://api.twitch.tv/helix/streams',
+        );
+        streamsUrl.searchParams.set('user_id', user.id);
+
+        const [channelResponse, streamResponse] = await Promise.all([
+            this.request(accountId, channelsUrl.toString()),
+            this.request(accountId, streamsUrl.toString()),
+        ]);
+
+        if (!channelResponse.ok || !streamResponse.ok) {
+            throw new Error('Failed to fetch Twitch channel information.');
+        }
+
+        const [channels, streams] = await Promise.all([
+            channelResponse.json() as Promise<TwitchChannelsResponse>,
+            streamResponse.json() as Promise<TwitchStreamsResponse>,
+        ]);
+
+        const channel = channels.data[0];
+
+        return {
+            displayName: user.display_name,
+            login: user.login,
+            category: channel?.game_name ?? '',
+            title: channel?.title ?? '',
+            isLive: streams.data.length > 0,
+        };
+    }
 }

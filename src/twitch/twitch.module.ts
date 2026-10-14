@@ -14,7 +14,8 @@ import { TwitchOAuthStateService } from './twitch-oauth-state.service.js';
 import { QueueModule } from '../queue/queue.module.js';
 import { PointPoolModule } from '../point-pool/point-pool.module.js';
 import { FirstOverlayModule } from '../first-overlay/first-overlay.module.js';
-
+import { ShoutoutHandler } from '../commands/handlers/shoutout.handler.js';
+import { TwitchCommandRegistration } from './twitch-command-registration.service.js';
 @Module({
   controllers: [
     TwitchController,
@@ -27,6 +28,8 @@ import { FirstOverlayModule } from '../first-overlay/first-overlay.module.js';
     TwitchEventNormalizer,
     TwitchEventIngestionService,
     TwitchOAuthStateService,
+    ShoutoutHandler,
+    TwitchCommandRegistration,
   ],
   imports: [
     EventsModule,
