@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stream Background Overlay</title>
+  <link rel="stylesheet" href="./background/background.css">
+</head>
+<body>
+  <main class="canvas" aria-label="Stream layout background">
+    <!-- Colorful Stage backdrop (all CSS) -->
+    <div class="stage" aria-hidden="true">
+      <div class="stage-glow"></div>
+      <div class="stripes"></div>
+      <div class="floor"></div>
+    </div>
+    <!-- Particles: stars, notes, rings, diamonds (JS canvas) -->
+    <canvas id="fx" width="1980" height="1080" aria-hidden="true"></canvas>
+
+    <section class="frame gameplay-frame" style="--accent: var(--mmj)" aria-label="Gameplay capture placement guide">
+      <span class="frame-label">GAMEPLAY</span>
+      <span class="frame-meta">1050 × 700</span>
+      <span class="corner corner-tl"></span><span class="corner corner-tr"></span>
+      <span class="corner corner-bl"></span><span class="corner corner-br"></span>
+    </section>
+
+    <section class="frame chat-frame" style="--accent: var(--vbs)" aria-label="Chat placement guide">
+      <span class="frame-label">CHAT</span>
+      <span class="frame-meta">OVERLAY AREA</span>
+      <span class="corner corner-tl"></span><span class="corner corner-tr"></span>
+      <span class="corner corner-bl"></span><span class="corner corner-br"></span>
+    </section>
+
+    <section class="frame handcam-frame" style="--accent: var(--wxs)" aria-label="Handcam placement guide">
+      <span class="frame-label">HANDCAM</span>
+      <span class="frame-meta">370 × 210</span>
+      <span class="corner corner-tl"></span><span class="corner corner-tr"></span>
+      <span class="corner corner-bl"></span><span class="corner corner-br"></span>
+    </section>
+
+    <section class="frame vtube-frame" style="--accent: var(--vs)" aria-label="VTube placement guide">
+      <span class="frame-label">VTUBE</span>
+      <span class="frame-meta">TRANSPARENT AREA</span>
+      <span class="corner corner-tl"></span><span class="corner corner-tr"></span>
+      <span class="corner corner-bl"></span><span class="corner corner-br"></span>
+    </section>
+
+    <div class="edge-mark edge-mark-left" aria-hidden="true"></div>
+    <div class="edge-mark edge-mark-right" aria-hidden="true"></div>
+  </main>
+  <script src="./background/background.js"></script>
+</body>
+</html>

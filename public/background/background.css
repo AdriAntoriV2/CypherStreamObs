@@ -1,0 +1,227 @@
+/* Register so the hue can animate smoothly */
+@property --hue { syntax: '<number>'; inherits: true; initial-value: 0; }
+@property --beat { syntax: '<number>'; inherits: true; initial-value: 0; }
+
+:root {
+  --canvas-width: 1980px;
+  --canvas-height: 1080px;
+  --game-width: 1050px;
+  --game-height: 700px;
+  --handcam-width: 370px;
+  --handcam-height: 210px;
+
+  /* Project Sekai unit colours */
+  --leo: #4455dd;     /* Leo/need */
+  --mmj: #88dd44;     /* MORE MORE JUMP! */
+  --vbs: #ee1166;     /* Vivid BAD SQUAD */
+  --wxs: #ff9900;     /* Wonderlands x Showtime */
+  --n25: #884499;     /* 25-ji, Nightcord de. */
+  --vs:  #33ccbb;     /* Virtual Singer */
+
+  --ink: #070a1f;
+  --edge: rgba(255, 255, 255, 0.78);
+  --text: rgba(255, 255, 255, 0.9);
+  --muted: rgba(255, 255, 255, 0.6);
+
+  --left: 42px;
+  --right: 42px;
+  --top: 42px;
+  --bottom: 42px;
+  --column-gap: 26px;
+  --panel-gap: 18px;
+  --bpm-dur: 0.9375s; /* 64 BPM half-time pulse; JS drives --beat at 128 BPM */
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  width: var(--canvas-width);
+  height: var(--canvas-height);
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: transparent;
+}
+
+body {
+  color: var(--text);
+  font-family: "Segoe UI", Inter, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.canvas {
+  position: relative;
+  width: var(--canvas-width);
+  height: var(--canvas-height);
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--ink);
+  animation: hue-cycle 40s linear infinite;
+}
+
+/* ---------- Colorful Stage backdrop ---------- */
+.stage, .stage > * { position: absolute; pointer-events: none; }
+.stage { inset: 0; z-index: -3; }
+
+/* Slow-drifting colour wash: Leo/need blue -> Nightcord purple -> Virtual Singer teal */
+.stage-glow {
+  inset: -20%;
+  background:
+    radial-gradient(circle at 20% 25%, color-mix(in srgb, var(--leo) 70%, transparent), transparent 42%),
+    radial-gradient(circle at 80% 20%, color-mix(in srgb, var(--vbs) 55%, transparent), transparent 40%),
+    radial-gradient(circle at 70% 85%, color-mix(in srgb, var(--vs) 55%, transparent), transparent 42%),
+    radial-gradient(circle at 15% 90%, color-mix(in srgb, var(--wxs) 45%, transparent), transparent 38%),
+    radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--n25) 55%, transparent), transparent 55%);
+  filter: saturate(1.1);
+  animation: glow-drift 26s ease-in-out infinite alternate;
+}
+
+/* Diagonal stage stripes sliding across */
+.stripes {
+  inset: -10%;
+  background: repeating-linear-gradient(
+    -35deg,
+    rgba(255, 255, 255, 0.055) 0 38px,
+    transparent 38px 110px
+  );
+  background-size: 220px 220px;
+  animation: stripe-slide 14s linear infinite;
+}
+
+/* Stage-floor glow + vignette to keep UI frames readable */
+.floor {
+  inset: 0;
+  background:
+    linear-gradient(to top, rgba(255, 255, 255, calc(0.08 + var(--beat) * 0.08)), transparent 22%),
+    radial-gradient(ellipse at 50% 50%, transparent 45%, rgba(5, 6, 24, 0.7) 100%);
+}
+
+#fx {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+}
+
+/* ---------- Layout frames ---------- */
+.frame {
+  --accent: var(--vs);
+  position: absolute;
+  border: 2px solid var(--accent);
+  background: linear-gradient(135deg, rgba(7, 10, 31, 0.18), rgba(7, 10, 31, 0.04));
+  box-shadow:
+    0 0 calc(10px + var(--beat) * 14px) color-mix(in srgb, var(--accent) 65%, transparent),
+    inset 0 0 22px color-mix(in srgb, var(--accent) 18%, transparent);
+  animation: frame-pulse var(--bpm-dur) ease-in-out infinite alternate;
+}
+
+.frame::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  pointer-events: none;
+}
+
+/* Gameplay aligns to the top of chat; free space stays below it */
+.gameplay-frame {
+  left: var(--left);
+  top: var(--top);
+  width: var(--game-width);
+  height: var(--game-height);
+}
+
+.chat-frame {
+  left: calc(var(--left) + var(--game-width) + var(--column-gap));
+  right: var(--right);
+  top: var(--top);
+  bottom: calc(var(--bottom) + var(--handcam-height) + var(--panel-gap));
+}
+
+.handcam-frame {
+  left: calc(var(--left) + var(--game-width) + var(--column-gap));
+  bottom: var(--bottom);
+  width: var(--handcam-width);
+  height: var(--handcam-height);
+}
+
+.vtube-frame {
+  left: calc(var(--left) + var(--game-width) + var(--column-gap) + var(--handcam-width) + var(--panel-gap));
+  right: var(--right);
+  bottom: var(--bottom);
+  height: var(--handcam-height);
+  border-style: dashed;
+  background: transparent;
+}
+
+.frame-label, .frame-meta {
+  position: absolute;
+  z-index: 2;
+  top: -13px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 4px 10px;
+  background: var(--ink);
+  border: 1px solid var(--accent);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  white-space: nowrap;
+  transform: skewX(-12deg);
+}
+.frame-label { left: 14px; background: var(--accent); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.45); }
+.frame-meta { right: 14px; color: var(--muted); font-size: 10px; letter-spacing: 0.1em; font-weight: 500; }
+
+.corner {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 0 solid #fff;
+  opacity: 0.95;
+  filter: drop-shadow(0 0 4px var(--accent));
+}
+.corner-tl { top: -2px; left: -2px; border-width: 3px 0 0 3px; }
+.corner-tr { top: -2px; right: -2px; border-width: 3px 3px 0 0; }
+.corner-bl { bottom: -2px; left: -2px; border-width: 0 0 3px 3px; }
+.corner-br { bottom: -2px; right: -2px; border-width: 0 3px 3px 0; }
+
+.edge-mark {
+  position: absolute;
+  top: 50%;
+  width: 4px;
+  height: 90px;
+  margin-top: -45px;
+  opacity: 0.8;
+  background: linear-gradient(180deg, var(--vbs), var(--wxs), var(--mmj), var(--vs), var(--leo));
+  background-size: 100% 300%;
+  animation: edge-flow 5s linear infinite;
+}
+.edge-mark-left { left: 14px; }
+.edge-mark-right { right: 14px; }
+
+/* ?guides=off : hide labels, fills and the VTube box; keep borders and glow */
+.guides-off .frame-label, .guides-off .frame-meta, .guides-off .frame::before { display: none; }
+.guides-off .frame { background: transparent; }
+.guides-off .vtube-frame { display: none; }
+
+/* ---------- Keyframes ---------- */
+@keyframes hue-cycle { from { --hue: 0; } to { --hue: 1; } }
+@keyframes glow-drift {
+  from { transform: translate(-3%, -2%) scale(1) rotate(0deg); }
+  to   { transform: translate(3%, 2%) scale(1.12) rotate(8deg); }
+}
+@keyframes stripe-slide { to { background-position: 220px 0; } }
+@keyframes frame-pulse { from { border-color: var(--accent); } to { border-color: color-mix(in srgb, var(--accent) 55%, #fff); } }
+@keyframes edge-flow { to { background-position: 0 300%; } }
+
+.motion-off *, .motion-off *::before, .motion-off *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
