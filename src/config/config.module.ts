@@ -55,6 +55,16 @@ import configuration from './configuration.js';
             : '/tmp/streamops-mpv.sock',
         ),
         RADIO_URL: Joi.string().uri().optional(),
+
+        CHAT_OVERLAY_MAX_MESSAGES: Joi.number()
+          .integer()
+          .min(1)
+          .default(30),
+
+        CHAT_OVERLAY_MESSAGE_TTL_SECONDS: Joi.number()
+          .integer()
+          .min(1)
+          .default(3600),
       }),
     }),
   ],

@@ -16,6 +16,8 @@ import { PointPoolModule } from '../point-pool/point-pool.module.js';
 import { FirstOverlayModule } from '../first-overlay/first-overlay.module.js';
 import { ShoutoutHandler } from '../commands/handlers/shoutout.handler.js';
 import { TwitchCommandRegistration } from './twitch-command-registration.service.js';
+import { ChatOverlayModule } from '../chat-overlay/chat-overlay.module.js';
+
 @Module({
   controllers: [
     TwitchController,
@@ -39,6 +41,7 @@ import { TwitchCommandRegistration } from './twitch-command-registration.service
     QueueModule,
     PointPoolModule,
     FirstOverlayModule,
+    ChatOverlayModule,
   ],
   exports: [
     TwitchService,

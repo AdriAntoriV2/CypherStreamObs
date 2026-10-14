@@ -57,4 +57,12 @@ export default () => ({
         : '/tmp/streamops-mpv.sock'),
     radioUrl: process.env.RADIO_URL,
   },
+  chatOverlay: {
+    maxMessages: Number(
+      process.env.CHAT_OVERLAY_MAX_MESSAGES ?? 30,
+    ),
+    messageTtlSeconds: Number(
+      process.env.CHAT_OVERLAY_MESSAGE_TTL_SECONDS ?? 3600,
+    ),
+  },
 });

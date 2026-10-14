@@ -16,6 +16,7 @@ import { TwitchEventIngestionService } from './twitch-event-ingestion.service.js
 import { ChatCommandDispatcher } from '../commands/chat-command-dispatcher.service.js';
 import { PointPoolService } from '../point-pool/point-pool.service.js';
 import { FirstOverlayService } from '../first-overlay/first-overlay.service.js';
+import { ChatOverlayService } from '../chat-overlay/chat-overlay.service.js';
 
 @Injectable()
 export class TwitchEventSubService
@@ -39,6 +40,7 @@ export class TwitchEventSubService
     private readonly chatCommandDispatcher: ChatCommandDispatcher,
     private readonly pointPoolService: PointPoolService,
     private readonly firstOverlayService: FirstOverlayService,
+    private readonly chatOverlayService: ChatOverlayService,
   ) { }
 
   async connect(
@@ -343,7 +345,12 @@ export class TwitchEventSubService
         subscriptionType as string,
         event,
       );
-
+    if (subscriptionType === 'channel.chat.message') {
+      await this.chatOverlayService.addMessage(
+        event,
+        normalized.externalId,
+      );
+    }
     if (
       subscriptionType ===
       'stream.online'

@@ -14,10 +14,12 @@ import { TwitchAuthenticatedClient } from './twitch-authenticated.client.js';
 import { TwitchEventSubService } from './twitch-eventsub.service.js';
 import { TwitchOAuthStateService } from './twitch-oauth-state.service.js';
 import { TwitchShoutoutInfo } from './types/twitch-eventsub.types.js';
+import { ChatOverlayService } from '../chat-overlay/chat-overlay.service.js';
 
 @Injectable()
 export class TwitchService implements OnModuleInit {
   private readonly logger = new Logger(TwitchService.name);
+  emoteMap: any;
 
   constructor(
     private readonly twitchApi: TwitchApiClient,
@@ -26,6 +28,7 @@ export class TwitchService implements OnModuleInit {
     private readonly prisma: PrismaService,
     private readonly encryption: SecretEncryptionService,
     private readonly oauthState: TwitchOAuthStateService,
+    private readonly chatOverlay: ChatOverlayService,
   ) { }
 
   async onModuleInit(): Promise<void> {
@@ -53,6 +56,11 @@ export class TwitchService implements OnModuleInit {
 
       const accessToken =
         await this.authenticatedClient.getAccessToken(account.id);
+
+      await this.refreshChatEmotes(
+        account.id,
+        account.twitchUserId,
+      );
 
       await this.eventSub.connect(
         accessToken,
@@ -146,6 +154,11 @@ export class TwitchService implements OnModuleInit {
       },
     });
 
+    await this.refreshChatEmotes(
+      account.id,
+      account.twitchUserId,
+    );
+
     await this.eventSub.connect(
       token.access_token,
       user.id,
@@ -184,4 +197,145 @@ export class TwitchService implements OnModuleInit {
       username,
     );
   }
+
+  
+  private async refreshChatEmotes(
+    accountId: string,
+    broadcasterId: string,
+  ): Promise<void> {
+    this.logger.log(
+      `Refreshing chat emotes for broadcaster ${broadcasterId}`,
+    );
+
+    type TwitchEmote = {
+      id: string;
+      name: string;
+      format: string[];
+    };
+
+    const fetchEmotes = async (
+      endpoint: string,
+    ): Promise<TwitchEmote[]> => {
+      const results: TwitchEmote[] = [];
+      let cursor: string | undefined;
+
+      try {
+        do {
+          const url = new URL(endpoint);
+
+          if (cursor) {
+            url.searchParams.set('after', cursor);
+          }
+
+          const response = await this.authenticatedClient.request(
+            accountId,
+            url.toString(),
+          );
+
+          if (!response.ok) {
+            this.logger.warn(
+              `Twitch emote lookup failed: HTTP ${response.status}`,
+            );
+            break;
+          }
+
+          const body = (await response.json()) as {
+            data?: Array<{
+              id?: string;
+              name?: string;
+              format?: string[];
+            }>;
+            pagination?: {
+              cursor?: string;
+            };
+          };
+
+          for (const emote of body.data ?? []) {
+            if (
+              typeof emote.id !== 'string' ||
+              emote.id.length === 0 ||
+              typeof emote.name !== 'string' ||
+              emote.name.length === 0
+            ) {
+              continue;
+            }
+
+            results.push({
+              id: emote.id,
+              name: emote.name,
+              format: Array.isArray(emote.format)
+                ? emote.format
+                : ['static'],
+            });
+          }
+
+          cursor = body.pagination?.cursor;
+        } while (cursor);
+      } catch (error) {
+        this.logger.warn(
+          `Twitch emote lookup failed: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+        );
+      }
+
+      return results;
+    };
+
+    const channelUrl = new URL(
+      'https://api.twitch.tv/helix/chat/emotes',
+    );
+    channelUrl.searchParams.set('broadcaster_id', broadcasterId);
+
+    const [globalEmotes, channelEmotes] = await Promise.all([
+      fetchEmotes(
+        'https://api.twitch.tv/helix/chat/emotes/global',
+      ),
+      fetchEmotes(channelUrl.toString()),
+    ]);
+
+    this.logger.log(
+      `Emote API results: global=${globalEmotes.length}, channel=${channelEmotes.length}, ` +
+        `DinoDance global=${globalEmotes.some((emote) => emote.name === 'DinoDance')}, ` +
+        `cypher151Kaitoball channel=${channelEmotes.some((emote) => emote.name === 'cypher151Kaitoball')}`,
+    );
+
+    const emotes: Record<
+      string,
+      { id: string; format: 'static' | 'animated' }
+    > = {};
+
+    for (const emote of globalEmotes) {
+      emotes[emote.name] = {
+        id: emote.id,
+        format: emote.format.includes('animated')
+          ? 'animated'
+          : 'static',
+      };
+    }
+
+    // Channel emotes override global entries if names collide.
+    for (const emote of channelEmotes) {
+      emotes[emote.name] = {
+        id: emote.id,
+        format: emote.format.includes('animated')
+          ? 'animated'
+          : 'static',
+      };
+    }
+
+    if (globalEmotes.length === 0 && channelEmotes.length === 0) {
+      this.logger.warn(
+        'No Twitch emotes were loaded; keeping the existing cache',
+      );
+      return;
+    }
+
+    await this.chatOverlay.setEmoteMap(emotes);
+
+    this.logger.log(
+      `Loaded ${globalEmotes.length} global and ${channelEmotes.length} channel emotes`,
+    );
+  }
+
 }
