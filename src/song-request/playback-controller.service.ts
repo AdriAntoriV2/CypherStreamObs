@@ -1,4 +1,3 @@
-
 import {
   Inject,
   Injectable,
@@ -23,6 +22,12 @@ export class PlaybackControllerService implements OnModuleDestroy {
 
   // Serialize lifecycle operations to prevent skip/end races.
   private transition: Promise<void> = Promise.resolve();
+
+  // Radio mode controls whether song requests can be played.
+  private radioEnabled = false;
+
+  // Incremented whenever the mode changes to invalidate in-flight requests.
+  private modeVersion = 0;
 
   private readonly unsubscribeTrackEnded: () => void;
 
@@ -73,6 +78,61 @@ export class PlaybackControllerService implements OnModuleDestroy {
     return result;
   }
 
+  isRadioEnabled(): boolean {
+    return this.radioEnabled;
+  }
+
+  getModeVersion(): number {
+    return this.modeVersion;
+  }
+
+  /**
+   * Toggles radio mode.
+   * Enabling starts radio when no song is queued.
+   * Disabling stops playback and clears the request queue.
+   */
+  toggleRadio(): Promise<boolean> {
+    return this.serialize(async () => {
+      if (this.radioEnabled) {
+        // Disable first so future playback advancement is blocked.
+        this.radioEnabled = false;
+        this.modeVersion++;
+
+        try {
+          await this.engine.stopTrack();
+        } catch (error) {
+          this.logger.warn(
+            `Failed to stop playback while disabling radio: ${
+              error instanceof Error
+                ? error.message
+                : String(error)
+            }`,
+          );
+        }
+
+        await this.repository.clear();
+
+        this.logger.log('Radio mode disabled');
+        return false;
+      }
+
+      this.radioEnabled = true;
+      this.modeVersion++;
+
+      try {
+        await this.startNextUnlocked();
+
+        this.logger.log('Radio mode enabled');
+        return true;
+      } catch (error) {
+        this.radioEnabled = false;
+        this.modeVersion++;
+
+        throw error;
+      }
+    });
+  }
+
   startNext(): Promise<SongRequest | null> {
     return this.serialize(() => this.startNextUnlocked());
   }
@@ -97,6 +157,10 @@ export class PlaybackControllerService implements OnModuleDestroy {
 
   skip(): Promise<boolean> {
     return this.serialize(async () => {
+      if (!this.radioEnabled) {
+        return false;
+      }
+
       const snapshot = await this.repository.snapshot(
         this.queueLimit,
       );
@@ -123,6 +187,12 @@ export class PlaybackControllerService implements OnModuleDestroy {
   }
 
   private async startNextUnlocked(): Promise<SongRequest | null> {
+    // Critical: resolution workers and track-ended events must not
+    // restart playback after radio mode has been disabled.
+    if (!this.radioEnabled) {
+      return null;
+    }
+
     const request = await this.repository.claimNextReady();
 
     if (request) {

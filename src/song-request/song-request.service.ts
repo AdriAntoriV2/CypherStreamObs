@@ -1,15 +1,15 @@
-
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
 import type { Queue } from 'bullmq';
 import { randomUUID } from 'node:crypto';
+import { ConfigService } from '@nestjs/config';
 import { SongRequestRepository } from './song-request.repository.js';
 import type {
   SongQueueSnapshot,
   SongRequest,
 } from './song-request.types.js';
 import { QUEUE_NAMES } from '../queue/queue.constants.js';
-import { ConfigService } from '@nestjs/config';
+import { PlaybackControllerService } from './playback-controller.service.js';
 
 type ResolutionWaiter = {
   resolve: (request: SongRequest) => void;
@@ -19,6 +19,7 @@ type ResolutionWaiter = {
 @Injectable()
 export class SongRequestService implements OnModuleInit {
   private readonly queueLimit: number;
+
   private readonly resolutionWaiters = new Map<
     string,
     ResolutionWaiter
@@ -29,6 +30,7 @@ export class SongRequestService implements OnModuleInit {
     @InjectQueue(QUEUE_NAMES.songResolution)
     private readonly resolutionQueue: Queue,
     private readonly configService: ConfigService,
+    private readonly playbackController: PlaybackControllerService,
   ) {
     this.queueLimit =
       this.configService.getOrThrow<number>(
@@ -42,6 +44,22 @@ export class SongRequestService implements OnModuleInit {
     await this.resolutionQueue.drain(true);
   }
 
+  async toggleRadio(): Promise<boolean> {
+    const enabled = await this.playbackController.toggleRadio();
+
+    if (!enabled) {
+      await this.resolutionQueue.drain(true);
+
+      for (const [requestId, waiter] of this.resolutionWaiters) {
+        this.resolutionWaiters.delete(requestId);
+        waiter.reject(
+          new Error('Song requests are disabled'),
+        );
+      }
+    }
+
+    return enabled;
+  }
 
   async addRequest(input: {
     query: string;
@@ -72,6 +90,17 @@ export class SongRequestService implements OnModuleInit {
       );
     }
 
+    // Capture the current mode so a concurrent toggle invalidates
+    // this request even if radio is enabled again immediately.
+    const modeVersion =
+      this.playbackController.getModeVersion();
+
+    if (!this.playbackController.isRadioEnabled()) {
+      throw new Error(
+        'Song requests are disabled. Use !radio to enable them.',
+      );
+    }
+
     const request: SongRequest = {
       id: randomUUID(),
       query,
@@ -91,6 +120,18 @@ export class SongRequestService implements OnModuleInit {
       );
     }
 
+    // Radio may have been toggled while Redis was processing enqueue.
+    if (
+      !this.playbackController.isRadioEnabled() ||
+      this.playbackController.getModeVersion() !== modeVersion
+    ) {
+      await this.repository.remove(request.id);
+
+      throw new Error(
+        'Radio mode changed before the request could be accepted.',
+      );
+    }
+
     let resolutionPromise: Promise<SongRequest> | undefined;
 
     if (waitForResolution) {
@@ -103,9 +144,9 @@ export class SongRequestService implements OnModuleInit {
         },
       );
 
-      // The worker could finish before this method reaches its await.
-      // Attach a handler now to avoid an unhandled rejection.
-      void resolutionPromise.catch(() => { });
+      // Avoid an unhandled rejection if the waiter is rejected
+      // before this method reaches its final await.
+      void resolutionPromise.catch(() => {});
     }
 
     try {
@@ -123,9 +164,27 @@ export class SongRequestService implements OnModuleInit {
           removeOnFail: true,
         },
       );
+
+      // Check again in case radio was toggled during job creation.
+      if (
+        !this.playbackController.isRadioEnabled() ||
+        this.playbackController.getModeVersion() !== modeVersion
+      ) {
+        throw new Error(
+          'Radio mode changed before the request could be accepted.',
+        );
+      }
     } catch (error) {
       this.resolutionWaiters.delete(request.id);
       await this.repository.remove(request.id);
+
+      // The job might have been added after the queue was drained.
+      const job = await this.resolutionQueue.getJob(request.id);
+
+      if (job) {
+        await job.remove().catch(() => undefined);
+      }
+
       throw error;
     }
 
@@ -164,6 +223,10 @@ export class SongRequestService implements OnModuleInit {
   }
 
   async skipCurrent(): Promise<boolean> {
+    if (!this.playbackController.isRadioEnabled()) {
+      return false;
+    }
+
     return this.repository.skipCurrent();
   }
 }
