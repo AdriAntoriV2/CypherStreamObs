@@ -1,0 +1,89 @@
+StreamOps Twitch Chat Commands
+==============================
+
+Commands are recognized when sent as a Twitch chat message beginning with !.
+Command names are case-insensitive. Built-in commands are handled only while
+StreamOps has an active stream.
+
+SONG REQUESTS AND PLAYBACK
+--------------------------
+
+!sr <YouTube URL or search query>
+    Add a YouTube video by URL or search text to the song request queue.
+    The request is resolved before the bot confirms it in chat. Song requests
+    must be enabled with !radio, and the queue must have room.
+
+!radio
+    Toggle radio mode. Enabling it starts playback (or radio playback when
+    there are no requests) and enables !sr. Disabling it stops playback,
+    disables requests, and clears the queue.
+
+!skip
+    Skip the currently playing track and advance playback. If nothing is
+    playing, the bot replies that there is no active track.
+
+!queue
+    Retrieve a snapshot of the current song queue. The command is recognized,
+    but it currently produces no Twitch chat reply: its structured queue result
+    is not converted to a message by the chat command dispatcher.
+
+POINT POOL
+----------
+
+!pointhelp
+    Show the point-pool command guide.
+
+!pointstart <name>
+    Start or create a point pool with this name. Channel admin only.
+
+!pointend <name>
+    End the active point pool with this name. Channel admin only.
+
+!pointrank
+    Show the top three redeemers and their points in the active pool.
+
+!pointgoal
+    Show the active pool's total points and each goal's progress. Goals that
+    have been reached are marked REACHED.
+
+!pointgoal add <points> <description>
+    Add a goal with a positive whole-number target and description.
+    Channel admin only.
+
+!pointgoal remove <id>
+    Remove a goal by an ID prefix of at least four characters. Use !pointgoal
+    to see its ID prefix. Channel admin only.
+
+!pointadd <positive amount>
+    Add points to the active pool. Channel admin only.
+
+!pointremove <positive amount>
+    Remove points from the active pool, up to the current total.
+    Channel admin only.
+
+All point-pool commands have a 30-second per-user, per-command cooldown.
+
+SHOUTOUT
+--------
+
+!so <username>
+    Look up a Twitch user and post a shoutout with their current/last listed
+    stream activity and Twitch channel link. The username may optionally start
+    with @.
+
+CUSTOM COMMANDS
+---------------
+
+The channel admin can create, edit, enable/disable, and delete custom commands
+through the chat-commands admin API. Custom commands are invoked as
+!<name>; they send the configured response text and can have a per-user
+cooldown. Names are 1-25 letters, digits, or underscores; responses are
+1-500 characters. No custom command names are built in: available names depend
+on the commands configured for this deployment.
+
+PERMISSIONS NOTE
+----------------
+
+The point-pool management commands listed above check for the configured
+channel admin. The current handlers for !radio and !skip do not impose an
+admin/moderator restriction.
