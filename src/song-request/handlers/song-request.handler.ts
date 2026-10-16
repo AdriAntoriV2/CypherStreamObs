@@ -1,6 +1,8 @@
-
 import { Injectable } from '@nestjs/common';
-import { ChatCommandContext, ChatCommandHandler } from '../../commands/types/chat-command.types.js';
+import type {
+  ChatCommandContext,
+  ChatCommandHandler,
+} from '../../commands/types/chat-command.types.js';
 import { SongRequestService } from '../song-request.service.js';
 
 @Injectable()
@@ -9,7 +11,7 @@ export class SongRequestHandler implements ChatCommandHandler {
 
   constructor(
     private readonly songRequests: SongRequestService,
-  ) { }
+  ) {}
 
   async execute(context: ChatCommandContext) {
     const query = context.args.join(' ').trim();
@@ -32,13 +34,21 @@ export class SongRequestHandler implements ChatCommandHandler {
         message: `Song added: ${request.track?.title ?? query}`,
         request,
       };
-    }
-    catch (error) {
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : String(error);
+
+      if (message.includes('Song requests are disabled')) {
+        return {
+          ok: false,
+          message: 'sr not enabled',
+        };
+      }
+
       return {
         ok: false,
-        message: 'Unable to find or load that video.'
+        message: 'Unable to find or load that video.',
       };
-
     }
   }
 }
