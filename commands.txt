@@ -23,9 +23,7 @@ SONG REQUESTS AND PLAYBACK
     playing, the bot replies that there is no active track.
 
 !queue
-    Retrieve a snapshot of the current song queue. The command is recognized,
-    but it currently produces no Twitch chat reply: its structured queue result
-    is not converted to a message by the chat command dispatcher.
+    Retrieve a snapshot of the current song queue.
 
 POINT POOL
 ----------
