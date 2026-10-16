@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import type {
   ChatCommandContext,
   ChatCommandHandler,
@@ -11,16 +12,29 @@ export class RadioHandler implements ChatCommandHandler {
 
   constructor(
     private readonly songRequests: SongRequestService,
+    private readonly configService: ConfigService,
   ) {}
 
-  async execute(_context: ChatCommandContext) {
+  async execute(context: ChatCommandContext) {
+    const adminUserId =
+      this.configService.getOrThrow<string>(
+        'twitch.adminUserId',
+      );
+
+    if (context.user.id !== adminUserId) {
+      return {
+        ok: false,
+        message: 'Only the broadcaster can use !radio.',
+      };
+    }
+
     try {
       const enabled = await this.songRequests.toggleRadio();
 
       return {
         ok: true,
         message: enabled
-          ? 'Radio started. Song requests are now enabled. Use !sr <query> to request a song.'
+          ? 'Radio started. Song requests are now enabled.'
           : 'Radio stopped. Song requests are now disabled.',
       };
     } catch (error) {
