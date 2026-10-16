@@ -10,7 +10,6 @@ import { PointPoolCommandRegistration } from './point-pool-command-registration.
 import { PointAddHandler } from './handlers/point-add.handler.js';
 import { PointEndHandler } from './handlers/point-end.handler.js';
 import { PointGoalHandler } from './handlers/point-goal.handler.js';
-import { PointHelpHandler } from './handlers/point-help.handler.js';
 import { PointRankHandler } from './handlers/point-rank.handler.js';
 import { PointRemoveHandler } from './handlers/point-remove.handler.js';
 import { PointStartHandler } from './handlers/point-start.handler.js';
@@ -34,7 +33,6 @@ import { PointPoolCommandCooldownService } from './point-pool-command-cooldown.s
     PointGoalHandler,
     PointAddHandler,
     PointRemoveHandler,
-    PointHelpHandler,
   ],
   controllers: [PointPoolController],
   exports: [PointPoolService],

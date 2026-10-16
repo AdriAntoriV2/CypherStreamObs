@@ -81,9 +81,11 @@ cooldown. Names are 1-25 letters, digits, or underscores; responses are
 1-500 characters. No custom command names are built in: available names depend
 on the commands configured for this deployment.
 
+!discord
+    Join Cypher SEKAI : https://discord.com/invite/47RGMQ5uDm
+
 PERMISSIONS NOTE
 ----------------
 
 The point-pool management commands listed above check for the configured
-channel admin. The current handlers for !radio and !skip do not impose an
-admin/moderator restriction.
+channel admin.

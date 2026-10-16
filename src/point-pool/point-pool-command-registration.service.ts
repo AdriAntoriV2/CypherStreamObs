@@ -8,7 +8,6 @@ import { PointPoolCommandCooldownService } from './point-pool-command-cooldown.s
 import { PointAddHandler } from './handlers/point-add.handler.js';
 import { PointEndHandler } from './handlers/point-end.handler.js';
 import { PointGoalHandler } from './handlers/point-goal.handler.js';
-import { PointHelpHandler } from './handlers/point-help.handler.js';
 import { PointRankHandler } from './handlers/point-rank.handler.js';
 import { PointRemoveHandler } from './handlers/point-remove.handler.js';
 import { PointStartHandler } from './handlers/point-start.handler.js';
@@ -26,7 +25,6 @@ export class PointPoolCommandRegistration implements OnModuleInit {
     private readonly pointGoalHandler: PointGoalHandler,
     private readonly pointAddHandler: PointAddHandler,
     private readonly pointRemoveHandler: PointRemoveHandler,
-    private readonly pointHelpHandler: PointHelpHandler,
   ) {}
 
   private registerWithCooldown(handler: ChatCommandHandler): void {
@@ -53,7 +51,6 @@ export class PointPoolCommandRegistration implements OnModuleInit {
       this.pointGoalHandler,
       this.pointAddHandler,
       this.pointRemoveHandler,
-      this.pointHelpHandler,
     ];
 
     for (const handler of handlers) {
