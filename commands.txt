@@ -82,6 +82,10 @@ on the commands configured for this deployment.
 !discord
     Join Cypher SEKAI : https://discord.com/invite/47RGMQ5uDm
 
+!help
+    StreamOps Commands: https://pastebin.com/hadWTQHf
+
+    
 PERMISSIONS NOTE
 ----------------
 
