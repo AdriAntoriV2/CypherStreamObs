@@ -42,7 +42,6 @@
             flex-direction: column;
             width: 100%;
             height: 100%;
-            max-height: 620px;
             overflow: hidden;
             border: 1px solid var(--border);
             border-radius: 12px;
@@ -187,12 +186,12 @@
         <header class="chat-header">
             <div class="header-title">
                 <span class="header-mark">⌁</span>
-                <span>Cyber Desk // Chat</span>
+                <span>Cypher SEKAI</span>
             </div>
 
             <div class="live-indicator">
                 <span class="live-dot"></span>
-                <span>LIVE FEED</span>
+                <span>Now Live</span>
             </div>
         </header>
 
@@ -202,7 +201,7 @@
     <script>
         const API_URL = '/api/chat-overlay/recent';
         const POLL_INTERVAL_MS = 1000;
-        const MAX_VISIBLE_MESSAGES = 8;
+        const MAX_VISIBLE_MESSAGES = 12;
         const MAX_TRACKED_IDS = 500;
 
         const messagesElement = document.getElementById('messages');
