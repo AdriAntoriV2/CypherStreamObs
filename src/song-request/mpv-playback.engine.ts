@@ -1,3 +1,4 @@
+
 import {
     Injectable,
     Logger,
@@ -6,6 +7,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { spawn, type ChildProcess } from 'node:child_process';
 import { unlink } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import net, { type Socket } from 'node:net';
 import type { ResolvedYouTubeTrack } from './song-request.types.js';
 import type { PlaybackEngine } from './playback-engine.js';
@@ -16,12 +18,20 @@ interface PendingCommand {
     timeout: ReturnType<typeof setTimeout>;
 }
 
+interface MpvMessage {
+    request_id?: number;
+    error?: string;
+    event?: string;
+    reason?: string;
+}
+
 @Injectable()
 export class MpvPlaybackEngine
     implements PlaybackEngine, OnModuleDestroy {
     private readonly logger = new Logger(MpvPlaybackEngine.name);
 
     private readonly mpvPath: string;
+    private readonly ytDlpPath: string;
     private readonly ipcPath: string;
     private readonly radioUrl: string | undefined;
 
@@ -46,9 +56,24 @@ export class MpvPlaybackEngine
     >();
 
     constructor(private readonly config: ConfigService) {
-        this.mpvPath = this.config.getOrThrow<string>('playback.mpvPath');
-        this.ipcPath = this.config.getOrThrow<string>('playback.ipcPath');
-        this.radioUrl = this.config.get<string>('playback.radioUrl');
+        this.mpvPath = this.config.getOrThrow<string>(
+            'playback.mpvPath',
+        );
+
+        this.ytDlpPath = resolve(
+            process.cwd(),
+            this.config.getOrThrow<string>(
+                'playback.ytDlpPath',
+            ),
+        );
+
+        this.ipcPath = this.config.getOrThrow<string>(
+            'playback.ipcPath',
+        );
+
+        this.radioUrl = this.config.get<string>(
+            'playback.radioUrl',
+        );
     }
 
     onTrackEnded(
@@ -71,8 +96,13 @@ export class MpvPlaybackEngine
         this.activeRequestId = requestId;
 
         try {
-            await this.sendCommand(['loadfile', track.url, 'replace']);
-            this.logger.log(`Playing "${track.title}"`);
+            await this.sendCommand([
+                'loadfile',
+                track.url,
+                'replace',
+            ]);
+
+            this.logger.log(`Loading "${track.title}"`);
         } catch (error) {
             this.activeRequestId = undefined;
             throw error;
@@ -89,13 +119,16 @@ export class MpvPlaybackEngine
 
     async startRadio(): Promise<void> {
         if (!this.radioUrl) {
-            this.logger.debug('No radio URL configured; leaving playback idle');
+            this.logger.debug(
+                'No radio URL configured; leaving playback idle',
+            );
             return;
         }
 
         await this.ensureConnected();
 
         this.isRadio = true;
+        this.activeRequestId = undefined;
 
         await this.sendCommand([
             'loadfile',
@@ -117,7 +150,9 @@ export class MpvPlaybackEngine
 
         for (const [id, pending] of this.pendingCommands) {
             clearTimeout(pending.timeout);
-            pending.reject(new Error('mpv playback engine is shutting down'));
+            pending.reject(
+                new Error('mpv playback engine is shutting down'),
+            );
             this.pendingCommands.delete(id);
         }
 
@@ -128,7 +163,9 @@ export class MpvPlaybackEngine
 
     private async ensureConnected(): Promise<void> {
         if (this.destroyed) {
-            throw new Error('mpv playback engine has been shut down');
+            throw new Error(
+                'mpv playback engine has been shut down',
+            );
         }
 
         if (this.socket && !this.socket.destroyed) {
@@ -152,23 +189,29 @@ export class MpvPlaybackEngine
         if (process.platform !== 'win32') {
             await unlink(this.ipcPath).catch(() => undefined);
         }
+
         const child = spawn(
             this.mpvPath,
             [
                 '--idle=yes',
                 '--no-terminal',
                 '--force-window=no',
+                '--ytdl=yes',
+                `--script-opts=ytdl_hook-ytdl_path=${this.ytDlpPath}`,
                 `--input-ipc-server=${this.ipcPath}`,
             ],
             {
                 stdio: 'ignore',
+                windowsHide: true,
             },
         );
 
         this.process = child;
 
         child.on('error', (error) => {
-            this.logger.error(`Failed to launch mpv: ${error.message}`);
+            this.logger.error(
+                `Failed to launch mpv: ${error.message}`,
+            );
         });
 
         child.on('exit', (code, signal) => {
@@ -183,28 +226,45 @@ export class MpvPlaybackEngine
                 `mpv exited (code=${code}, signal=${signal})`,
             );
 
-            for (const [id, pending] of this.pendingCommands) {
-                clearTimeout(pending.timeout);
-                pending.reject(error);
-                this.pendingCommands.delete(id);
+            this.rejectPendingCommands(error);
+            this.logger.warn(error.message);
+
+            // Don't advance playback during application shutdown.
+            if (this.destroyed) {
+                return;
             }
 
-            this.logger.warn(error.message);
+            // Recover if mpv exits while a song is active.
+            const requestId = this.activeRequestId;
+
+            if (!requestId) {
+                return;
+            }
+
+            this.activeRequestId = undefined;
+            this.isRadio = false;
+
+            this.logger.warn(
+                `mpv exited during request ${requestId}; advancing playback`,
+            );
+
+            for (const listener of this.trackEndedListeners) {
+                listener(requestId);
+            }
         });
 
-        await new Promise<void>((resolve, reject) => {
-            child.once('spawn', resolve);
-            child.once('error', reject);
+        await new Promise<void>((resolveSpawn, rejectSpawn) => {
+            child.once('spawn', resolveSpawn);
+            child.once('error', rejectSpawn);
         });
-
-        await this.connectSocket();
 
         await this.connectSocket();
     }
 
     private connectSocket(): Promise<void> {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolveConnection, rejectConnection) => {
             const deadline = Date.now() + 5000;
+
             let currentSocket: Socket | undefined;
             let retryTimer: ReturnType<typeof setTimeout> | undefined;
             let settled = false;
@@ -223,9 +283,9 @@ export class MpvPlaybackEngine
 
                 if (error) {
                     currentSocket?.destroy();
-                    reject(error);
+                    rejectConnection(error);
                 } else {
-                    resolve();
+                    resolveConnection();
                 }
             };
 
@@ -254,7 +314,9 @@ export class MpvPlaybackEngine
 
                     socket.on('error', (error) => {
                         this.rejectPendingCommands(error);
-                        this.logger.warn(`mpv IPC error: ${error.message}`);
+                        this.logger.warn(
+                            `mpv IPC error: ${error.message}`,
+                        );
                     });
 
                     socket.on('close', () => {
@@ -301,22 +363,21 @@ export class MpvPlaybackEngine
                 continue;
             }
 
-            let message: {
-                request_id?: number;
-                error?: string;
-                event?: string;
-                reason?: string;
-            };
+            let message: MpvMessage;
 
             try {
-                message = JSON.parse(line) as typeof message;
+                message = JSON.parse(line) as MpvMessage;
             } catch {
-                this.logger.warn('Ignoring invalid JSON received from mpv IPC');
+                this.logger.warn(
+                    'Ignoring invalid JSON received from mpv IPC',
+                );
                 continue;
             }
 
             if (message.request_id !== undefined) {
-                const pending = this.pendingCommands.get(message.request_id);
+                const pending = this.pendingCommands.get(
+                    message.request_id,
+                );
 
                 if (pending) {
                     clearTimeout(pending.timeout);
@@ -326,7 +387,9 @@ export class MpvPlaybackEngine
                         pending.resolve();
                     } else {
                         pending.reject(
-                            new Error(`mpv command failed: ${message.error}`),
+                            new Error(
+                                `mpv command failed: ${message.error}`,
+                            ),
                         );
                     }
                 }
@@ -352,20 +415,27 @@ export class MpvPlaybackEngine
         const socket = this.socket;
 
         if (!socket || socket.destroyed) {
-            return Promise.reject(new Error('mpv IPC is not connected'));
+            return Promise.reject(
+                new Error('mpv IPC is not connected'),
+            );
         }
 
         const id = ++this.requestId;
 
-        return new Promise((resolve, reject) => {
+        return new Promise((resolveCommand, rejectCommand) => {
             const timeout = setTimeout(() => {
                 this.pendingCommands.delete(id);
-                reject(new Error(`mpv command timed out: ${command[0]}`));
+
+                rejectCommand(
+                    new Error(
+                        `mpv command timed out: ${command[0]}`,
+                    ),
+                );
             }, 5000);
 
             this.pendingCommands.set(id, {
-                resolve,
-                reject,
+                resolve: resolveCommand,
+                reject: rejectCommand,
                 timeout,
             });
 

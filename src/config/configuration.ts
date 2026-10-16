@@ -50,6 +50,10 @@ export default () => ({
 
   playback: {
     mpvPath: process.env.MPV_PATH ?? 'mpv',
+    ytDlpPath: process.env.YT_DLP_PATH ?? './yt-dlp.exe',
+    ytDlpResolveTimeoutMs: Number(
+      process.env.YT_DLP_RESOLVE_TIMEOUT_MS ?? 30_000,
+    ),
     ipcPath:
       process.env.MPV_IPC_PATH ??
       (process.platform === 'win32'
@@ -57,6 +61,7 @@ export default () => ({
         : '/tmp/streamops-mpv.sock'),
     radioUrl: process.env.RADIO_URL,
   },
+
   chatOverlay: {
     maxMessages: Number(
       process.env.CHAT_OVERLAY_MAX_MESSAGES ?? 30,
