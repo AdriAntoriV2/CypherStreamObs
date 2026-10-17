@@ -1,12 +1,9 @@
-import {
-  IsIn,
-  IsString,
-} from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class MixItUpActionDto {
-  @IsIn(['mixitup'])
-  type: 'mixitup';
+@ApiProperty({ enum: ['mixitup'], example: 'mixitup' })
+type: 'mixitup';
 
-  @IsString()
-  command: string;
+@ApiProperty({ example: '!so someviewer' })
+command: string;
 }

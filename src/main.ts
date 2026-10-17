@@ -1,17 +1,42 @@
-
 import 'reflect-metadata';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import {
+  DocumentBuilder,
+  SwaggerModule,
+} from '@nestjs/swagger';
 import session from 'express-session';
 import { RedisStore } from 'connect-redis';
-import { AppModule } from './app.module.js';
-import { PrismaExceptionFilter } from './common/filters/prisma-exception.filter.js';
 import { ConfigService } from '@nestjs/config';
 import { createClient } from 'redis';
+import { AppModule } from './app.module.js';
+import { PrismaExceptionFilter } from './common/filters/prisma-exception.filter.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const config = app.get(ConfigService);
+
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('StreamOps API')
+    .setDescription(
+      'Backend API for StreamOps, a Twitch streaming automation and overlay platform.',
+    )
+    .setVersion('1.0')
+    .addServer('/api')
+    .addCookieAuth('streamops.sid', {
+      type: 'apiKey',
+      in: 'cookie',
+      name: 'streamops.sid',
+    }, 'streamops.sid')
+    .build();
+
+  const swaggerDocument = SwaggerModule.createDocument(
+    app,
+    swaggerConfig,
+  );
+
+  SwaggerModule.setup('docs', app, swaggerDocument);
+
   const sessionRedis = createClient({
     url: config.getOrThrow<string>('redis.url'),
   });

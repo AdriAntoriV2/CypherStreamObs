@@ -1,24 +1,21 @@
-import {
-  IsIn,
-  IsObject,
-  IsOptional,
-  IsString,
-  IsUrl,
-} from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class WebhookActionDto {
-  @IsIn(['webhook'])
+  @ApiProperty({ enum: ['webhook'], example: 'webhook' })
   type: 'webhook';
 
-  @IsUrl()
+  @ApiProperty({ format: 'uri', example: 'https://example.com/webhook' })
   url: string;
 
-  @IsOptional()
-  @IsString()
-  @IsIn(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])
+  @ApiPropertyOptional({
+    enum: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    default: 'POST',
+  })
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
-  @IsOptional()
-  @IsObject()
+  @ApiPropertyOptional({
+    type: 'object',
+    additionalProperties: true,
+  })
   body?: Record<string, unknown>;
 }
