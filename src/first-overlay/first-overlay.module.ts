@@ -1,12 +1,14 @@
+
 import { Module } from '@nestjs/common';
-import { StreamsModule } from '../streams/streams.module.js';
 import { FirstOverlayController } from './first-overlay.controller.js';
 import { FirstOverlayService } from './first-overlay.service.js';
+import { DatabaseModule } from '../database/database.module.js';
+import { StreamsModule } from '../streams/streams.module.js';
 
 @Module({
-  imports: [StreamsModule],
-  controllers: [FirstOverlayController],
-  providers: [FirstOverlayService],
-  exports: [FirstOverlayService],
+    controllers: [FirstOverlayController],
+    providers: [FirstOverlayService],
+    imports: [DatabaseModule, StreamsModule],
+    exports: [FirstOverlayService],
 })
 export class FirstOverlayModule {}

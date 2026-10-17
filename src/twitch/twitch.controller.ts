@@ -10,19 +10,26 @@ import {
     UnauthorizedException,
 } from '@nestjs/common';
 import type { Response } from 'express';
-import { TwitchService } from './twitch.service.js';
 import type { Request } from 'express';
 import { ConfigService } from '@nestjs/config';
+import { TwitchService } from './twitch.service.js';
+import {
+    ApiTwitchControllerDocs,
+    ApiTwitchLogout,
+    ApiTwitchOAuth,
+    ApiTwitchOAuthCallback,
+} from './twitch.swagger.js';
 
+@ApiTwitchControllerDocs()
 @Controller('twitch')
 export class TwitchController {
     constructor(
         private readonly twitchService: TwitchService,
         private readonly config: ConfigService,
-    ) { }
-
+    ) {}
 
     @Get('oauth')
+    @ApiTwitchOAuth()
     async authorize(
         @Req() request: Request,
         @Res() response: Response,
@@ -47,6 +54,7 @@ export class TwitchController {
     }
 
     @Get('oauth/callback')
+    @ApiTwitchOAuthCallback()
     async callback(
         @Query('code') code: string,
         @Query('state') state: string,
@@ -70,7 +78,6 @@ export class TwitchController {
         const account =
             await this.twitchService.handleOAuthCallback(code, state);
 
-        // Prevent session fixation after successful OAuth.
         await new Promise<void>((resolve, reject) => {
             request.session.regenerate((error) => {
                 if (error) reject(error);
@@ -96,7 +103,11 @@ export class TwitchController {
 
     @Post('logout')
     @HttpCode(HttpStatus.NO_CONTENT)
-    async logout(@Req() request: Request, @Res({ passthrough: true }) response: Response) {
+    @ApiTwitchLogout()
+    async logout(
+        @Req() request: Request,
+        @Res({ passthrough: true }) response: Response,
+    ) {
         await new Promise<void>((resolve, reject) => {
             request.session.destroy((error) => {
                 if (error) reject(error);
@@ -106,7 +117,9 @@ export class TwitchController {
 
         response.clearCookie('streamops.sid', {
             httpOnly: true,
-            secure: this.config.getOrThrow<boolean>('session.cookieSecure'),
+            secure: this.config.getOrThrow<boolean>(
+                'session.cookieSecure',
+            ),
             sameSite: 'lax',
             path: '/',
         });
