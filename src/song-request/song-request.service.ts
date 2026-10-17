@@ -1,4 +1,10 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  OnModuleInit,
+} from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
 import type { Queue } from 'bullmq';
 import { randomUUID } from 'node:crypto';
@@ -53,7 +59,9 @@ export class SongRequestService implements OnModuleInit {
       for (const [requestId, waiter] of this.resolutionWaiters) {
         this.resolutionWaiters.delete(requestId);
         waiter.reject(
-          new Error('Song requests are disabled'),
+          new ConflictException(
+            'Song requests are disabled.',
+          ),
         );
       }
     }
@@ -85,8 +93,8 @@ export class SongRequestService implements OnModuleInit {
     const query = input.query.trim();
 
     if (!query) {
-      throw new Error(
-        'A YouTube URL or search query is required',
+      throw new BadRequestException(
+        'A YouTube URL or search query is required.',
       );
     }
 
@@ -96,7 +104,7 @@ export class SongRequestService implements OnModuleInit {
       this.playbackController.getModeVersion();
 
     if (!this.playbackController.isRadioEnabled()) {
-      throw new Error(
+      throw new ConflictException(
         'Song requests are disabled. Use !radio to enable them.',
       );
     }
@@ -115,8 +123,8 @@ export class SongRequestService implements OnModuleInit {
     );
 
     if (!added) {
-      throw new Error(
-        `The song request queue is full (${this.queueLimit} pending requests)`,
+      throw new ConflictException(
+        `The song request queue is full (${this.queueLimit} pending requests).`,
       );
     }
 
@@ -127,7 +135,7 @@ export class SongRequestService implements OnModuleInit {
     ) {
       await this.repository.remove(request.id);
 
-      throw new Error(
+      throw new ConflictException(
         'Radio mode changed before the request could be accepted.',
       );
     }
@@ -170,7 +178,7 @@ export class SongRequestService implements OnModuleInit {
         !this.playbackController.isRadioEnabled() ||
         this.playbackController.getModeVersion() !== modeVersion
       ) {
-        throw new Error(
+        throw new ConflictException(
           'Radio mode changed before the request could be accepted.',
         );
       }

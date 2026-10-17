@@ -2,6 +2,8 @@
 import { Module } from '@nestjs/common';
 import { CommandsModule } from '../commands/commands.module.js';
 import { QueueModule } from '../queue/queue.module.js';
+import { TwitchModule } from '../twitch/twitch.module.js';
+import { ChatCommandAdminGuard } from '../chat-commands/chat-command-admin.guard.js';
 import { QueueHandler } from './handlers/queue.handler.js';
 import { SkipHandler } from './handlers/skip.handler.js';
 import { SongRequestHandler } from './handlers/song-request.handler.js';
@@ -14,13 +16,17 @@ import { MpvPlaybackEngine } from './mpv-playback.engine.js';
 import { PLAYBACK_ENGINE } from './playback-engine.js';
 import { PlaybackControllerService } from './playback-controller.service.js';
 import { RadioHandler } from './handlers/radio.handler.js';
+import { SongRequestController } from './song-request.controller.js';
 
 @Module({
   imports: [
-    CommandsModule, 
-    QueueModule, 
+    CommandsModule,
+    QueueModule,
+    TwitchModule,
   ],
+  controllers: [SongRequestController],
   providers: [
+    ChatCommandAdminGuard,
     SongRequestRepository,
     SongRequestService,
     SongRequestHandler,

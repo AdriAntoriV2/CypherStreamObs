@@ -198,7 +198,7 @@ export class TwitchService implements OnModuleInit {
     );
   }
 
-  
+
   private async refreshChatEmotes(
     accountId: string,
     broadcasterId: string,
@@ -273,8 +273,7 @@ export class TwitchService implements OnModuleInit {
         } while (cursor);
       } catch (error) {
         this.logger.warn(
-          `Twitch emote lookup failed: ${
-            error instanceof Error ? error.message : String(error)
+          `Twitch emote lookup failed: ${error instanceof Error ? error.message : String(error)
           }`,
         );
       }
@@ -296,8 +295,8 @@ export class TwitchService implements OnModuleInit {
 
     this.logger.log(
       `Emote API results: global=${globalEmotes.length}, channel=${channelEmotes.length}, ` +
-        `DinoDance global=${globalEmotes.some((emote) => emote.name === 'DinoDance')}, ` +
-        `cypher151Kaitoball channel=${channelEmotes.some((emote) => emote.name === 'cypher151Kaitoball')}`,
+      `DinoDance global=${globalEmotes.some((emote) => emote.name === 'DinoDance')}, ` +
+      `cypher151Kaitoball channel=${channelEmotes.some((emote) => emote.name === 'cypher151Kaitoball')}`,
     );
 
     const emotes: Record<
@@ -336,6 +335,28 @@ export class TwitchService implements OnModuleInit {
     this.logger.log(
       `Loaded ${globalEmotes.length} global and ${channelEmotes.length} channel emotes`,
     );
+  }
+  async getAccountIdentity(twitchUserId: string) {
+    const account = await this.prisma.twitchAccount.findUnique({
+      where: { twitchUserId },
+      select: {
+        twitchUserId: true,
+        login: true,
+        displayName: true,
+      },
+    });
+
+    if (!account) {
+      throw new UnauthorizedException(
+        'The authenticated Twitch account was not found.',
+      );
+    }
+
+    return {
+      id: account.twitchUserId,
+      login: account.login,
+      displayName: account.displayName,
+    };
   }
 
 }
