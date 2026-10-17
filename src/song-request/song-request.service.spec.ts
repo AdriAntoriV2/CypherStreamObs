@@ -17,11 +17,20 @@ describe('SongRequestService', () => {
     drain: vi.fn(),
   };
 
-  const configService = {
-    getOrThrow: vi.fn(),
+  const configService = { getOrThrow: vi.fn() };
+
+  const playbackController = {
+    getModeVersion: vi.fn(),
+    isRadioEnabled: vi.fn(),
   };
 
   let service: SongRequestService;
+
+  const requester = {
+    id: 'user-1',
+    login: 'testuser',
+    displayName: 'Test User',
+  };
 
   beforeEach(() => {
     vi.resetAllMocks();
@@ -29,13 +38,19 @@ describe('SongRequestService', () => {
     configService.getOrThrow.mockReturnValue(10);
 
     repository.remove.mockResolvedValue(true);
+    repository.enqueue.mockResolvedValue(true);
+
     resolutionQueue.add.mockResolvedValue({});
     resolutionQueue.drain.mockResolvedValue(undefined);
+
+    playbackController.getModeVersion.mockReturnValue(0);
+    playbackController.isRadioEnabled.mockReturnValue(true);
 
     service = new SongRequestService(
       repository as unknown as SongRequestRepository,
       resolutionQueue as never,
       configService as never,
+      playbackController as never,
     );
   });
 
@@ -43,42 +58,44 @@ describe('SongRequestService', () => {
     await service.onModuleInit();
 
     expect(repository.clear).toHaveBeenCalledOnce();
-    expect(resolutionQueue.drain).toHaveBeenCalledOnce();
+    expect(resolutionQueue.drain).toHaveBeenCalledWith(true);
   });
 
   it('adds a request with trimmed query and requester identity', async () => {
-    repository.enqueue.mockResolvedValue(true);
-
     const request = await service.addRequest({
       query: '  test song  ',
-      requester: {
-        id: 'user-1',
-        login: 'testuser',
-        displayName: 'Test User',
-      },
+      requester,
     });
 
     expect(request.query).toBe('test song');
     expect(request.requester.login).toBe('testuser');
     expect(request.id).toBeTruthy();
     expect(request.status).toBe('resolving');
+
     expect(repository.enqueue).toHaveBeenCalledWith(request, 10);
-    expect(resolutionQueue.add).toHaveBeenCalledOnce();
+
+    expect(resolutionQueue.add).toHaveBeenCalledWith(
+      'song.resolve',
+      { requestId: request.id },
+      expect.objectContaining({
+        jobId: request.id,
+        attempts: 3,
+        removeOnComplete: true,
+        removeOnFail: true,
+      }),
+    );
   });
 
   it('rejects an empty query', async () => {
     await expect(
       service.addRequest({
         query: '   ',
-        requester: {
-          id: 'user-1',
-          login: 'testuser',
-          displayName: 'Test User',
-        },
+        requester,
       }),
     ).rejects.toThrow('A YouTube URL or search query is required');
 
     expect(repository.enqueue).not.toHaveBeenCalled();
+    expect(resolutionQueue.add).not.toHaveBeenCalled();
   });
 
   it('rejects requests when the queue is full', async () => {
@@ -87,11 +104,7 @@ describe('SongRequestService', () => {
     await expect(
       service.addRequest({
         query: 'test song',
-        requester: {
-          id: 'user-1',
-          login: 'testuser',
-          displayName: 'Test User',
-        },
+        requester,
       }),
     ).rejects.toThrow('queue is full');
 

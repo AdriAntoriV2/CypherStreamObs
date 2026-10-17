@@ -20,9 +20,7 @@ describe('PlaybackControllerService', () => {
     onTrackEnded: vi.fn(),
   };
 
-  const configService = {
-    getOrThrow: vi.fn(),
-  };
+  const configService = { getOrThrow: vi.fn() };
 
   let controller: PlaybackControllerService;
 
@@ -50,6 +48,7 @@ describe('PlaybackControllerService', () => {
     vi.resetAllMocks();
 
     configService.getOrThrow.mockReturnValue(10);
+
     engine.onTrackEnded.mockReturnValue(vi.fn());
 
     repository.claimNextReady.mockResolvedValue(null);
@@ -71,11 +70,31 @@ describe('PlaybackControllerService', () => {
     );
   });
 
+  async function enableRadio(): Promise<void> {
+    await controller.toggleRadio();
+
+    // Keep the radio enabled but clear setup calls from the test assertions.
+    vi.clearAllMocks();
+
+    // Restore the default mock implementations after clearing call history.
+    engine.onTrackEnded.mockReturnValue(vi.fn());
+
+    repository.claimNextReady.mockResolvedValue(null);
+    repository.completeCurrent.mockResolvedValue(true);
+    repository.snapshot.mockResolvedValue({
+      current: null,
+      pending: [],
+      limit: 10,
+    });
+
+    engine.playTrack.mockResolvedValue(undefined);
+    engine.stopTrack.mockResolvedValue(undefined);
+    engine.startRadio.mockResolvedValue(undefined);
+  }
+
   it('subscribes to track-ended events', () => {
     expect(engine.onTrackEnded).toHaveBeenCalledOnce();
-    expect(engine.onTrackEnded).toHaveBeenCalledWith(
-      expect.any(Function),
-    );
+    expect(engine.onTrackEnded).toHaveBeenCalledWith(expect.any(Function));
   });
 
   it('unsubscribes from track-ended events on destruction', () => {
@@ -87,21 +106,23 @@ describe('PlaybackControllerService', () => {
   });
 
   it('plays the next ready request', async () => {
+    await enableRadio();
     repository.claimNextReady.mockResolvedValue(request);
 
     await expect(controller.startNext()).resolves.toEqual(request);
 
-    expect(engine.playTrack).toHaveBeenCalledWith(
-      request.track,
-      request.id,
-    );
+    expect(engine.playTrack).toHaveBeenCalledWith(request.track, request.id);
     expect(engine.startRadio).not.toHaveBeenCalled();
   });
 
   it('does not start radio while requests are pending', async () => {
+    await enableRadio();
+
     repository.snapshot.mockResolvedValue({
       current: null,
-      pending: [{ ...request, status: 'resolving', track: undefined }],
+      pending: [
+        { ...request, status: 'resolving', track: undefined },
+      ],
       limit: 10,
     });
 
@@ -111,12 +132,16 @@ describe('PlaybackControllerService', () => {
   });
 
   it('starts radio when the queue is empty', async () => {
+    await enableRadio();
+
     await controller.startNext();
 
     expect(engine.startRadio).toHaveBeenCalledOnce();
   });
 
   it('advances when the current track ends', async () => {
+    await enableRadio();
+
     repository.claimNextReady.mockResolvedValueOnce(null);
     repository.snapshot.mockResolvedValueOnce({
       current: null,
@@ -128,13 +153,13 @@ describe('PlaybackControllerService', () => {
       controller.handleTrackEnded('request-1'),
     ).resolves.toBe(true);
 
-    expect(repository.completeCurrent).toHaveBeenCalledWith(
-      'request-1',
-    );
+    expect(repository.completeCurrent).toHaveBeenCalledWith('request-1');
     expect(engine.startRadio).toHaveBeenCalledOnce();
   });
 
   it('ignores a stale track-ended event', async () => {
+    await enableRadio();
+
     repository.completeCurrent.mockResolvedValue(false);
 
     await expect(
@@ -146,6 +171,8 @@ describe('PlaybackControllerService', () => {
   });
 
   it('stops and completes the current request when skipping', async () => {
+    await enableRadio();
+
     repository.snapshot.mockResolvedValue({
       current: request,
       pending: [],
@@ -159,6 +186,8 @@ describe('PlaybackControllerService', () => {
   });
 
   it('does nothing when skip is called without a current request', async () => {
+    await enableRadio();
+
     await expect(controller.skip()).resolves.toBe(false);
 
     expect(engine.stopTrack).not.toHaveBeenCalled();

@@ -54,9 +54,6 @@ export const ModelName = {
   Stream: 'Stream',
   FirstRedemption: 'FirstRedemption',
   StreamEvent: 'StreamEvent',
-  AutomationRule: 'AutomationRule',
-  AutomationExecution: 'AutomationExecution',
-  AutomationActionExecution: 'AutomationActionExecution',
   TwitchAccount: 'TwitchAccount',
   ChatCommand: 'ChatCommand',
   PointPoolEvent: 'PointPoolEvent',
@@ -117,52 +114,6 @@ export const StreamEventScalarFieldEnum = {
 } as const
 
 export type StreamEventScalarFieldEnum = (typeof StreamEventScalarFieldEnum)[keyof typeof StreamEventScalarFieldEnum]
-
-
-export const AutomationRuleScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  enabled: 'enabled',
-  eventType: 'eventType',
-  conditions: 'conditions',
-  actions: 'actions',
-  priority: 'priority',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type AutomationRuleScalarFieldEnum = (typeof AutomationRuleScalarFieldEnum)[keyof typeof AutomationRuleScalarFieldEnum]
-
-
-export const AutomationExecutionScalarFieldEnum = {
-  id: 'id',
-  ruleId: 'ruleId',
-  eventId: 'eventId',
-  status: 'status',
-  attempts: 'attempts',
-  result: 'result',
-  lastError: 'lastError',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  completedAt: 'completedAt'
-} as const
-
-export type AutomationExecutionScalarFieldEnum = (typeof AutomationExecutionScalarFieldEnum)[keyof typeof AutomationExecutionScalarFieldEnum]
-
-
-export const AutomationActionExecutionScalarFieldEnum = {
-  id: 'id',
-  executionId: 'executionId',
-  actionIndex: 'actionIndex',
-  actionType: 'actionType',
-  status: 'status',
-  result: 'result',
-  error: 'error',
-  createdAt: 'createdAt',
-  completedAt: 'completedAt'
-} as const
-
-export type AutomationActionExecutionScalarFieldEnum = (typeof AutomationActionExecutionScalarFieldEnum)[keyof typeof AutomationActionExecutionScalarFieldEnum]
 
 
 export const TwitchAccountScalarFieldEnum = {
@@ -261,14 +212,6 @@ export const JsonNullValueInput = {
 } as const
 
 export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
-
-
-export const NullableJsonNullValueInput = {
-  DbNull: DbNull,
-  JsonNull: JsonNull
-} as const
-
-export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const QueryMode = {

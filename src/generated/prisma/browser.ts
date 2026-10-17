@@ -33,21 +33,6 @@ export type FirstRedemption = Prisma.FirstRedemptionModel
  */
 export type StreamEvent = Prisma.StreamEventModel
 /**
- * Model AutomationRule
- * 
- */
-export type AutomationRule = Prisma.AutomationRuleModel
-/**
- * Model AutomationExecution
- * 
- */
-export type AutomationExecution = Prisma.AutomationExecutionModel
-/**
- * Model AutomationActionExecution
- * 
- */
-export type AutomationActionExecution = Prisma.AutomationActionExecutionModel
-/**
  * Model TwitchAccount
  * 
  */

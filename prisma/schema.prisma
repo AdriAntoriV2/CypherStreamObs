@@ -49,8 +49,6 @@ model StreamEvent {
 
   stream Stream @relation(fields: [streamId], references: [id], onDelete: Cascade)
 
-  executions AutomationExecution[]
-
   @@unique([externalId])
   @@index([streamId])
   @@index([type])

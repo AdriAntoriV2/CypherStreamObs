@@ -1,63 +1,46 @@
-import { Injectable } from '@nestjs/common';
+
+import { Injectable, Logger } from '@nestjs/common';
 import { Processor, WorkerHost } from '@nestjs/bullmq';
-import { Job } from 'bullmq';
+import type { Job } from 'bullmq';
 import { PrismaService } from '../../database/prisma.service.js';
-import { AutomationQueueService } from '../automation-queue.service.js';
 import { QUEUE_NAMES } from '../queue.constants.js';
 
 @Injectable()
 @Processor(QUEUE_NAMES.events)
 export class EventsProcessor extends WorkerHost {
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly automationQueueService: AutomationQueueService,
-  ) {
+  private readonly logger = new Logger(EventsProcessor.name);
+
+  constructor(private readonly prisma: PrismaService) {
     super();
   }
 
   async process(job: Job): Promise<void> {
-    console.log(
-      `[EventsProcessor] Processing job ${job.id}:`,
-      job.name,
-      job.data,
-    );
-
     if (job.name !== 'event.received') {
+      this.logger.warn(`Ignoring unsupported event job: ${job.name}`);
       return;
     }
 
+    const eventId = job.data?.eventId;
+
+    if (typeof eventId !== 'string') {
+      throw new Error('Event job is missing a valid eventId');
+    }
+
     const event = await this.prisma.streamEvent.findUnique({
-      where: {
-        id: job.data.eventId,
+      where: { id: eventId },
+      select: {
+        id: true,
+        type: true,
+        streamId: true,
       },
     });
 
     if (!event) {
-      throw new Error(
-        `Event ${job.data.eventId} not found`,
-      );
+      throw new Error(`Event ${eventId} not found`);
     }
 
-    const rules =
-      await this.prisma.automationRule.findMany({
-        where: {
-          eventType: event.type,
-          enabled: true,
-        },
-        orderBy: {
-          priority: 'desc',
-        },
-      });
-
-    for (const rule of rules) {
-      await this.automationQueueService.enqueueRuleExecution(
-        event.id,
-        rule.id,
-      );
-    }
-
-    console.log(
-      `[EventsProcessor] Enqueued ${rules.length} automation job(s) for event ${event.id}`,
+    this.logger.debug(
+      `Processed stream event ${event.id} (${event.type}) for stream ${event.streamId}`,
     );
   }
 }
