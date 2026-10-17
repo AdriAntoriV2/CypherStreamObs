@@ -12,7 +12,6 @@ import { HealthModule } from './health/health.module.js';
 import { QueueModule } from './queue/queue.module.js';
 import { EventsModule } from './events/events.module.js';
 import { StreamsModule } from './streams/streams.module.js';
-import { AutomationModule } from './automation/automation.module.js';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware.js';
 import { TwitchModule } from './twitch/twitch.module.js';
 import { CommandsModule } from './commands/commands.module.js';
@@ -30,7 +29,6 @@ import { ChatOverlayModule } from './chat-overlay/chat-overlay.module.js';
     HealthModule,
     EventsModule,
     StreamsModule,
-    AutomationModule,
     TwitchModule,
     CommandsModule,
     SongRequestModule,

@@ -22,11 +22,6 @@ import configuration from './configuration.js';
           .uri({ scheme: ['redis', 'rediss'] })
           .default('redis://localhost:6379'),
 
-        //MIXITUP_HOST: Joi.string().required(),
-
-        //MIXITUP_PORT: Joi.number().port().default(8911),
-        MIXITUP_URL: Joi.string().uri().required(),
-
         TWITCH_CLIENT_ID: Joi.string().required(),
         TWITCH_CLIENT_SECRET: Joi.string().required(),
         TWITCH_REDIRECT_URI: Joi.string().uri().required(),

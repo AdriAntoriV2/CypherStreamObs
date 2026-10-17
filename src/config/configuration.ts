@@ -13,12 +13,6 @@ export default () => ({
     url: process.env.REDIS_URL ?? 'redis://localhost:6379',
   },
 
-  // mixitup: {
-  //   url:
-  //     process.env.MIXITUP_URL ??
-  //     'http://127.0.0.1:8911',
-  // },
-
   session: {
     secret: process.env.SESSION_SECRET,
     cookieSecure: process.env.NODE_ENV === 'production',
