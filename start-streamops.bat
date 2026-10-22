@@ -4,6 +4,7 @@ setlocal
 set "PROJECT_DIR=D:\Work\Portfolio\streamops"
 set "OBS_EXE=C:\Program Files\obs-studio\bin\64bit\obs64.exe"
 set "VEADOTUBE_EXE=D:\Stream\veadotube-mini-win-x64\veadotube-mini.exe"
+set "SONG_REQUEST_EXE=D:\Work\Portfolio\CypherTwitchSongRequest\release\CypherTwitchSongRequest.exe"
 set "PORT=6769"
 set "LOG=%PROJECT_DIR%\start-streamops.log"
 
@@ -36,6 +37,7 @@ if exist "%VEADOTUBE_EXE%" (
 )
 
 echo Starting StreamOps...
+echo [%date% %time%] Starting StreamOps >> "%LOG%"
 start "StreamOps" /D "%PROJECT_DIR%" cmd /k "npm run start:dev"
 
 echo Waiting for StreamOps on port %PORT%...
@@ -55,6 +57,34 @@ goto :fail
 echo StreamOps port is responding.
 echo [%date% %time%] StreamOps port ready >> "%LOG%"
 
+echo.
+echo Starting standalone !sr module...
+
+if not exist "%SONG_REQUEST_EXE%" (
+    echo WARNING: Standalone !sr module was not found:
+    echo %SONG_REQUEST_EXE%
+    echo [%date% %time%] WARNING: !sr executable missing >> "%LOG%"
+) else (
+    for %%I in ("%SONG_REQUEST_EXE%") do set "SONG_REQUEST_DIR=%%~dpI"
+
+    echo !sr executable: %SONG_REQUEST_EXE%
+    echo !sr directory: %SONG_REQUEST_DIR%
+    echo [%date% %time%] Starting standalone !sr module >> "%LOG%"
+
+    powershell -NoProfile -Command "try { Start-Process -FilePath $env:SONG_REQUEST_EXE -WorkingDirectory $env:SONG_REQUEST_DIR -ErrorAction Stop; Write-Output '!sr launch request submitted.' } catch { Write-Output ($_ | Out-String); exit 1 }" >> "%LOG%" 2>&1
+
+    if errorlevel 1 (
+        echo WARNING: Standalone !sr module failed to launch.
+        echo Check the log:
+        echo %LOG%
+        echo [%date% %time%] WARNING: !sr launch failed >> "%LOG%"
+    ) else (
+        echo Standalone !sr module started.
+        echo [%date% %time%] Standalone !sr module started >> "%LOG%"
+    )
+)
+
+echo.
 if not exist "%OBS_EXE%" (
     echo ERROR: OBS executable not found:
     echo %OBS_EXE%
@@ -80,7 +110,9 @@ if errorlevel 1 (
 
 echo OBS launch request submitted.
 echo.
-echo Launcher finished. StreamOps remains in its own terminal.
+echo Launcher finished.
+echo StreamOps remains in its own terminal.
+echo Standalone !sr module is running independently.
 goto :end
 
 :fail

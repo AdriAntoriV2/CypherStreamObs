@@ -38,6 +38,7 @@ async function bootstrap() {
 
     app.setGlobalPrefix('api');
 
+    /*
     // Log HTTP requests and responses without logging credentials or cookies.
     app.use((req: { method: any; originalUrl: any; }, res: { on: (arg0: string, arg1: { (): void; (): void; }) => void; statusCode: any; }, next: () => void) => {
       const requestLogger = new Logger('HTTP');
@@ -73,6 +74,7 @@ async function bootstrap() {
 
       next();
     });
+    */
 
     logger.log('Configuring Swagger...');
     const swaggerConfig = new DocumentBuilder()

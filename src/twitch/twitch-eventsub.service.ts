@@ -335,9 +335,9 @@ export class TwitchEventSubService
     const subscriptionType =
       subscription.type;
 
-    this.logger.debug(
-      `EventSub notification received: ${String(subscriptionType)}`,
-    );
+    // this.logger.debug(
+    //   `EventSub notification received: ${String(subscriptionType)}`,
+    // );
 
     const normalized =
       this.normalizer.normalize(
@@ -388,9 +388,9 @@ export class TwitchEventSubService
     );
 
     if (subscriptionType === 'channel.chat.message') {
-      this.logger.log(
-        `Chat message received; ingestion result: ${ingested ? 'accepted' : 'ignored'}`,
-      );
+      // this.logger.log(
+      //   `Chat message received; ingestion result: ${ingested ? 'accepted' : 'ignored'}`,
+      // );
 
       if (ingested) {
         const reply =
@@ -399,9 +399,9 @@ export class TwitchEventSubService
             ingested.streamId,
           );
 
-        this.logger.log(
-          `Chat command dispatch completed; reply: ${reply ? 'generated' : 'none'}`,
-        );
+        // this.logger.log(
+        //   `Chat command dispatch completed; reply: ${reply ? 'generated' : 'none'}`,
+        // );
 
         if (reply && this.accessToken && this.broadcasterUserId) {
           await this.twitchApi.sendChatMessage(
