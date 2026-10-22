@@ -2,7 +2,7 @@ export default () => ({
   nodeEnv: process.env.NODE_ENV ?? 'development',
 
   server: {
-    port: Number(process.env.PORT ?? 42069),
+    port: Number(process.env.PORT ?? 6769),
   },
 
   database: {

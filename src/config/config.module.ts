@@ -14,7 +14,7 @@ import configuration from './configuration.js';
           .valid('development', 'test', 'production')
           .default('development'),
 
-        PORT: Joi.number().port().default(42069),
+        PORT: Joi.number().port().default(6769),
 
         DATABASE_URL: Joi.string().uri().required(),
 
