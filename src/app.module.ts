@@ -15,7 +15,6 @@ import { StreamsModule } from './streams/streams.module.js';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware.js';
 import { TwitchModule } from './twitch/twitch.module.js';
 import { CommandsModule } from './commands/commands.module.js';
-import { SongRequestModule } from './song-request/song-request.module.js';
 import { ChatCommandsModule } from './chat-commands/chat-commands.module.js';
 import { PointPoolModule } from './point-pool/point-pool.module.js';
 import { FirstOverlayModule } from './first-overlay/first-overlay.module.js';
@@ -31,7 +30,6 @@ import { ChatOverlayModule } from './chat-overlay/chat-overlay.module.js';
     StreamsModule,
     TwitchModule,
     CommandsModule,
-    SongRequestModule,
     ChatCommandsModule,
     PointPoolModule,
     FirstOverlayModule,
