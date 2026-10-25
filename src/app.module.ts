@@ -9,7 +9,9 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { AppConfigModule } from './config/config.module.js';
 import { DatabaseModule } from './database/database.module.js';
 import { HealthModule } from './health/health.module.js';
+/*
 import { QueueModule } from './queue/queue.module.js';
+*/
 import { EventsModule } from './events/events.module.js';
 import { StreamsModule } from './streams/streams.module.js';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware.js';
@@ -24,7 +26,6 @@ import { ChatOverlayModule } from './chat-overlay/chat-overlay.module.js';
   imports: [
     AppConfigModule,
     DatabaseModule,
-    QueueModule,
     HealthModule,
     EventsModule,
     StreamsModule,

@@ -15,7 +15,7 @@ export const ApiCreateEvent = () =>
         ApiOperation({
             summary: 'Create a stream event',
             description:
-                'Persists a stream event and queues it for downstream processing. ' +
+                'Persists a stream event. Downstream queue processing is temporarily paused while Redis is disabled. ' +
                 'If an event with the same externalId already exists, returns that event.',
         }),
         ApiCreatedResponse({

@@ -1,11 +1,11 @@
 import {
     Injectable,
     Logger,
-    OnModuleDestroy,
-    OnModuleInit,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+/*
 import { createClient } from 'redis';
+*/
 
 export interface ChatOverlayFragment {
     type: 'text' | 'emote';
@@ -29,17 +29,21 @@ interface CachedTwitchEmote {
 }
 
 @Injectable()
-export class ChatOverlayService
-    implements OnModuleInit, OnModuleDestroy {
+export class ChatOverlayService {
     private readonly logger = new Logger(ChatOverlayService.name);
+    /*
     private readonly redis;
 
     private readonly listKey = 'streamops:chat-overlay:messages';
     private readonly emoteMapKey = 'streamops:chat-overlay:emotes';
+    */
 
     private readonly emoteMap = new Map<string, CachedTwitchEmote>();
+    private messages: ChatOverlayMessage[] = [];
+    private messagesExpireAt = 0;
 
     constructor(private readonly config: ConfigService) {
+        /*
         this.redis = createClient({
             url: this.config.getOrThrow<string>('redis.url'),
         });
@@ -47,8 +51,10 @@ export class ChatOverlayService
         this.redis.on('error', (error) => {
             this.logger.error('Chat overlay Redis error', error);
         });
+        */
     }
 
+    /*
     async onModuleInit(): Promise<void> {
         await this.redis.connect();
 
@@ -86,6 +92,7 @@ export class ChatOverlayService
             await this.redis.close();
         }
     }
+    */
 
     async setEmoteMap(
         emotes: Record<string, CachedTwitchEmote>,
@@ -96,10 +103,12 @@ export class ChatOverlayService
             this.emoteMap.set(name, emote);
         }
 
+        /*
         await this.redis.set(
             this.emoteMapKey,
             JSON.stringify(emotes),
         );
+        */
 
         this.logger.log(
             `Cached ${this.emoteMap.size} Twitch channel emotes`,
@@ -278,25 +287,29 @@ export class ChatOverlayService
                 'chatOverlay.messageTtlSeconds',
             );
 
-        try {
-            await this.redis
-                .multi()
-                .lPush(this.listKey, JSON.stringify(entry))
-                .lTrim(this.listKey, 0, maxMessages - 1)
-                .expire(this.listKey, ttlSeconds)
-                .exec();
-        } catch (error) {
-            // Chat display must not break Twitch event ingestion or commands.
-            this.logger.error(
-                'Failed to store chat overlay message',
-                error instanceof Error ? error.stack : String(error),
-            );
+        const now = Date.now();
+
+        if (now >= this.messagesExpireAt) {
+            this.messages = [];
         }
+
+        this.messages.unshift(entry);
+        this.messages = this.messages.slice(0, maxMessages);
+        this.messagesExpireAt = now + ttlSeconds * 1_000;
     }
 
     async getRecentMessages(): Promise<ChatOverlayMessage[]> {
+        /*
         const entries = await this.redis.lRange(this.listKey, 0, -1);
 
         return entries.map((entry) => JSON.parse(entry) as ChatOverlayMessage);
+        */
+
+        if (Date.now() >= this.messagesExpireAt) {
+            this.messages = [];
+            return [];
+        }
+
+        return [...this.messages];
     }
-} 
+}

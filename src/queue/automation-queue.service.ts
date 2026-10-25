@@ -1,10 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  ServiceUnavailableException,
+} from '@nestjs/common';
+/*
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import { QUEUE_NAMES } from './queue.constants.js';
+*/
 
 @Injectable()
 export class AutomationQueueService {
+  /*
   constructor(
     @InjectQueue(QUEUE_NAMES.automation)
     private readonly automationQueue: Queue,
@@ -27,6 +33,16 @@ export class AutomationQueueService {
           delay: 1_000,
         },
       },
+    );
+  }
+  */
+
+  async enqueueRuleExecution(
+    _eventId: string,
+    _ruleId: string,
+  ): Promise<never> {
+    throw new ServiceUnavailableException(
+      'Automation queue processing is temporarily disabled.',
     );
   }
 }

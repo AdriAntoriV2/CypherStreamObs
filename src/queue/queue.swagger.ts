@@ -16,42 +16,16 @@ export const ApiTestQueue = () =>
         ApiOperation({
             summary: 'Queue a test event',
             description:
-                'Adds a test event to the BullMQ events queue. A successful response confirms that the job was queued, not that processing has completed.',
+                'Queue processing is temporarily disabled. Requests are rejected until the queue is re-enabled.',
         }),
         ApiResponse({
-            status: 201,
-            description: 'The test event was queued successfully.',
-            schema: {
-                type: 'object',
-                properties: {
-                    queued: {
-                        type: 'boolean',
-                        example: true,
-                    },
-                    jobId: {
-                        type: 'string',
-                        nullable: true,
-                        example: '42',
-                        description:
-                            'BullMQ job ID. May be null if the queue does not return an ID.',
-                    },
-                },
-                required: ['queued', 'jobId'],
-                example: {
-                    queued: true,
-                    jobId: '42',
-                },
-            },
-        }),
-        ApiResponse({
-            status: 500,
-            description:
-                'The job could not be added to the queue, for example due to a Redis connection failure.',
+            status: 503,
+            description: 'Queue processing is temporarily unavailable.',
             schema: {
                 type: 'object',
                 example: {
-                    statusCode: 500,
-                    message: 'Internal server error',
+                    statusCode: 503,
+                    message: 'Queue processing is temporarily disabled.',
                 },
             },
         }),

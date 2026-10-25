@@ -9,9 +9,11 @@ export default () => ({
     url: process.env.DATABASE_URL,
   },
 
+  /*
   redis: {
     url: process.env.REDIS_URL ?? 'redis://localhost:6379',
   },
+  */
 
   session: {
     secret: process.env.SESSION_SECRET,

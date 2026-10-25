@@ -36,7 +36,7 @@ export const ApiGetRecentChatMessages = () =>
         ApiOperation({
             summary: 'Get recent chat messages',
             description:
-                'Returns cached Twitch chat messages, newest first. Each message includes its author, text, timestamp, optional username color, and text/emote fragments for rendering in the OBS browser overlay. The number of messages and their retention period are configurable.',
+                'Returns in-memory Twitch chat messages, newest first. Messages and emote mappings are process-local and are lost when the server restarts. Each message includes its author, text, timestamp, optional username color, and text/emote fragments for rendering in the OBS browser overlay. The number of messages and their retention period are configurable.',
         }),
         ApiResponse({
             status: 200,
@@ -69,19 +69,6 @@ export const ApiGetRecentChatMessages = () =>
                             summary: 'No cached messages',
                             value: [],
                         },
-                    },
-                },
-            },
-        }),
-        ApiResponse({
-            status: 500,
-            description:
-                'The chat message cache could not be read, for example due to a Redis connection failure or invalid cached JSON.',
-            content: {
-                'application/json': {
-                    example: {
-                        statusCode: 500,
-                        message: 'Internal server error',
                     },
                 },
             },

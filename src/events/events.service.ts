@@ -4,14 +4,18 @@ import {
 } from '@nestjs/common';
 import { Prisma } from '../generated/prisma/client.js';
 import { PrismaService } from '../database/prisma.service.js';
+/*
 import { QueueService } from '../queue/queue.service.js';
+*/
 import { CreateEventDto } from './dto/create-event.dto.js';
 
 @Injectable()
 export class EventsService {
   constructor(
     private readonly prisma: PrismaService,
+    /*
     private readonly queueService: QueueService,
+    */
   ) {}
 
   async create(dto: CreateEventDto) {
@@ -37,12 +41,14 @@ export class EventsService {
         },
       });
 
+      /*
       await this.queueService.addEvent({
         eventId: event.id,
         streamId: event.streamId,
         type: event.type,
         payload: event.payload,
       });
+      */
 
       return event;
     } catch (error) {

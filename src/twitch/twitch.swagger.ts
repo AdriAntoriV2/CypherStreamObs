@@ -14,7 +14,7 @@ export const ApiTwitchOAuth = () =>
         ApiOperation({
             summary: 'Start Twitch OAuth authorization',
             description:
-                'Creates an OAuth state value, saves it in the current session, and redirects the browser to Twitch for authorization. After authorization, Twitch redirects the browser to the callback endpoint.',
+                'Creates an OAuth state value, saves it in the current in-memory session, and redirects the browser to Twitch for authorization. Session and OAuth state are process-local and are lost on server restart.',
         }),
         ApiResponse({
             status: 302,
@@ -50,7 +50,7 @@ export const ApiTwitchOAuthCallback = () =>
         ApiOperation({
             summary: 'Complete Twitch OAuth authorization',
             description:
-                'Validates the OAuth state against the initiating session, exchanges the authorization code, saves the connected Twitch account, starts EventSub, regenerates the session to prevent session fixation, and saves the authenticated Twitch user ID in the new session.',
+                'Validates the process-local OAuth state against the initiating session, exchanges the authorization code, saves the connected Twitch account, starts EventSub, regenerates the session to prevent session fixation, and saves the authenticated Twitch user ID in the new session.',
         }),
         ApiQuery({
             name: 'code',

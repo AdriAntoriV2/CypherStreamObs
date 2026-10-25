@@ -10,8 +10,10 @@ import {
 } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import session from 'express-session';
+/*
 import { RedisStore } from 'connect-redis';
 import { createClient } from 'redis';
+*/
 
 import { AppModule } from './app.module.js';
 import { PrismaExceptionFilter } from './common/filters/prisma-exception.filter.js';
@@ -20,7 +22,9 @@ async function bootstrap() {
   const logger = new Logger('Bootstrap');
   const startedAt = Date.now();
 
+  /*
   let sessionRedis: ReturnType<typeof createClient> | undefined;
+  */
 
   try {
     logger.log('Starting StreamOps...');
@@ -102,6 +106,7 @@ async function bootstrap() {
 
     SwaggerModule.setup('docs', app, swaggerDocument);
 
+    /*
     logger.log('Connecting to session Redis...');
     sessionRedis = createClient({
       url: config.getOrThrow<string>('redis.url'),
@@ -116,12 +121,14 @@ async function bootstrap() {
 
     await sessionRedis.connect();
     logger.log('Session Redis connected.');
+    */
 
-    logger.log('Configuring session middleware...');
+    logger.log('Configuring in-memory session middleware...');
     app.use(
       session({
         name: 'streamops.sid',
-        store: new RedisStore({ client: sessionRedis }),
+        // Redis-backed session store is temporarily disabled; express-session uses MemoryStore.
+        // store: new RedisStore({ client: sessionRedis }),
         secret: config.getOrThrow<string>('session.secret'),
         resave: false,
         saveUninitialized: false,
@@ -182,6 +189,7 @@ async function bootstrap() {
 
     logger.error(`StreamOps failed to start: ${message}`, stack);
 
+    /*
     if (sessionRedis?.isOpen) {
       try {
         await sessionRedis.quit();
@@ -195,9 +203,10 @@ async function bootstrap() {
         );
       }
     }
+    */
 
     process.exitCode = 1;
   }
 }
 
-bootstrap();
+void bootstrap();

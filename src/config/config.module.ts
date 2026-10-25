@@ -18,9 +18,11 @@ import configuration from './configuration.js';
 
         DATABASE_URL: Joi.string().uri().required(),
 
+        /*
         REDIS_URL: Joi.string()
           .uri({ scheme: ['redis', 'rediss'] })
           .default('redis://localhost:6379'),
+        */
 
         TWITCH_CLIENT_ID: Joi.string().required(),
         TWITCH_CLIENT_SECRET: Joi.string().required(),

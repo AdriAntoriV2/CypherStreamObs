@@ -1,11 +1,14 @@
 import { Module } from '@nestjs/common';
+/*
 import { BullModule } from '@nestjs/bullmq';
 import { Redis } from 'ioredis';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { QUEUE_NAMES } from './queue.constants.js';
+*/
 import { QueueService } from './queue.service.js';
 import { AutomationQueueService } from './automation-queue.service.js';
 
+/*
 export const REDIS_CLIENT = Symbol('REDIS_CLIENT');
 
 function getBullRedisConnection(redisUrl: string) {
@@ -77,5 +80,10 @@ function getBullRedisConnection(redisUrl: string) {
     REDIS_CLIENT,
     BullModule,
   ],
+})
+*/
+@Module({
+  providers: [QueueService, AutomationQueueService],
+  exports: [QueueService, AutomationQueueService],
 })
 export class QueueModule {}
